@@ -40,7 +40,7 @@ function initializeCharts(colors) {
         maintainAspectRatio: false,
         layout: {
             padding: {
-                left: 0,
+                left: 20,
                 right: 120,  // Add padding for legend
                 top: 20,
                 bottom: 20
@@ -91,7 +91,15 @@ function initializeCharts(colors) {
                 },
                 textStrokeColor: 'rgba(0,0,0,0.5)',
                 textStrokeWidth: 2
-            },
+            }
+        }
+    };
+
+    const pieOptions = {
+        ...commonOptions,
+        radius: '75%',  // Control pie chart size
+        plugins: {
+            ...commonOptions.plugins,
             tooltip: {
                 enabled: true,
                 callbacks: {
@@ -132,10 +140,7 @@ function initializeCharts(colors) {
                     borderColor: '#ffffff'
                 }]
             },
-            options: {
-                ...commonOptions,
-                radius: '75%'  // Control pie chart size
-            }
+            options: pieOptions
         });
 
         // Expense Chart
@@ -155,10 +160,7 @@ function initializeCharts(colors) {
                     borderColor: '#ffffff'
                 }]
             },
-            options: {
-                ...commonOptions,
-                radius: '75%'
-            }
+            options: pieOptions
         });
 
         // Asset Chart
@@ -188,10 +190,7 @@ function initializeCharts(colors) {
                     borderColor: '#ffffff'
                 }]
             },
-            options: {
-                ...commonOptions,
-                radius: '75%'
-            }
+            options: pieOptions
         });
 
         // Liability Chart
@@ -211,10 +210,7 @@ function initializeCharts(colors) {
                     borderColor: '#ffffff'
                 }]
             },
-            options: {
-                ...commonOptions,
-                radius: '75%'
-            }
+            options: pieOptions
         });
         
         console.log('All charts initialized successfully');
@@ -398,11 +394,8 @@ function updateCharts(networthValues, expenseValues) {
 
         // Update Income Chart
         const incomeData = calculateYieldIncome(networthValues);
+        console.log('Raw income data:', incomeData);
         if (window.incomeChart) {
-            const incomeValues = Object.values(incomeData);
-            const totalIncome = incomeValues.reduce((a, b) => a + b, 0);
-            
-            // Only show non-zero values
             const filteredData = {
                 labels: [],
                 data: []
@@ -422,18 +415,18 @@ function updateCharts(networthValues, expenseValues) {
             window.incomeChart.data.labels = filteredData.labels;
             window.incomeChart.data.datasets[0].data = filteredData.data;
             window.incomeChart.data.datasets[0].backgroundColor = colors.blue.slice(0, filteredData.data.length);
-            window.incomeChart.options.plugins.legend.labels.color = '#1a2942';
-            window.incomeChart.options.plugins.legend.labels.font.weight = 'bold';
-            window.incomeChart.update();
-            console.log('Income chart updated with data:', filteredData);
+            window.incomeChart.update('none'); // Disable animation for immediate update
+            console.log('Income chart updated with filtered data:', filteredData);
         }
 
         // Update Expense Chart
         const monthlyExpenses = calculateMonthlyExpenses(expenseValues);
         const bigExpenses = calculateBigExpenses(expenseValues);
-        if (window.expenseChart) {
-            updateChartData(window.expenseChart, [monthlyExpenses, bigExpenses]);
-            console.log('Expense chart updated with data:', [monthlyExpenses, bigExpenses]);
+        console.log('Expense data:', { monthlyExpenses, bigExpenses });
+        if (window.expenseChart && (monthlyExpenses > 0 || bigExpenses > 0)) {
+            window.expenseChart.data.datasets[0].data = [monthlyExpenses, bigExpenses];
+            window.expenseChart.update('none');
+            console.log('Expense chart updated');
         }
 
         // Update Asset Chart
@@ -448,9 +441,24 @@ function updateCharts(networthValues, expenseValues) {
             parseFloat(networthValues.gold) || 0,
             parseFloat(networthValues.cash) || 0
         ];
-        if (window.assetChart) {
-            updateChartData(window.assetChart, assetData);
-            console.log('Asset chart updated with data:', assetData);
+        console.log('Asset data:', assetData);
+        if (window.assetChart && assetData.some(value => value > 0)) {
+            // Filter out zero values
+            const filteredAssets = {
+                labels: [],
+                data: []
+            };
+            assetData.forEach((value, index) => {
+                if (value > 0) {
+                    filteredAssets.labels.push(window.assetChart.data.labels[index]);
+                    filteredAssets.data.push(value);
+                }
+            });
+            window.assetChart.data.labels = filteredAssets.labels;
+            window.assetChart.data.datasets[0].data = filteredAssets.data;
+            window.assetChart.data.datasets[0].backgroundColor = colors.green.slice(0, filteredAssets.data.length);
+            window.assetChart.update('none');
+            console.log('Asset chart updated with filtered data:', filteredAssets);
         }
 
         // Update Liability Chart
@@ -461,12 +469,27 @@ function updateCharts(networthValues, expenseValues) {
             parseFloat(networthValues.educationLoan) || 0,
             calculateCustomLiabilities(networthValues.liabilities || [])
         ];
-        if (window.liabilityChart) {
-            updateChartData(window.liabilityChart, liabilityData);
-            console.log('Liability chart updated with data:', liabilityData);
+        console.log('Liability data:', liabilityData);
+        if (window.liabilityChart && liabilityData.some(value => value > 0)) {
+            // Filter out zero values
+            const filteredLiabilities = {
+                labels: [],
+                data: []
+            };
+            liabilityData.forEach((value, index) => {
+                if (value > 0) {
+                    filteredLiabilities.labels.push(window.liabilityChart.data.labels[index]);
+                    filteredLiabilities.data.push(value);
+                }
+            });
+            window.liabilityChart.data.labels = filteredLiabilities.labels;
+            window.liabilityChart.data.datasets[0].data = filteredLiabilities.data;
+            window.liabilityChart.data.datasets[0].backgroundColor = colors.purple.slice(0, filteredLiabilities.data.length);
+            window.liabilityChart.update('none');
+            console.log('Liability chart updated with filtered data:', filteredLiabilities);
         }
 
-        // Update summary values
+        // Update summary values with the filtered data
         const totalAssets = calculateTotalAssets(networthValues);
         const totalLiabilities = calculateTotalLiabilities(networthValues);
         const netWorth = totalAssets - totalLiabilities;
