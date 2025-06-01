@@ -78,6 +78,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const scoreElement = document.getElementById('score');
         const yearsLabel = document.getElementById('yearsLabel');
         const progressBar = document.getElementById('progressBar');
+        const initialNetWorthElement = document.getElementById('initialNetWorth');
+        const annualExpenseElement = document.getElementById('annualExpense');
+        const returnRateValue = document.getElementById('returnRateValue');
+        const inflationRateValue = document.getElementById('inflationRateValue');
         
         if (scoreElement) scoreElement.textContent = years.toFixed(1);
         if (yearsLabel) yearsLabel.textContent = `${years === 1 ? 'year' : 'years'} without active income`;
@@ -87,11 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (progressBar) progressBar.style.width = `${progressPercentage}%`;
         
         // Update summary values
-        const initialNetWorthElement = document.getElementById('initialNetWorth');
-        const annualExpenseElement = document.getElementById('annualExpense');
-        const returnRateValue = document.getElementById('returnRateValue');
-        const inflationRateValue = document.getElementById('inflationRateValue');
-        
         if (initialNetWorthElement) initialNetWorthElement.textContent = formatCurrency(netWorth);
         if (annualExpenseElement) annualExpenseElement.textContent = formatCurrency(annualExpense);
         if (returnRateValue) returnRateValue.textContent = `${returnRate}%`;
@@ -131,6 +130,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Dispatch events to notify other pages
         window.dispatchEvent(new Event('storage'));
         window.dispatchEvent(new CustomEvent('localStorageUpdated'));
+        
+        // Log the values for debugging
+        console.log('FF Score Calculation:', {
+            netWorth,
+            monthlyExpense,
+            annualExpense,
+            returnRate,
+            inflationRate,
+            realReturnRate,
+            years
+        });
     }
 });
 

@@ -219,6 +219,14 @@ function calculateNetWorth() {
     // Dispatch events to notify other pages
     window.dispatchEvent(new Event('storage'));
     window.dispatchEvent(new CustomEvent('localStorageUpdated'));
+    
+    // Log the values for debugging
+    console.log('Net Worth Calculation:', {
+        totalAssets,
+        totalLiabilities,
+        netWorth,
+        incomeData
+    });
 }
 
 function calculateRentalIncome() {
