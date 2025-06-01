@@ -207,24 +207,30 @@ body {
 /* Section Header */
 .section-header {
     text-align: center;
-    margin-bottom: 40px;
-    padding: 20px;
+    margin-bottom: 2rem;
 }
 
 .section-header h2 {
-    font-size: 2.8rem;
-    margin-bottom: 15px;
-    background: linear-gradient(to right, #ffffff, #c0d6e4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    color: var(--text-dark);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 .section-header p {
+    color: var(--text-muted);
     font-size: 1.1rem;
-    max-width: 700px;
-    margin: 0 auto;
-    color: #e0e0e0;
+    margin-bottom: 1rem;
+}
+
+.section-header #downloadPDFBtn {
+    margin: 1rem auto;
+    background: var(--danger);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.section-header #downloadPDFBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
 }
 
 /* Common Card Styles */

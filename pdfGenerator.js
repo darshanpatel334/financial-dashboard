@@ -1,7 +1,10 @@
 // PDF Generation functionality
 class PDFGenerator {
     constructor() {
-        this.pdf = new jsPDF('p', 'pt', 'a4');
+        if (typeof window.jspdf === 'undefined') {
+            window.jspdf = window.jsPDF;
+        }
+        this.pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
         this.pageWidth = this.pdf.internal.pageSize.width;
         this.pageHeight = this.pdf.internal.pageSize.height;
         this.margin = 40;
@@ -269,34 +272,16 @@ class PDFGenerator {
     }
 }
 
-// Add download button to dashboard page
+// Initialize PDF functionality on dashboard and FF pages
 document.addEventListener('DOMContentLoaded', function() {
-    // Add required scripts
-    const scripts = [
-        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
-    ];
-    
-    scripts.forEach(src => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.async = true;
-        document.head.appendChild(script);
-    });
-    
-    // Add download button to dashboard
-    const dashboardSummary = document.querySelector('.result-card');
-    if (dashboardSummary) {
-        const downloadBtn = document.createElement('button');
-        downloadBtn.type = 'button';
-        downloadBtn.id = 'downloadPDFBtn';
-        downloadBtn.className = 'btn-calculate';
-        downloadBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF Report';
+    const downloadBtn = document.getElementById('downloadPDFBtn');
+    if (downloadBtn) {
         downloadBtn.style.background = '#e74c3c';
         downloadBtn.style.marginTop = '20px';
         
         downloadBtn.addEventListener('click', async () => {
             downloadBtn.disabled = true;
+            const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
             
             try {
@@ -304,10 +289,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 await generator.generateFullReport();
             } finally {
                 downloadBtn.disabled = false;
-                downloadBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF Report';
+                downloadBtn.innerHTML = originalText;
             }
         });
-        
-        dashboardSummary.appendChild(downloadBtn);
     }
 }); 
