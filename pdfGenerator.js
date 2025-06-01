@@ -294,7 +294,6 @@ class PDFGenerator {
 document.addEventListener('DOMContentLoaded', function() {
     const downloadBtn = document.getElementById('downloadPDFBtn');
     if (downloadBtn) {
-        downloadBtn.style.background = '#e74c3c';
         downloadBtn.style.marginTop = '20px';
         
         downloadBtn.addEventListener('click', async () => {

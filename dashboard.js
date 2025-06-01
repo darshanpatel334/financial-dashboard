@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Professional color palette
     const colors = {
-        blue: ['#2c3e50', '#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60'],
-        green: ['#27ae60', '#2ecc71', '#229954', '#1abc9c', '#16a085', '#2c3e50'],
-        purple: ['#8e44ad', '#9b59b6', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'],
-        orange: ['#d35400', '#e67e22', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041']
+        blue: ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60', '#2c3e50'],
+        green: ['#2ecc71', '#27ae60', '#229954', '#1abc9c', '#16a085', '#2c3e50'],
+        purple: ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'],
+        orange: ['#e67e22', '#d35400', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041']
     };
 
     try {
@@ -42,15 +42,16 @@ function initializeCharts(colors) {
             legend: {
                 position: 'right',
                 labels: {
-                    color: '#fff',
+                    color: '#1a2942',
                     font: {
-                        size: 12
+                        size: 12,
+                        weight: 'bold'
                     },
                     padding: 20
                 }
             },
             datalabels: {
-                color: '#fff',
+                color: '#ffffff',
                 font: {
                     weight: 'bold',
                     size: 12
@@ -59,7 +60,9 @@ function initializeCharts(colors) {
                     const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                     return percentage > 5 ? `${percentage}%` : '';
-                }
+                },
+                textStrokeColor: 'rgba(0,0,0,0.5)',
+                textStrokeWidth: 2
             },
             tooltip: {
                 enabled: true,
