@@ -1,4 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Add yield instruction tooltips
+    const yieldInputs = document.querySelectorAll('input[id$="Yield"]');
+    yieldInputs.forEach(input => {
+        input.title = "Enter the annual income percentage (excluding appreciation) you generate from this asset";
+        // Add instruction text below yield inputs
+        const instructionDiv = document.createElement('div');
+        instructionDiv.className = 'yield-instruction';
+        instructionDiv.textContent = '% yield represents annual income excluding appreciation';
+        instructionDiv.style.fontSize = '0.8em';
+        instructionDiv.style.color = '#666';
+        input.parentNode.appendChild(instructionDiv);
+    });
+
     // Load saved values
     const savedValues = getFromLocalStorage('networthValues') || {};
     
@@ -33,17 +46,25 @@ document.addEventListener('DOMContentLoaded', function() {
         educationLoan: savedValues.educationLoan || ''
     };
     
-    // Set values to input fields
+    // Set values to input fields and update words
     Object.keys(inputs).forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.value = inputs[id];
+            if (!id.includes('Yield')) {
+                updateNumberInWords(id);
+            }
         }
     });
     
     // Add event listeners to all input fields for auto-update
     document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('input', calculateNetWorth);
+        input.addEventListener('input', () => {
+            if (!input.id.includes('Yield')) {
+                updateNumberInWords(input.id);
+            }
+            calculateNetWorth();
+        });
     });
     
     // Add event listeners for buttons
@@ -114,62 +135,21 @@ function calculateNetWorth() {
     document.getElementById('totalLiabilities').textContent = formatCurrency(totalLiabilities);
     document.getElementById('netWorth').textContent = formatCurrency(netWorth);
     
+    // Update words display for totals
+    document.getElementById('totalAssetsWords').textContent = `₹${numberToWords(totalAssets)}`;
+    document.getElementById('totalLiabilitiesWords').textContent = `₹${numberToWords(totalLiabilities)}`;
+    document.getElementById('netWorthWords').textContent = `₹${numberToWords(netWorth)}`;
+    
     // Calculate category totals
     calculateCategoryTotals();
     
     // Calculate and update income data
-    const incomeData = {
-        annual: {
-            rental: calculateRentalIncome(),
-            dividend: calculateDividendIncome(),
-            interest: calculateInterestIncome()
-        }
-    };
-    
-    // Convert annual to monthly
-    incomeData.monthly = {
-        rental: Math.round(incomeData.annual.rental / 12),
-        dividend: Math.round(incomeData.annual.dividend / 12),
-        interest: Math.round(incomeData.annual.interest / 12)
-    };
-    
-    // Calculate totals
-    incomeData.totals = {
-        annual: Object.values(incomeData.annual).reduce((sum, val) => sum + val, 0),
-        monthly: Object.values(incomeData.monthly).reduce((sum, val) => sum + val, 0)
-    };
-    
-    // Add detailed breakdown for income page
-    incomeData.breakdown = {
-        rental: {
-            total: incomeData.annual.rental,
-            sources: {
-                buildings: (parseFloat(document.getElementById('buildings').value || 0) * parseFloat(document.getElementById('buildingsYield').value || 0) / 100),
-                plots: (parseFloat(document.getElementById('plots').value || 0) * parseFloat(document.getElementById('plotsYield').value || 0) / 100),
-                land: (parseFloat(document.getElementById('land').value || 0) * parseFloat(document.getElementById('landYield').value || 0) / 100)
-            }
-        },
-        dividend: {
-            total: incomeData.annual.dividend,
-            sources: {
-                directEquity: (parseFloat(document.getElementById('directEquity').value || 0) * parseFloat(document.getElementById('directEquityYield').value || 0) / 100),
-                equityMF: (parseFloat(document.getElementById('equityMF').value || 0) * parseFloat(document.getElementById('equityMFYield').value || 0) / 100)
-            }
-        },
-        interest: {
-            total: incomeData.annual.interest,
-            sources: {
-                debtMF: (parseFloat(document.getElementById('debtMF').value || 0) * parseFloat(document.getElementById('debtMFYield').value || 0) / 100),
-                fixedDeposits: (parseFloat(document.getElementById('fixedDeposits').value || 0) * parseFloat(document.getElementById('fixedDepositsYield').value || 0) / 100),
-                otherFixedIncome: (parseFloat(document.getElementById('otherFixedIncome').value || 0) * parseFloat(document.getElementById('otherFixedIncomeYield').value || 0) / 100)
-            }
-        }
-    };
+    const incomeData = calculateIncomeData();
     
     // Save income data
     saveToLocalStorage('incomeData', incomeData);
     
-    // Save net worth data
+    // Save net worth data with all details
     const networthData = {
         // Save all input values
         buildings: document.getElementById('buildings').value,
@@ -229,21 +209,58 @@ function calculateNetWorth() {
     });
 }
 
-function calculateRentalIncome() {
-    return (parseFloat(document.getElementById('buildings').value || 0) * parseFloat(document.getElementById('buildingsYield').value || 0) / 100) +
-           (parseFloat(document.getElementById('plots').value || 0) * parseFloat(document.getElementById('plotsYield').value || 0) / 100) +
-           (parseFloat(document.getElementById('land').value || 0) * parseFloat(document.getElementById('landYield').value || 0) / 100);
-}
-
-function calculateDividendIncome() {
-    return (parseFloat(document.getElementById('directEquity').value || 0) * parseFloat(document.getElementById('directEquityYield').value || 0) / 100) +
-           (parseFloat(document.getElementById('equityMF').value || 0) * parseFloat(document.getElementById('equityMFYield').value || 0) / 100);
-}
-
-function calculateInterestIncome() {
-    return (parseFloat(document.getElementById('debtMF').value || 0) * parseFloat(document.getElementById('debtMFYield').value || 0) / 100) +
-           (parseFloat(document.getElementById('fixedDeposits').value || 0) * parseFloat(document.getElementById('fixedDepositsYield').value || 0) / 100) +
-           (parseFloat(document.getElementById('otherFixedIncome').value || 0) * parseFloat(document.getElementById('otherFixedIncomeYield').value || 0) / 100);
+function calculateIncomeData() {
+    // Calculate rental income from real estate
+    const rentalIncome = {
+        buildings: (parseFloat(document.getElementById('buildings').value || 0) * parseFloat(document.getElementById('buildingsYield').value || 0) / 100),
+        plots: (parseFloat(document.getElementById('plots').value || 0) * parseFloat(document.getElementById('plotsYield').value || 0) / 100),
+        land: (parseFloat(document.getElementById('land').value || 0) * parseFloat(document.getElementById('landYield').value || 0) / 100)
+    };
+    
+    // Calculate dividend income
+    const dividendIncome = {
+        directEquity: (parseFloat(document.getElementById('directEquity').value || 0) * parseFloat(document.getElementById('directEquityYield').value || 0) / 100),
+        equityMF: (parseFloat(document.getElementById('equityMF').value || 0) * parseFloat(document.getElementById('equityMFYield').value || 0) / 100)
+    };
+    
+    // Calculate interest income
+    const interestIncome = {
+        debtMF: (parseFloat(document.getElementById('debtMF').value || 0) * parseFloat(document.getElementById('debtMFYield').value || 0) / 100),
+        fixedDeposits: (parseFloat(document.getElementById('fixedDeposits').value || 0) * parseFloat(document.getElementById('fixedDepositsYield').value || 0) / 100),
+        otherFixedIncome: (parseFloat(document.getElementById('otherFixedIncome').value || 0) * parseFloat(document.getElementById('otherFixedIncomeYield').value || 0) / 100)
+    };
+    
+    // Calculate totals
+    const totalRental = Object.values(rentalIncome).reduce((sum, val) => sum + val, 0);
+    const totalDividend = Object.values(dividendIncome).reduce((sum, val) => sum + val, 0);
+    const totalInterest = Object.values(interestIncome).reduce((sum, val) => sum + val, 0);
+    
+    return {
+        annual: {
+            rental: totalRental,
+            dividend: totalDividend,
+            interest: totalInterest
+        },
+        monthly: {
+            rental: Math.round(totalRental / 12),
+            dividend: Math.round(totalDividend / 12),
+            interest: Math.round(totalInterest / 12)
+        },
+        breakdown: {
+            rental: {
+                total: totalRental,
+                sources: rentalIncome
+            },
+            dividend: {
+                total: totalDividend,
+                sources: dividendIncome
+            },
+            interest: {
+                total: totalInterest,
+                sources: interestIncome
+            }
+        }
+    };
 }
 
 function calculateTotalAssets() {

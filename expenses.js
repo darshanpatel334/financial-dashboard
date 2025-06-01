@@ -1,45 +1,66 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Load saved values
-    const savedValues = getFromLocalStorage('expenseValues');
+    const savedValues = getFromLocalStorage('expenseValues') || {};
+    
+    // Set input values from saved data
+    const monthlyInputs = {
+        groceries: savedValues.groceries || '',
+        utilities: savedValues.utilities || '',
+        subscriptions: savedValues.subscriptions || '',
+        shopping: savedValues.shopping || '',
+        dining: savedValues.dining || '',
+        carEMI: savedValues.carEMI || '',
+        homeEMI: savedValues.homeEMI || ''
+    };
+    
+    const bigInputs = {
+        electronics: savedValues.electronics || '',
+        vacations: savedValues.vacations || '',
+        medical: savedValues.medical || '',
+        education: savedValues.education || '',
+        vehicle: savedValues.vehicle || ''
+    };
     
     // Initialize custom expenses
-    initCustomFields('custom-monthly', 'monthly', savedValues.monthly);
-    initCustomFields('custom-big', 'big', savedValues.big);
+    initCustomFields('customMonthlyList', 'monthly', savedValues.monthly || []);
+    initCustomFields('customBigList', 'big', savedValues.big || []);
     
-    // Set input values and update words
-    const inputs = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI', 'electronics', 'vacations'];
-    inputs.forEach(id => {
-        if (savedValues[id]) document.getElementById(id).value = savedValues[id];
-        updateNumberInWords(id);
+    // Set values to input fields and update words
+    Object.keys(monthlyInputs).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = monthlyInputs[id];
+            updateNumberInWords(id);
+        }
+    });
+    
+    Object.keys(bigInputs).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = bigInputs[id];
+            updateNumberInWords(id);
+        }
     });
     
     // Add event listeners to all input fields for auto-update
     document.querySelectorAll('input').forEach(input => {
         input.addEventListener('input', () => {
-            if (input.type === 'number') {
-                updateNumberInWords(input.id);
-            }
-            calculateTotalExpenses();
+            updateNumberInWords(input.id);
+            calculateExpenses();
         });
     });
     
-    // Calculate expenses on load
-    calculateTotalExpenses();
-    
-    // Event listeners
-    document.getElementById('addMonthlyExpenseBtn').addEventListener('click', () => {
-        addCustomField('custom-monthly', 'monthly');
+    // Add event listeners for buttons
+    document.getElementById('addMonthly').addEventListener('click', () => {
+        addCustomField('customMonthlyList', 'monthly');
     });
     
-    document.getElementById('addBigExpenseBtn').addEventListener('click', () => {
-        addCustomField('custom-big', 'big');
+    document.getElementById('addBig').addEventListener('click', () => {
+        addCustomField('customBigList', 'big');
     });
     
-    // Remove the updateFFBtn since we're using automatic updates
-    const updateFFExpensesBtn = document.getElementById('updateFFExpensesBtn');
-    if (updateFFExpensesBtn) {
-        updateFFExpensesBtn.style.display = 'none';
-    }
+    // Initial calculation
+    calculateExpenses();
 });
 
 function initCustomFields(containerId, type, savedItems = []) {
@@ -59,11 +80,11 @@ function addCustomField(containerId, type, item = { name: '', value: '' }) {
     
     const fieldHTML = `
         <div class="custom-item" id="${fieldId}">
-            <input type="text" placeholder="Expense Name" 
+            <input type="text" placeholder="${type === 'monthly' ? 'Monthly Expense Name' : 'Big Expense Name'}" 
                    value="${item.name || ''}" class="custom-name">
             <input type="number" placeholder="Amount (₹)" 
                    value="${item.value || ''}" class="custom-value">
-            <button class="remove-btn" onclick="document.getElementById('${fieldId}').remove(); calculateTotalExpenses();">
+            <button class="remove-btn" onclick="document.getElementById('${fieldId}').remove(); calculateExpenses();">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -72,22 +93,60 @@ function addCustomField(containerId, type, item = { name: '', value: '' }) {
     container.insertAdjacentHTML('beforeend', fieldHTML);
 }
 
-function calculateTotalExpenses() {
-    // Calculate monthly expenses
-    let monthlyExpenses = calculateMonthlyExpenses();
-    document.getElementById('monthlyExpensesResult').textContent = formatCurrency(monthlyExpenses);
+function calculateExpenses() {
+    // Calculate monthly recurring expenses
+    let totalMonthlyRecurring = 0;
+    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
+        totalMonthlyRecurring += parseFloat(document.getElementById(id).value) || 0;
+    });
+    
+    // Add custom monthly expenses
+    document.querySelectorAll('#customMonthlyList .custom-value').forEach(input => {
+        totalMonthlyRecurring += parseFloat(input.value) || 0;
+    });
     
     // Calculate big expenses
-    let bigExpenses = calculateBigExpenses();
-    document.getElementById('bigExpensesResult').textContent = formatCurrency(bigExpenses);
+    let totalBigExpenses = 0;
+    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
+        totalBigExpenses += parseFloat(document.getElementById(id).value) || 0;
+    });
     
-    // Calculate total monthly (including big expenses spread over 12 months)
-    let totalMonthlyExpenses = monthlyExpenses + (bigExpenses / 12);
-    document.getElementById('totalExpenses').textContent = formatCurrency(totalMonthlyExpenses);
+    // Add custom big expenses
+    document.querySelectorAll('#customBigList .custom-value').forEach(input => {
+        totalBigExpenses += parseFloat(input.value) || 0;
+    });
+    
+    // Calculate monthly equivalent of big expenses
+    const monthlyBigExpenses = totalBigExpenses / 12;
+    
+    // Calculate total monthly expenses
+    const totalMonthlyExpenses = totalMonthlyRecurring + monthlyBigExpenses;
+    
+    // Update display
+    document.getElementById('totalMonthlyRecurring').textContent = formatCurrency(totalMonthlyRecurring);
+    document.getElementById('totalBigExpenses').textContent = formatCurrency(totalBigExpenses);
+    document.getElementById('monthlyBigExpenses').textContent = formatCurrency(monthlyBigExpenses);
+    document.getElementById('totalMonthlyExpenses').textContent = formatCurrency(totalMonthlyExpenses);
+    
+    // Update words display
+    document.getElementById('totalMonthlyRecurringWords').textContent = `₹${numberToWords(totalMonthlyRecurring)}`;
+    document.getElementById('totalBigExpensesWords').textContent = `₹${numberToWords(totalBigExpenses)}`;
+    document.getElementById('monthlyBigExpensesWords').textContent = `₹${numberToWords(monthlyBigExpenses)}`;
+    document.getElementById('totalMonthlyExpensesWords').textContent = `₹${numberToWords(totalMonthlyExpenses)}`;
+    
+    // Calculate and display annual values
+    const annualRecurring = totalMonthlyRecurring * 12;
+    const annualTotal = totalMonthlyExpenses * 12;
+    
+    document.getElementById('annualRecurring').textContent = formatCurrency(annualRecurring);
+    document.getElementById('annualTotal').textContent = formatCurrency(annualTotal);
+    
+    document.getElementById('annualRecurringWords').textContent = `₹${numberToWords(annualRecurring)}`;
+    document.getElementById('annualTotalWords').textContent = `₹${numberToWords(annualTotal)}`;
     
     // Save expense data
-    const expenseValues = {
-        // Monthly expenses
+    const expenseData = {
+        // Monthly recurring expenses
         groceries: document.getElementById('groceries').value,
         utilities: document.getElementById('utilities').value,
         subscriptions: document.getElementById('subscriptions').value,
@@ -99,106 +158,46 @@ function calculateTotalExpenses() {
         // Big expenses
         electronics: document.getElementById('electronics').value,
         vacations: document.getElementById('vacations').value,
+        medical: document.getElementById('medical').value,
+        education: document.getElementById('education').value,
+        vehicle: document.getElementById('vehicle').value,
         
         // Custom expenses
-        monthly: [],
-        big: [],
+        monthly: Array.from(document.querySelectorAll('#customMonthlyList .custom-item')).map(item => ({
+            name: item.querySelector('.custom-name').value,
+            value: item.querySelector('.custom-value').value
+        })),
+        big: Array.from(document.querySelectorAll('#customBigList .custom-item')).map(item => ({
+            name: item.querySelector('.custom-name').value,
+            value: item.querySelector('.custom-value').value
+        })),
         
         // Totals
-        totalMonthly: monthlyExpenses,
-        totalBig: bigExpenses,
-        totalMonthlyWithBig: totalMonthlyExpenses,
+        totalMonthlyRecurring,
+        totalBigExpenses,
+        monthlyBigExpenses,
+        totalMonthlyExpenses,
+        annualRecurring,
+        annualTotal,
         lastUpdated: new Date().toISOString()
     };
     
-    // Save custom monthly expenses
-    document.querySelectorAll('#custom-monthly .custom-item').forEach(item => {
-        expenseValues.monthly.push({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        });
-    });
-    
-    // Save custom big expenses
-    document.querySelectorAll('#custom-big .custom-item').forEach(item => {
-        expenseValues.big.push({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        });
-    });
-    
     // Save to localStorage
-    saveToLocalStorage('expenseValues', expenseValues);
-}
-
-function calculateMonthlyExpenses() {
-    let total = 0;
+    saveToLocalStorage('expenseValues', expenseData);
     
-    // Predefined monthly expenses
-    const monthlyInputs = document.querySelectorAll('#groceries, #utilities, #subscriptions, #shopping, #dining');
-    monthlyInputs.forEach(input => {
-        total += parseFloat(input.value) || 0;
+    // Dispatch events to notify other pages
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('localStorageUpdated'));
+    
+    // Log the values for debugging
+    console.log('Expense Calculation:', {
+        totalMonthlyRecurring,
+        totalBigExpenses,
+        monthlyBigExpenses,
+        totalMonthlyExpenses,
+        annualRecurring,
+        annualTotal
     });
-    
-    // Custom monthly expenses
-    const customMonthly = document.querySelectorAll('#custom-monthly input');
-    customMonthly.forEach(input => {
-        total += parseFloat(input.value) || 0;
-    });
-    
-    return total;
-}
-
-function calculateBigExpenses() {
-    let total = 0;
-    
-    // Predefined big expenses
-    const bigInputs = document.querySelectorAll('#carEMI, #homeEMI, #electronics, #vacations');
-    bigInputs.forEach(input => {
-        total += parseFloat(input.value) || 0;
-    });
-    
-    // Custom big expenses
-    const customBig = document.querySelectorAll('#custom-big input');
-    customBig.forEach(input => {
-        total += parseFloat(input.value) || 0;
-    });
-    
-    return total;
-}
-
-function saveExpenseValues() {
-    const expenseValues = {
-        groceries: document.getElementById('groceries').value,
-        utilities: document.getElementById('utilities').value,
-        subscriptions: document.getElementById('subscriptions').value,
-        shopping: document.getElementById('shopping').value,
-        dining: document.getElementById('dining').value,
-        carEMI: document.getElementById('carEMI').value,
-        homeEMI: document.getElementById('homeEMI').value,
-        electronics: document.getElementById('electronics').value,
-        vacations: document.getElementById('vacations').value,
-        monthly: [],
-        big: []
-    };
-    
-    // Save custom monthly expenses
-    document.querySelectorAll('#custom-monthly .custom-item').forEach(item => {
-        expenseValues.monthly.push({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        });
-    });
-    
-    // Save custom big expenses
-    document.querySelectorAll('#custom-big .custom-item').forEach(item => {
-        expenseValues.big.push({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        });
-    });
-    
-    saveToLocalStorage('expenseValues', expenseValues);
 }
 
 function updateNumberInWords(inputId) {

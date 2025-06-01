@@ -47,28 +47,31 @@ document.addEventListener('DOMContentLoaded', function() {
         // Calculate annual expense
         const annualExpense = monthlyExpense * 12;
         
-        // Calculate real return rate (accounting for inflation)
-        const realReturnRate = ((1 + returnRate/100) / (1 + inflationRate/100) - 1) * 100;
-        
-        // Calculate years of freedom
+        // Initialize variables for calculation
+        let currentNetWorth = netWorth;
         let years = 0;
         
-        if (netWorth > 0 && annualExpense > 0) {
-            if (realReturnRate > 0) {
-                // If real return rate is positive, calculate using perpetual withdrawal rate
-                const withdrawalRate = (annualExpense / netWorth) * 100;
-                if (withdrawalRate <= realReturnRate) {
-                    years = 100; // Infinite/Perpetual freedom
-                } else {
-                    // Calculate years until depletion using compound interest formula
-                    const r = realReturnRate / 100;
-                    years = Math.log(1 - (netWorth * r / annualExpense)) / Math.log(1 + r);
-                    years = Math.max(0, -years); // Convert negative years to positive
-                }
-            } else {
-                // If real return rate is zero or negative, simple division
-                years = netWorth / annualExpense;
+        // Calculate year by year until net worth becomes negative
+        while (currentNetWorth > 0) {
+            // Calculate inflated expenses for this year
+            const inflatedExpense = annualExpense * Math.pow(1 + inflationRate/100, years);
+            
+            // Set aside expenses at start of year
+            if (currentNetWorth < inflatedExpense) {
+                // If we can't cover this year's expenses, break
+                break;
             }
+            
+            // Deduct expenses at start of year
+            currentNetWorth -= inflatedExpense;
+            
+            // Grow remaining net worth at return rate
+            currentNetWorth *= (1 + returnRate/100);
+            
+            years++;
+            
+            // Safety check to prevent infinite loop
+            if (years > 150) break;
         }
         
         // Round to 1 decimal place
@@ -83,36 +86,53 @@ document.addEventListener('DOMContentLoaded', function() {
         const returnRateValue = document.getElementById('returnRateValue');
         const inflationRateValue = document.getElementById('inflationRateValue');
         
-        if (scoreElement) scoreElement.textContent = years.toFixed(1);
+        if (scoreElement) {
+            scoreElement.textContent = years.toFixed(1);
+            // Update words display
+            const scoreWordsElement = document.getElementById('scoreWords');
+            if (scoreWordsElement) {
+                scoreWordsElement.textContent = `${numberToWords(years)} years`;
+            }
+        }
+        
         if (yearsLabel) yearsLabel.textContent = `${years === 1 ? 'year' : 'years'} without active income`;
         
         // Update progress bar (max 100%)
         const progressPercentage = Math.min((years / 65) * 100, 100);
         if (progressBar) progressBar.style.width = `${progressPercentage}%`;
         
-        // Update summary values
-        if (initialNetWorthElement) initialNetWorthElement.textContent = formatCurrency(netWorth);
-        if (annualExpenseElement) annualExpenseElement.textContent = formatCurrency(annualExpense);
-        if (returnRateValue) returnRateValue.textContent = `${returnRate}%`;
-        if (inflationRateValue) inflationRateValue.textContent = `${inflationRate}%`;
-        
-        // Update number in words
-        updateNumberInWords('netWorth', netWorth);
-        updateNumberInWords('monthlyExpense', monthlyExpense);
-        updateNumberInWords('returnRate', returnRate);
-        updateNumberInWords('inflationRate', inflationRate);
-        
-        // Highlight the appropriate range in the FF matrix
-        const ffMatrixRows = document.querySelectorAll('#ffMatrixBody tr');
-        ffMatrixRows.forEach(row => {
-            row.classList.remove('highlighted');
-            const minYears = parseFloat(row.dataset.min);
-            const maxYears = row.dataset.max ? parseFloat(row.dataset.max) : Infinity;
-            
-            if (years >= minYears && years <= maxYears) {
-                row.classList.add('highlighted');
+        // Update summary values with both numbers and words
+        if (initialNetWorthElement) {
+            initialNetWorthElement.textContent = formatCurrency(netWorth);
+            const netWorthWordsElement = document.getElementById('initialNetWorthWords');
+            if (netWorthWordsElement) {
+                netWorthWordsElement.textContent = `₹${numberToWords(netWorth)}`;
             }
-        });
+        }
+        
+        if (annualExpenseElement) {
+            annualExpenseElement.textContent = formatCurrency(annualExpense);
+            const annualExpenseWordsElement = document.getElementById('annualExpenseWords');
+            if (annualExpenseWordsElement) {
+                annualExpenseWordsElement.textContent = `₹${numberToWords(annualExpense)}`;
+            }
+        }
+        
+        if (returnRateValue) {
+            returnRateValue.textContent = `${returnRate}%`;
+            const returnRateWordsElement = document.getElementById('returnRateWords');
+            if (returnRateWordsElement) {
+                returnRateWordsElement.textContent = `${numberToWords(returnRate)} percent`;
+            }
+        }
+        
+        if (inflationRateValue) {
+            inflationRateValue.textContent = `${inflationRate}%`;
+            const inflationRateWordsElement = document.getElementById('inflationRateWords');
+            if (inflationRateWordsElement) {
+                inflationRateWordsElement.textContent = `${numberToWords(inflationRate)} percent`;
+            }
+        }
         
         // Save the current values
         const freedomValues = {
@@ -138,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
             annualExpense,
             returnRate,
             inflationRate,
-            realReturnRate,
             years
         });
     }
