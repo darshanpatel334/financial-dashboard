@@ -214,13 +214,13 @@ body {
 }
 
 .section-header h2 {
-    color: var(--text-dark);
+    color: var(--primary);
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
 .section-header p {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: 1.1rem;
     margin-bottom: 1rem;
 }
@@ -287,37 +287,21 @@ body {
     margin-bottom: 20px;
 }
 
-label {
-    display: block;
-    margin-bottom: 10px;
+.form-group label {
+    color: var(--text-primary);
     font-weight: 600;
-    color: var(--text-primary);
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    margin-bottom: 8px;
 }
 
-input {
-    width: 100%;
-    padding: 16px 20px;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    font-size: 1.1rem;
-    transition: all 0.3s;
+.form-group input {
     background: #ffffff;
+    border: 2px solid var(--border-color);
     color: var(--text-primary);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
 }
 
-input:focus {
+.form-group input:focus {
     border-color: var(--accent);
-    outline: none;
     box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-}
-
-input::placeholder {
-    color: #a0aec0;
 }
 
 .btn-calculate {
@@ -391,21 +375,21 @@ input::placeholder {
 }
 
 .summary-item {
+    color: var(--text-primary);
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-primary);
+    align-items: center;
 }
 
 .summary-item:last-child {
     border-bottom: none;
 }
 
-.highlight {
+.summary-item .highlight {
     color: var(--primary);
     font-weight: 700;
-    font-size: 1.2rem;
 }
 
 .actions {
@@ -415,8 +399,18 @@ input::placeholder {
 }
 
 /* Custom elements */
-.custom-assets, .custom-liabilities, .custom-expenses {
+.custom-assets, .custom-liabilities {
     margin: 20px 0;
+    padding: 20px;
+    background: var(--light);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.custom-assets h3, .custom-liabilities h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
 }
 
 .custom-item {
@@ -587,15 +581,15 @@ input[type="number"].no-spinner {
 .asset-category {
     margin-bottom: 30px;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--light);
     border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
 }
 
 .asset-category h3 {
     font-size: 1.3rem;
     margin-bottom: 20px;
-    color: var(--accent);
+    color: var(--primary);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -611,46 +605,49 @@ input[type="number"].no-spinner {
 .yield-input {
     width: 100%;
     padding: 16px 20px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     font-size: 1.1rem;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: #ffffff;
+    color: var(--text-primary);
 }
 
 .yield-input:focus {
     border-color: var(--accent);
     outline: none;
-    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
 }
 
 .yield-input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+    color: #a0aec0;
 }
 
 .category-total {
     margin-top: 1rem;
-    padding: 0.5rem;
-    background-color: var(--bg-secondary);
+    padding: 1rem;
+    background-color: var(--light);
     border-radius: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .category-income {
     margin-top: 0.5rem;
-    padding: 0.5rem;
-    background-color: var(--success-light);
+    padding: 1rem;
+    background-color: rgba(46, 204, 113, 0.1);
     border-radius: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--success-dark);
+    color: var(--text-primary);
+    border: 1px solid #2ecc71;
 }
 
 .category-income .highlight {
-    color: var(--success-dark);
+    color: #27ae60;
     font-weight: bold;
 }
 
