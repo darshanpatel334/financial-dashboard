@@ -17,6 +17,9 @@ class PDFGenerator {
             // Add logo and header
             await this.addHeader();
             
+            // Add personal information section
+            this.addPersonalInfoSection();
+            
             // Add summary section
             this.addSummarySection();
             
@@ -63,6 +66,21 @@ class PDFGenerator {
         
         this.yPos += 80;
         this.addDivider();
+    }
+
+    addPersonalInfoSection() {
+        this.addSectionTitle('Personal Information');
+        
+        const personalInfo = getFromLocalStorage('personalInfo') || {};
+        const data = [
+            ['Full Name', personalInfo.fullName || 'Not provided'],
+            ['Email', personalInfo.email || 'Not provided'],
+            ['Age', personalInfo.age ? `${personalInfo.age} years` : 'Not provided'],
+            ['Last Updated', personalInfo.lastUpdated ? new Date(personalInfo.lastUpdated).toLocaleDateString() : 'Not provided']
+        ];
+        
+        this.addTable(data, ['Field', 'Value'], [200, 250]);
+        this.yPos += 20;
     }
 
     addSummarySection() {

@@ -695,3 +695,41 @@ input[type="number"].no-spinner {
         justify-content: center;
     }
 }
+
+/* Personal Information Page */
+.personal-info-card {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.personal-info-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-message {
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.form-message.success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid #2ecc71;
+}
+
+.form-message.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.form-message.info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    border: 1px solid #3498db;
+}

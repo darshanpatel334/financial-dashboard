@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Information - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="./index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="./personal-info.html" class="nav-link active"><i class="fas fa-user"></i> Profile</a>
+            <a href="./networth.html" class="nav-link"><i class="fas fa-landmark"></i> Net Worth</a>
+            <a href="./income.html" class="nav-link"><i class="fas fa-wallet"></i> Income</a>
+            <a href="./expenses.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Expenses</a>
+            <a href="./dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="./freedom.html" class="nav-link"><i class="fas fa-calculator"></i> FF Score</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="section-header">
+            <h2>Personal Information</h2>
+            <p>Help us personalize your financial journey</p>
+        </section>
+        
+        <div class="card personal-info-card">
+            <h2 class="section-title"><i class="fas fa-user-circle"></i> Your Profile</h2>
+            
+            <form id="personalInfoForm" class="personal-info-form">
+                <div class="form-group">
+                    <label for="fullName"><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age"><i class="fas fa-birthday-cake"></i> Age</label>
+                    <input type="number" id="age" name="age" placeholder="Enter your age" min="18" max="100" class="no-spinner" required>
+                </div>
+
+                <div class="form-message" id="formMessage"></div>
+
+                <button type="submit" class="btn-calculate">
+                    <i class="fas fa-arrow-right"></i> Continue to Net Worth
+                </button>
+            </form>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="./index.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
+    </footer>
+
+    <script src="main.js"></script>
+    <script src="personal-info.js"></script>
+</body>
+</html> 
