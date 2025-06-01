@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Professional color palette
     const colors = {
-        blue: ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60', '#2c3e50'],
-        green: ['#2ecc71', '#27ae60', '#229954', '#1abc9c', '#16a085', '#2c3e50'],
-        purple: ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'],
-        orange: ['#e67e22', '#d35400', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041']
+        blue: ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60', '#2c3e50'].map(color => color + 'ee'),
+        green: ['#2ecc71', '#27ae60', '#229954', '#1abc9c', '#16a085', '#2c3e50'].map(color => color + 'ee'),
+        purple: ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'].map(color => color + 'ee'),
+        orange: ['#e67e22', '#d35400', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041'].map(color => color + 'ee')
     };
 
     try {
@@ -392,6 +392,9 @@ function updateCharts(networthValues, expenseValues) {
             
             window.incomeChart.data.labels = filteredData.labels;
             window.incomeChart.data.datasets[0].data = filteredData.data;
+            window.incomeChart.data.datasets[0].backgroundColor = colors.blue.slice(0, filteredData.data.length);
+            window.incomeChart.options.plugins.legend.labels.color = '#1a2942';
+            window.incomeChart.options.plugins.legend.labels.font.weight = 'bold';
             window.incomeChart.update();
             console.log('Income chart updated with data:', filteredData);
         }

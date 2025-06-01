@@ -13,7 +13,8 @@
 }
 
 .summary-card {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, #ffffff, var(--light));
+    border: 1px solid var(--border-color);
 }
 
 .summary-grid {
@@ -26,7 +27,7 @@
 .summary-block {
     text-align: center;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--primary);
     border-radius: var(--border-radius);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: var(--transition);
@@ -34,7 +35,7 @@
 
 .summary-block:hover {
     transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--secondary);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
