@@ -1,0 +1,56 @@
+/* Specific styles for Freedom Calculator */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 900px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+.name-input {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.assumptions {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.assumptions ul {
+    list-style: none;
+    margin-top: 15px;
+}
+
+.assumptions li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.assumptions i {
+    color: var(--success);
+    margin-top: 3px;
+}
+
+.score-label {
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+}
+
+.years-label {
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 20px;
+}

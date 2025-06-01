@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="./index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="./networth.html" class="nav-link"><i class="fas fa-landmark"></i> Net Worth</a>
+            <a href="./income.html" class="nav-link"><i class="fas fa-wallet"></i> Income</a>
+            <a href="./expenses.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Expenses</a>
+            <a href="./dashboard.html" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="./freedom.html" class="nav-link"><i class="fas fa-calculator"></i> FF Score</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="section-header">
+            <h2>Financial Dashboard</h2>
+            <p>A comprehensive view of your financial health</p>
+        </section>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-wallet"></i> Income Overview</h2>
+                <div class="chart-container">
+                    <canvas id="incomeChart"></canvas>
+                </div>
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Total Monthly Income:</span>
+                        <span class="highlight" id="totalIncome">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Expense Breakdown</h2>
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Total Monthly Expenses:</span>
+                        <span class="highlight" id="totalExpenses">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-landmark"></i> Assets Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="assetChart"></canvas>
+                </div>
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Total Assets:</span>
+                        <span class="highlight" id="totalAssets">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-exclamation-circle"></i> Liabilities Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="liabilityChart"></canvas>
+                </div>
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Total Liabilities:</span>
+                        <span class="highlight" id="totalLiabilities">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card summary-card" style="grid-column: 1 / -1;">
+                <h2 class="section-title"><i class="fas fa-chart-line"></i> Financial Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-block">
+                        <h3>Net Worth</h3>
+                        <span class="highlight large" id="netWorth">₹0</span>
+                    </div>
+                    <div class="summary-block">
+                        <h3>Monthly Savings</h3>
+                        <span class="highlight large" id="monthlySavings">₹0</span>
+                    </div>
+                    <div class="summary-block">
+                        <h3>FF Score</h3>
+                        <span class="highlight large" id="ffScore">0 years</span>
+                    </div>
+                    <div class="summary-block">
+                        <h3>Savings Rate</h3>
+                        <span class="highlight large" id="savingsRate">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="./expenses.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Expenses
+            </a>
+            <a href="./freedom.html" class="btn-next">
+                Calculate FF Score <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
+    </footer>
+
+    <script src="main.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html> 

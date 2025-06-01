@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="expenses.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="./index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="./networth.html" class="nav-link"><i class="fas fa-landmark"></i> Net Worth</a>
+            <a href="./income.html" class="nav-link"><i class="fas fa-wallet"></i> Income</a>
+            <a href="./expenses.html" class="nav-link active"><i class="fas fa-money-bill-wave"></i> Expenses</a>
+            <a href="./dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="./freedom.html" class="nav-link"><i class="fas fa-calculator"></i> FF Score</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="section-header">
+            <h2>Expense Management</h2>
+            <p>Track both your recurring monthly expenses and amortized big expenses in one place</p>
+        </section>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-sync-alt"></i> Monthly Expenses</h2>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-shopping-basket"></i> Groceries</label>
+                    <input type="number" id="groceries" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="groceriesWords"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-bolt"></i> Utilities</label>
+                    <input type="number" id="utilities" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="utilitiesWords"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-tv"></i> Subscriptions</label>
+                    <input type="number" id="subscriptions" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="subscriptionsWords"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-shopping-cart"></i> Shopping</label>
+                    <input type="number" id="shopping" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="shoppingWords"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-utensils"></i> Dining Out</label>
+                    <input type="number" id="dining" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="diningWords"></span>
+                </div>
+                
+                <div id="custom-monthly" class="custom-expenses">
+                    <!-- Custom monthly expenses will be added here -->
+                </div>
+                
+                <button class="btn-calculate" id="addMonthlyExpenseBtn">
+                    <i class="fas fa-plus"></i> Add Custom Expense
+                </button>
+            </div>
+            
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-home"></i> Big Expenses</h2>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-car"></i> Car EMI</label>
+                    <input type="number" id="carEMI" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="carEMIWords"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-house"></i> Home Loan</label>
+                    <input type="number" id="homeEMI" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="homeEMIWords"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-tv"></i> Electronics</label>
+                    <input type="number" id="electronics" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="electronicsWords"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-plane"></i> Vacations</label>
+                    <input type="number" id="vacations" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="vacationsWords"></span>
+                </div>
+                
+                <div id="custom-big" class="custom-expenses">
+                    <!-- Custom big expenses will be added here -->
+                </div>
+                
+                <button class="btn-calculate" id="addBigExpenseBtn">
+                    <i class="fas fa-plus"></i> Add Custom Expense
+                </button>
+            </div>
+            
+            <div class="card result-card" style="grid-column: 1 / -1;">
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Expense Summary</h2>
+                
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Monthly Expenses:</span>
+                        <span class="highlight" id="monthlyExpensesResult">₹78,000</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>Big Expenses:</span>
+                        <span class="highlight" id="bigExpensesResult">₹80,000</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span style="font-size: 1.3rem;">Total Monthly Expenses:</span>
+                        <span class="highlight" id="totalExpenses" style="font-size: 1.8rem;">₹1,58,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="./income.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Income
+            </a>
+            <a href="./dashboard.html" class="btn-next">
+                View Dashboard <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
+    </footer>
+
+    <script src="main.js"></script>
+    <script src="expenses.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+.custom-income {
+    margin-top: 20px;
+}
+
+.custom-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.custom-item input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.custom-item .remove-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.custom-item .remove-btn:hover {
+    background: #cc0000;
+}
+
+.summary {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.highlight {
+    color: #4CAF50;
+    font-weight: bold;
+} 

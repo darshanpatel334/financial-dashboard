@@ -1,0 +1,52 @@
+/* Specific styles for Net Worth Calculator */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 900px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+.custom-assets, .custom-liabilities {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.custom-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.custom-item input:first-child {
+    flex: 2;
+}
+
+.custom-item input:last-child {
+    flex: 1;
+}
+
+.remove-btn {
+    background: var(--danger);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.remove-btn:hover {
+    background: #d32f2f;
+}

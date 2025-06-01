@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Worth - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="./index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="./networth.html" class="nav-link active"><i class="fas fa-landmark"></i> Net Worth</a>
+            <a href="./income.html" class="nav-link"><i class="fas fa-wallet"></i> Income</a>
+            <a href="./expenses.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Expenses</a>
+            <a href="./dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="./freedom.html" class="nav-link"><i class="fas fa-calculator"></i> FF Score</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="section-header">
+            <h2>Net Worth Calculator</h2>
+            <p>Track your assets and liabilities to understand your financial position</p>
+        </section>
+
+        <form id="networthForm" autocomplete="off">
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-plus-circle"></i> Assets</h2>
+                
+                <!-- Real Estate Section -->
+                <div class="asset-category">
+                    <h3>Real Estate</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-building"></i> Buildings</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="buildings" name="buildings" placeholder="Value" class="no-spinner">
+                            <input type="number" id="buildingsYield" name="buildingsYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-map"></i> Plots</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="plots" placeholder="Value" class="no-spinner">
+                            <input type="number" id="plotsYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-mountain"></i> Land</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="land" placeholder="Value" class="no-spinner">
+                            <input type="number" id="landYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="category-total">
+                        <span>Total Real Estate:</span>
+                        <span class="highlight" id="totalRealEstate">₹0</span>
+                    </div>
+                    <div class="category-income">
+                        <span>Monthly Rental Income:</span>
+                        <span class="highlight" id="monthlyRentalIncome">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Investment Section -->
+                <div class="asset-category">
+                    <h3>Investments</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-line"></i> Direct Equity</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="directEquity" name="directEquity" placeholder="Value" class="no-spinner">
+                            <input type="number" id="directEquityYield" name="directEquityYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-pie"></i> Equity Mutual Funds</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="equityMF" placeholder="Value" class="no-spinner">
+                            <input type="number" id="equityMFYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-bar"></i> Debt Mutual Funds</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="debtMF" placeholder="Value" class="no-spinner">
+                            <input type="number" id="debtMFYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="category-total">
+                        <span>Total Investments:</span>
+                        <span class="highlight" id="totalInvestments">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Fixed Income Section -->
+                <div class="asset-category">
+                    <h3>Fixed Income</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-piggy-bank"></i> Fixed Deposits</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="fixedDeposits" name="fixedDeposits" placeholder="Value" class="no-spinner">
+                            <input type="number" id="fixedDepositsYield" name="fixedDepositsYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-landmark"></i> Other Fixed Income</label>
+                        <div class="input-with-yield">
+                            <input type="number" id="otherFixedIncome" placeholder="Value" class="no-spinner">
+                            <input type="number" id="otherFixedIncomeYield" placeholder="Annual Yield %" class="yield-input no-spinner">
+                        </div>
+                    </div>
+                    <div class="category-total">
+                        <span>Total Fixed Income:</span>
+                        <span class="highlight" id="totalFixedIncome">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Commodity Section -->
+                <div class="asset-category">
+                    <h3>Commodities</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-coins"></i> Gold</label>
+                        <input type="number" id="gold" name="gold" placeholder="Value" class="no-spinner">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-box"></i> Other Commodities</label>
+                        <input type="number" id="commodity" name="commodity" placeholder="Value" class="no-spinner">
+                    </div>
+                    <div class="category-total">
+                        <span>Total Commodities:</span>
+                        <span class="highlight" id="totalCommodity">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Cash Section -->
+                <div class="asset-category">
+                    <h3>Cash</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-wallet"></i> Cash</label>
+                        <input type="number" id="cash" name="cash" placeholder="Value" class="no-spinner">
+                    </div>
+                    <div class="category-total">
+                        <span>Total Cash:</span>
+                        <span class="highlight" id="totalCash">₹0</span>
+                    </div>
+                </div>
+
+                <div class="custom-assets">
+                    <h3>Other Assets</h3>
+                    <div id="customAssetsList"></div>
+                    <button type="button" id="addAsset" class="btn-calculate">
+                        <i class="fas fa-plus"></i> Add Other Asset
+                    </button>
+                    <div class="category-total">
+                        <span>Total Other Assets:</span>
+                        <span class="highlight" id="totalOtherAssets">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-minus-circle"></i> Liabilities</h2>
+                <div class="form-group">
+                    <label><i class="fas fa-home"></i> Home Loan</label>
+                    <input type="number" id="homeLoan" name="homeLoan" placeholder="Outstanding Amount" class="no-spinner">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-car"></i> Car Loan</label>
+                    <input type="number" id="carLoan" placeholder="Outstanding Amount" class="no-spinner">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-credit-card"></i> Credit Card</label>
+                    <input type="number" id="creditCard" placeholder="Outstanding Amount" class="no-spinner">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-graduation-cap"></i> Education Loan</label>
+                    <input type="number" id="educationLoan" placeholder="Outstanding Amount" class="no-spinner">
+                </div>
+
+                <div class="custom-liabilities">
+                    <h3>Other Liabilities</h3>
+                    <div id="customLiabilitiesList"></div>
+                    <button type="button" id="addLiability" class="btn-calculate">
+                        <i class="fas fa-plus"></i> Add Other Liability
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="card result-card">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> Net Worth Summary</h2>
+            <div class="summary">
+                <div class="summary-item">
+                    <span>Total Assets</span>
+                    <span class="highlight" id="totalAssets">₹0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total Liabilities</span>
+                    <span class="highlight" id="totalLiabilities">₹0</span>
+                </div>
+                <div class="summary-item">
+                    <span>Net Worth</span>
+                    <span class="highlight" id="netWorth">₹0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
+    </footer>
+
+    <script src="main.js"></script>
+    <script src="calculations.js"></script>
+    <script src="networth.js"></script>
+</body>
+</html>
