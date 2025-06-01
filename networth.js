@@ -114,21 +114,33 @@ function calculateNetWorth() {
     
     // Calculate net worth
     let netWorth = totalAssets - totalLiabilities;
-    document.getElementById('netWorthResult').textContent = formatCurrency(netWorth);
+    document.getElementById('netWorth').textContent = formatCurrency(netWorth);
     
-    // Automatically save to localStorage
-    localStorage.setItem('savedNetWorth', netWorth);
+    // Calculate category totals
+    calculateCategoryTotals();
 }
 
 function calculateTotalAssets() {
     let totalAssets = 0;
     
-    // Predefined assets
-    totalAssets += parseFloat(document.getElementById('realEstate').value) || 0;
+    // Real Estate
+    totalAssets += parseFloat(document.getElementById('buildings').value) || 0;
+    totalAssets += parseFloat(document.getElementById('plots').value) || 0;
+    totalAssets += parseFloat(document.getElementById('land').value) || 0;
+    
+    // Investments
+    totalAssets += parseFloat(document.getElementById('directEquity').value) || 0;
+    totalAssets += parseFloat(document.getElementById('equityMF').value) || 0;
+    totalAssets += parseFloat(document.getElementById('debtMF').value) || 0;
+    
+    // Fixed Income
+    totalAssets += parseFloat(document.getElementById('fixedDeposits').value) || 0;
+    totalAssets += parseFloat(document.getElementById('otherFixedIncome').value) || 0;
+    
+    // Other Assets
     totalAssets += parseFloat(document.getElementById('gold').value) || 0;
+    totalAssets += parseFloat(document.getElementById('commodity').value) || 0;
     totalAssets += parseFloat(document.getElementById('cash').value) || 0;
-    totalAssets += parseFloat(document.getElementById('savings').value) || 0;
-    totalAssets += parseFloat(document.getElementById('investments').value) || 0;
     
     // Custom assets
     document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
@@ -153,6 +165,52 @@ function calculateTotalLiabilities() {
     });
     
     return totalLiabilities;
+}
+
+function calculateCategoryTotals() {
+    // Real Estate Total
+    const realEstateTotal = 
+        (parseFloat(document.getElementById('buildings').value) || 0) +
+        (parseFloat(document.getElementById('plots').value) || 0) +
+        (parseFloat(document.getElementById('land').value) || 0);
+    document.getElementById('totalRealEstate').textContent = formatCurrency(realEstateTotal);
+    
+    // Monthly Rental Income
+    const monthlyRentalIncome = 
+        ((parseFloat(document.getElementById('buildings').value) || 0) * (parseFloat(document.getElementById('buildingsYield').value) || 0) / 1200) +
+        ((parseFloat(document.getElementById('plots').value) || 0) * (parseFloat(document.getElementById('plotsYield').value) || 0) / 1200) +
+        ((parseFloat(document.getElementById('land').value) || 0) * (parseFloat(document.getElementById('landYield').value) || 0) / 1200);
+    document.getElementById('monthlyRentalIncome').textContent = formatCurrency(monthlyRentalIncome);
+    
+    // Investments Total
+    const investmentsTotal = 
+        (parseFloat(document.getElementById('directEquity').value) || 0) +
+        (parseFloat(document.getElementById('equityMF').value) || 0) +
+        (parseFloat(document.getElementById('debtMF').value) || 0);
+    document.getElementById('totalInvestments').textContent = formatCurrency(investmentsTotal);
+    
+    // Fixed Income Total
+    const fixedIncomeTotal = 
+        (parseFloat(document.getElementById('fixedDeposits').value) || 0) +
+        (parseFloat(document.getElementById('otherFixedIncome').value) || 0);
+    document.getElementById('totalFixedIncome').textContent = formatCurrency(fixedIncomeTotal);
+    
+    // Commodity Total
+    const commodityTotal = 
+        (parseFloat(document.getElementById('gold').value) || 0) +
+        (parseFloat(document.getElementById('commodity').value) || 0);
+    document.getElementById('totalCommodity').textContent = formatCurrency(commodityTotal);
+    
+    // Cash Total
+    const cashTotal = parseFloat(document.getElementById('cash').value) || 0;
+    document.getElementById('totalCash').textContent = formatCurrency(cashTotal);
+    
+    // Other Assets Total
+    let otherAssetsTotal = 0;
+    document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
+        otherAssetsTotal += parseFloat(input.value) || 0;
+    });
+    document.getElementById('totalOtherAssets').textContent = formatCurrency(otherAssetsTotal);
 }
 
 function saveNetWorthValues() {
