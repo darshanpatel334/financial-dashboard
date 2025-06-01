@@ -81,12 +81,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (startJourneyBtn) {
         startJourneyBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            window.location.href = './networth.html';
+            window.location.href = './personal-info.html';
         });
     }
 
     // Add completion buttons to each page
-    if (currentPage === 'networth.html') {
+    if (currentPage === 'personal-info.html') {
+        addCompletionButton('Continue to Net Worth', './networth.html');
+    } else if (currentPage === 'networth.html') {
         addCompletionButton('Continue to Income', './income.html');
         setupAutoSave('networthForm', 'networthValues');
     } else if (currentPage === 'income.html') {
