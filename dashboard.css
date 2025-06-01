@@ -13,7 +13,7 @@
 }
 
 .summary-card {
-    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
 }
 
 .summary-grid {
@@ -26,21 +26,29 @@
 .summary-block {
     text-align: center;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+}
+
+.summary-block:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .summary-block h3 {
     font-size: 1.1rem;
     margin-bottom: 15px;
-    color: #e0e0e0;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .highlight.large {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--accent);
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 1200px) {

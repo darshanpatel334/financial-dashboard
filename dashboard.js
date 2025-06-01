@@ -47,7 +47,26 @@ function initializeCharts(colors) {
                         size: 12,
                         weight: 'bold'
                     },
-                    padding: 20
+                    padding: 20,
+                    generateLabels: function(chart) {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            return data.labels.map(function(label, i) {
+                                const value = data.datasets[0].data[i];
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return {
+                                    text: `${label}: ${percentage}%`,
+                                    fillStyle: data.datasets[0].backgroundColor[i],
+                                    strokeStyle: data.datasets[0].backgroundColor[i],
+                                    lineWidth: 2,
+                                    hidden: isNaN(value) || value === 0,
+                                    index: i
+                                };
+                            });
+                        }
+                        return [];
+                    }
                 }
             },
             datalabels: {
@@ -351,8 +370,30 @@ function updateCharts(networthValues, expenseValues) {
         // Update Income Chart
         const incomeData = calculateYieldIncome(networthValues);
         if (window.incomeChart) {
-            updateChartData(window.incomeChart, Object.values(incomeData));
-            console.log('Income chart updated with data:', Object.values(incomeData));
+            const incomeValues = Object.values(incomeData);
+            const totalIncome = incomeValues.reduce((a, b) => a + b, 0);
+            
+            // Only show non-zero values
+            const filteredData = {
+                labels: [],
+                data: []
+            };
+            
+            Object.entries(incomeData).forEach(([key, value]) => {
+                if (value > 0) {
+                    const label = key.replace(/([A-Z])/g, ' $1')
+                        .replace(/^./, str => str.toUpperCase())
+                        .replace('MF', 'Mutual Fund')
+                        .replace('Fixed Deposits', 'FD');
+                    filteredData.labels.push(label);
+                    filteredData.data.push(value);
+                }
+            });
+            
+            window.incomeChart.data.labels = filteredData.labels;
+            window.incomeChart.data.datasets[0].data = filteredData.data;
+            window.incomeChart.update();
+            console.log('Income chart updated with data:', filteredData);
         }
 
         // Update Expense Chart
