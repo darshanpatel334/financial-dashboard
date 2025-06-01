@@ -1,166 +1,237 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Load saved values
-    loadSavedIncomeData();
+    console.log('Income page initialization');
     
-    // Add event listeners for input changes
+    // Reset all input fields to empty
     document.querySelectorAll('input[type="number"]').forEach(input => {
-        input.addEventListener('input', calculateTotalIncome);
+        input.value = '';
+        input.placeholder = '₹0';
     });
+
+    // Set up event listeners
+    setupEventListeners();
     
-    // Add event listener for custom income sources
+    // Load any existing data
+    loadSavedData();
+});
+
+function setupEventListeners() {
+    // Input change listeners
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value === '') {
+                this.placeholder = '₹0';
+            }
+            updateCalculations();
+        });
+        
+        // Prevent negative values
+        input.addEventListener('change', function() {
+            if (parseFloat(this.value) < 0) {
+                this.value = '';
+                this.placeholder = '₹0';
+            }
+        });
+    });
+
+    // Add income source button
     document.getElementById('addIncomeSource').addEventListener('click', () => {
         addCustomIncomeSource();
     });
-    
-    // Add save button event listener
-    document.getElementById('saveDataBtn').addEventListener('click', saveIncomeData);
-    
-    // Add storage event listeners
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'incomeData' || e.key === 'networthValues') {
-            loadSavedIncomeData();
-        }
-    });
-    
-    window.addEventListener('localStorageUpdated', function(e) {
-        loadSavedIncomeData();
-    });
-});
 
-function loadSavedIncomeData() {
-    const incomeData = getFromLocalStorage('incomeData') || {};
-    const savedValues = getFromLocalStorage('incomeValues') || {};
+    // Save button
+    document.getElementById('saveDataBtn').addEventListener('click', saveData);
 
-    // Set values from assets calculations
-    if (incomeData.monthly) {
-        document.getElementById('rental').value = incomeData.monthly.rental || 0;
-        document.getElementById('dividend').value = incomeData.monthly.dividend || 0;
-        document.getElementById('interest').value = incomeData.monthly.interest || 0;
-    }
-
-    // Set other saved values
-    if (savedValues.salary) document.getElementById('salary').value = savedValues.salary;
-    if (savedValues.fixed) document.getElementById('fixed').value = savedValues.fixed;
-
-    // Load custom income sources
-    const customList = document.getElementById('customIncomeList');
-    customList.innerHTML = ''; // Clear existing custom sources
-    
-    if (savedValues.customSources) {
-        savedValues.customSources.forEach(source => {
-            addCustomIncomeSource(source.name, source.amount);
-        });
-    }
-    
-    // Calculate total income
-    calculateTotalIncome();
+    // Storage events for cross-page updates
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageUpdated', loadSavedData);
 }
 
-function calculateTotalIncome() {
-    const salary = parseFloat(document.getElementById('salary').value) || 0;
-    const rental = parseFloat(document.getElementById('rental').value) || 0;
-    const dividend = parseFloat(document.getElementById('dividend').value) || 0;
-    const interest = parseFloat(document.getElementById('interest').value) || 0;
-    const fixed = parseFloat(document.getElementById('fixed').value) || 0;
+function handleStorageChange(e) {
+    if (e.key === 'incomeData' || e.key === 'networthValues') {
+        loadSavedData();
+    }
+}
 
-    // Calculate custom income
-    let customTotal = 0;
-    const customSources = [];
-    document.querySelectorAll('.custom-income-row').forEach(row => {
-        const amount = parseFloat(row.querySelector('.custom-amount').value) || 0;
-        const name = row.querySelector('.custom-source').value;
-        customTotal += amount;
-        if (name || amount) {
-            customSources.push({ name, amount });
+function loadSavedData() {
+    console.log('Loading saved income data');
+    
+    // Reset all fields first
+    resetAllFields();
+    
+    // Get saved data
+    const incomeData = getFromLocalStorage('incomeData') || {};
+    const savedValues = getFromLocalStorage('incomeValues') || {};
+    
+    // Only set values if they exist and are greater than 0
+    setFieldValueIfValid('salary', savedValues.salary);
+    setFieldValueIfValid('rental', incomeData.monthly?.rental);
+    setFieldValueIfValid('dividend', incomeData.monthly?.dividend);
+    setFieldValueIfValid('interest', incomeData.monthly?.interest);
+    setFieldValueIfValid('fixed', savedValues.fixed);
+    
+    // Load custom sources
+    loadCustomSources(savedValues.customSources);
+    
+    // Update calculations
+    updateCalculations();
+}
+
+function setFieldValueIfValid(fieldId, value) {
+    const field = document.getElementById(fieldId);
+    if (field && value && parseFloat(value) > 0) {
+        field.value = value;
+    } else if (field) {
+        field.value = '';
+        field.placeholder = '₹0';
+    }
+}
+
+function resetAllFields() {
+    // Reset main income fields
+    ['salary', 'rental', 'dividend', 'interest', 'fixed'].forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.value = '';
+            field.placeholder = '₹0';
         }
     });
+    
+    // Clear custom income sources
+    const customIncomeDiv = document.getElementById('custom-income');
+    if (customIncomeDiv) {
+        customIncomeDiv.innerHTML = '';
+    }
+    
+    // Reset summary values
+    ['regularIncome', 'additionalIncome', 'totalIncome'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = '₹0';
+        }
+    });
+}
 
+function loadCustomSources(sources = []) {
+    const validSources = sources.filter(source => 
+        source && source.amount && parseFloat(source.amount) > 0);
+        
+    validSources.forEach(source => {
+        addCustomIncomeSource(source.name, source.amount);
+    });
+}
+
+function updateCalculations() {
+    console.log('Updating income calculations');
+    
+    // Calculate regular income
+    const salary = getNumericValue('salary');
+    const rental = getNumericValue('rental');
+    const dividend = getNumericValue('dividend');
+    const interest = getNumericValue('interest');
+    const fixed = getNumericValue('fixed');
+    
+    // Calculate custom income
+    const customSources = [];
+    let customTotal = 0;
+    
+    document.querySelectorAll('.custom-income-row').forEach(row => {
+        const amount = getNumericValue(row.querySelector('.custom-amount'));
+        if (amount > 0) {
+            const name = row.querySelector('.custom-source').value.trim();
+            customSources.push({ name: name || 'Custom Income', amount });
+            customTotal += amount;
+        }
+    });
+    
+    // Calculate totals
     const regularIncome = salary + rental + dividend + interest;
     const additionalIncome = fixed + customTotal;
     const totalIncome = regularIncome + additionalIncome;
-
-    // Update displays
-    document.getElementById('regularIncome').textContent = formatCurrency(regularIncome);
-    document.getElementById('additionalIncome').textContent = formatCurrency(additionalIncome);
-    document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
-
-    // Save values
-    const incomeValues = {
-        salary,
-        rental,
-        dividend,
-        interest,
-        fixed,
-        customSources,
-        regularIncome,
-        additionalIncome,
-        totalIncome,
-        lastUpdated: new Date().toISOString()
-    };
-    saveToLocalStorage('incomeValues', incomeValues);
     
-    // Dispatch events to notify other pages
-    window.dispatchEvent(new Event('storage'));
-    window.dispatchEvent(new CustomEvent('localStorageUpdated'));
+    // Update display
+    updateDisplay('regularIncome', regularIncome);
+    updateDisplay('additionalIncome', additionalIncome);
+    updateDisplay('totalIncome', totalIncome);
+    
+    // Save if we have any non-zero values
+    if (totalIncome > 0) {
+        saveToLocalStorage('incomeValues', {
+            salary: salary || '',
+            rental: rental || '',
+            dividend: dividend || '',
+            interest: interest || '',
+            fixed: fixed || '',
+            customSources,
+            regularIncome,
+            additionalIncome,
+            totalIncome,
+            lastUpdated: new Date().toISOString()
+        });
+    } else {
+        localStorage.removeItem('incomeValues');
+    }
+    
+    // Notify other pages
+    notifyUpdate();
+}
+
+function getNumericValue(inputOrId) {
+    const input = typeof inputOrId === 'string' ? 
+        document.getElementById(inputOrId) : inputOrId;
+    return input && input.value ? parseFloat(input.value) || 0 : 0;
+}
+
+function updateDisplay(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value > 0 ? formatCurrency(value) : '₹0';
+    }
 }
 
 function addCustomIncomeSource(name = '', amount = '') {
     const customIncomeDiv = document.getElementById('custom-income');
     const newRow = document.createElement('div');
     newRow.className = 'form-group custom-income-row';
+    
     newRow.innerHTML = `
         <div class="custom-income-inputs">
             <input type="text" placeholder="Income Source" value="${name}" class="custom-source">
-            <input type="number" placeholder="Amount (₹)" value="${amount}" class="custom-amount no-spinner">
+            <input type="number" placeholder="₹0" value="${amount}" class="custom-amount no-spinner">
         </div>
         <button type="button" class="remove-income">
             <i class="fas fa-trash"></i>
         </button>
     `;
-
+    
     // Add event listeners
-    newRow.querySelector('.remove-income').addEventListener('click', function() {
+    newRow.querySelector('.remove-income').addEventListener('click', () => {
         newRow.remove();
-        calculateTotalIncome();
+        updateCalculations();
     });
-
+    
     newRow.querySelectorAll('input').forEach(input => {
-        input.addEventListener('input', calculateTotalIncome);
+        input.addEventListener('input', updateCalculations);
+        if (input.type === 'number') {
+            input.addEventListener('change', function() {
+                if (parseFloat(this.value) < 0) {
+                    this.value = '';
+                    this.placeholder = '₹0';
+                    updateCalculations();
+                }
+            });
+        }
     });
-
+    
     customIncomeDiv.appendChild(newRow);
-    calculateTotalIncome(); // Calculate totals after adding new row
+    updateCalculations();
 }
 
-function saveIncomeData() {
-    const incomeValues = {
-        salary: document.getElementById('salary').value,
-        rental: document.getElementById('rental').value,
-        dividend: document.getElementById('dividend').value,
-        interest: document.getElementById('interest').value,
-        fixed: document.getElementById('fixed').value,
-        customSources: [],
-        lastUpdated: new Date().toISOString()
-    };
+function saveData() {
+    updateCalculations();
+    notifyUpdate();
+}
 
-    // Save custom income sources
-    document.querySelectorAll('.custom-income-row').forEach(row => {
-        incomeValues.customSources.push({
-            name: row.querySelector('.custom-source').value,
-            amount: row.querySelector('.custom-amount').value
-        });
-    });
-
-    // Calculate totals
-    const regularIncome = parseFloat(incomeValues.salary) + parseFloat(incomeValues.rental) + 
-                         parseFloat(incomeValues.dividend) + parseFloat(incomeValues.interest);
-    const additionalIncome = parseFloat(incomeValues.fixed) + 
-                            incomeValues.customSources.reduce((sum, source) => sum + (parseFloat(source.amount) || 0), 0);
-    
-    incomeValues.regularIncome = regularIncome;
-    incomeValues.additionalIncome = additionalIncome;
-    incomeValues.totalIncome = regularIncome + additionalIncome;
-
-    // Save to localStorage
-    saveToLocalStorage('incomeValues', incomeValues);
+function notifyUpdate() {
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('localStorageUpdated'));
 } 

@@ -1,29 +1,142 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard initialization started');
-    initializeDashboard();
+    
+    // Initialize with empty state
+    resetDashboard();
+    
+    // Initialize charts
+    initializeCharts();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Load initial data
+    updateDashboard();
 });
 
-function initializeDashboard() {
-    console.log('Initializing dashboard');
-    
-    // Initialize charts first
-    initializeCharts(colors);
-    
-    // Add event listeners for data updates
+function setupEventListeners() {
+    // Listen for storage changes
     window.addEventListener('storage', function(e) {
         console.log('Storage event triggered:', e.key);
-        if (['networthValues', 'expenseValues', 'incomeData', 'freedomValues'].includes(e.key)) {
+        if (['networthValues', 'expenseValues', 'incomeData', 'incomeValues'].includes(e.key)) {
             updateDashboard();
         }
     });
     
-    window.addEventListener('localStorageUpdated', function(e) {
-        console.log('LocalStorage updated event received');
-        updateDashboard();
+    window.addEventListener('localStorageUpdated', updateDashboard);
+}
+
+function resetDashboard() {
+    // Reset all summary values to zero
+    const summaryFields = [
+        'totalIncome', 'totalExpenses', 'totalAssets', 'totalLiabilities',
+        'netWorth', 'monthlySavings', 'savingsRate', 'ffScore'
+    ];
+    
+    summaryFields.forEach(field => {
+        const element = document.getElementById(field);
+        if (element) {
+            if (field === 'savingsRate') {
+                element.textContent = '0%';
+            } else if (field === 'ffScore') {
+                element.textContent = 'N/A';
+            } else if (field.includes('monthly') || field.includes('Income') || field.includes('Expenses')) {
+                element.textContent = '₹0 / month';
+            } else {
+                element.textContent = '₹0';
+            }
+        }
     });
     
-    // Initial update
-    updateDashboard();
+    // Reset charts
+    resetCharts();
+}
+
+function updateDashboard() {
+    console.log('Starting dashboard update');
+    
+    try {
+        // Load all values
+        const networthValues = getFromLocalStorage('networthValues') || {};
+        const expenseValues = getFromLocalStorage('expenseValues') || {};
+        const incomeValues = getFromLocalStorage('incomeValues') || {};
+        
+        // Calculate base values
+        const totalAssets = calculateTotalAssets(networthValues);
+        const totalLiabilities = calculateTotalLiabilities(networthValues);
+        const netWorth = totalAssets - totalLiabilities;
+        const monthlyIncome = calculateMonthlyIncome(networthValues, incomeValues);
+        const monthlyExpenses = calculateTotalMonthlyExpenses(expenseValues);
+        const monthlySavings = monthlyIncome - monthlyExpenses;
+        const savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome * 100) : 0;
+
+        // Update summary displays
+        updateSummaryDisplays({
+            totalAssets,
+            totalLiabilities,
+            netWorth,
+            monthlyIncome,
+            monthlyExpenses,
+            monthlySavings,
+            savingsRate
+        });
+
+        // Update charts if we have data
+        if (hasValidData(totalAssets, totalLiabilities, monthlyIncome, monthlyExpenses)) {
+            updateCharts(networthValues, expenseValues, incomeValues);
+        } else {
+            resetCharts();
+        }
+        
+        console.log('Dashboard updated successfully');
+    } catch (error) {
+        console.error('Error updating dashboard:', error);
+        resetDashboard();
+    }
+}
+
+function hasValidData(...values) {
+    return values.some(value => value > 0);
+}
+
+function updateSummaryDisplays(data) {
+    // Update income
+    updateDisplay('totalIncome', data.monthlyIncome, '/month');
+    
+    // Update expenses
+    updateDisplay('totalExpenses', data.monthlyExpenses, '/month');
+    
+    // Update assets and liabilities
+    updateDisplay('totalAssets', data.totalAssets);
+    updateDisplay('totalLiabilities', data.totalLiabilities);
+    
+    // Update net worth
+    updateDisplay('netWorth', data.netWorth);
+    
+    // Update savings
+    updateDisplay('monthlySavings', data.monthlySavings);
+    
+    // Update savings rate
+    const savingsRateElement = document.getElementById('savingsRate');
+    if (savingsRateElement) {
+        savingsRateElement.textContent = data.savingsRate > 0 ? 
+            `${data.savingsRate.toFixed(1)}%` : '0%';
+    }
+    
+    // Update FF Score
+    const ffScoreElement = document.getElementById('ffScore');
+    if (ffScoreElement) {
+        ffScoreElement.textContent = data.monthlyExpenses > 0 ? 
+            calculateFFScore(data.netWorth, data.monthlyExpenses) : 'N/A';
+    }
+}
+
+function updateDisplay(elementId, value, suffix = '') {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value > 0 ? 
+            `${formatCurrency(value)}${suffix}` : `₹0${suffix}`;
+    }
 }
 
 // Professional color palette with full opacity
@@ -254,181 +367,21 @@ function initializeCharts(colors) {
     }
 }
 
-function updateDashboard() {
-    console.log('Starting dashboard update');
-    
+function updateCharts(networthValues, expenseValues, incomeValues) {
     try {
-        // Load saved values
-        const networthValues = getFromLocalStorage('networthValues') || {};
-        const expenseValues = getFromLocalStorage('expenseValues') || {};
-        
-        console.log('Loaded values:', { networthValues, expenseValues });
+        console.log('Updating charts with values:', { networthValues, expenseValues, incomeValues });
 
-        // Calculate totals
-        const totalAssets = calculateTotalAssets(networthValues);
-        const totalLiabilities = calculateTotalLiabilities(networthValues);
-        const netWorth = totalAssets - totalLiabilities;
-        
-        // Calculate income and expenses
-        const monthlyIncome = calculateMonthlyIncome(networthValues);
-        const monthlyExpenses = calculateTotalMonthlyExpenses(expenseValues);
-        const monthlySavings = monthlyIncome - monthlyExpenses;
-        const savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome * 100) : 0;
-
-        // Update summary values
-        document.getElementById('totalIncome').textContent = formatCurrency(monthlyIncome) + ' / month';
-        document.getElementById('totalExpenses').textContent = formatCurrency(monthlyExpenses) + ' / month';
-        document.getElementById('totalAssets').textContent = formatCurrency(totalAssets);
-        document.getElementById('totalLiabilities').textContent = formatCurrency(totalLiabilities);
-        document.getElementById('netWorth').textContent = formatCurrency(netWorth);
-        document.getElementById('monthlySavings').textContent = formatCurrency(monthlySavings);
-        document.getElementById('savingsRate').textContent = `${savingsRate.toFixed(1)}%`;
-        document.getElementById('ffScore').textContent = calculateFFScore(netWorth, monthlyExpenses);
-
-        // Update charts
-        updateCharts(networthValues, expenseValues);
-        
-        console.log('Dashboard updated successfully');
-    } catch (error) {
-        console.error('Error updating dashboard:', error);
-    }
-}
-
-function calculateYieldIncome(values) {
-    return {
-        directEquityDividend: (parseFloat(values.directEquity) || 0) * (parseFloat(values.directEquityYield) || 0) / 100,
-        equityMFDividend: (parseFloat(values.equityMF) || 0) * (parseFloat(values.equityMFYield) || 0) / 100,
-        debtMFInterest: (parseFloat(values.debtMF) || 0) * (parseFloat(values.debtMFYield) || 0) / 100,
-        fixedDepositsInterest: (parseFloat(values.fixedDeposits) || 0) * (parseFloat(values.fixedDepositsYield) || 0) / 100,
-        otherFixedIncome: (parseFloat(values.otherFixedIncome) || 0) * (parseFloat(values.otherFixedIncomeYield) || 0) / 100,
-        commodityIncome: (parseFloat(values.commodity) || 0) * (parseFloat(values.commodityYield) || 0) / 100,
-        rentalIncome: calculateRentalIncome(values)
-    };
-}
-
-function calculateRentalIncome(values) {
-    const buildingsRent = (parseFloat(values.buildings) || 0) * (parseFloat(values.buildingsYield) || 0) / 100;
-    const plotsRent = (parseFloat(values.plots) || 0) * (parseFloat(values.plotsYield) || 0) / 100;
-    const landRent = (parseFloat(values.land) || 0) * (parseFloat(values.landYield) || 0) / 100;
-    return buildingsRent + plotsRent + landRent;
-}
-
-function calculateFFScore(netWorth, monthlyExpenses) {
-    if (monthlyExpenses <= 0) return 'N/A';
-    const years = (netWorth / (monthlyExpenses * 12)).toFixed(1);
-    return `${years} years`;
-}
-
-function updateChartData(chart, newData) {
-    chart.data.datasets[0].data = newData;
-    chart.update();
-}
-
-function calculateMonthlyExpenses(values) {
-    const regularExpenses = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining'];
-    const total = regularExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
-    return total + calculateCustomExpenses(values.monthly || []);
-}
-
-function calculateBigExpenses(values) {
-    const bigExpenses = ['carEMI', 'homeEMI', 'electronics', 'vacations'];
-    const total = bigExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
-    return total + calculateCustomExpenses(values.big || []);
-}
-
-function calculateCustomExpenses(items) {
-    return items.reduce((total, item) => total + (parseFloat(item.value) || 0), 0);
-}
-
-function calculateCustomLiabilities(items) {
-    return items.reduce((total, item) => total + (parseFloat(item.value) || 0), 0);
-}
-
-function calculateRealEstateTotal(values) {
-    return (
-        (parseFloat(values.buildings) || 0) +
-        (parseFloat(values.plots) || 0) +
-        (parseFloat(values.land) || 0)
-    );
-}
-
-function calculateInvestmentsTotal(values) {
-    return (
-        (parseFloat(values.directEquity) || 0) +
-        (parseFloat(values.equityMF) || 0) +
-        (parseFloat(values.debtMF) || 0)
-    );
-}
-
-function calculateFixedIncomeTotal(values) {
-    return (
-        (parseFloat(values.fixedDeposits) || 0) +
-        (parseFloat(values.otherFixedIncome) || 0)
-    );
-}
-
-function calculateCustomAssetsTotal(items) {
-    return items.reduce((total, item) => total + (parseFloat(item.value) || 0), 0);
-}
-
-function calculateTotalMonthlyExpenses(values) {
-    const monthlyExpenses = calculateMonthlyExpenses(values);
-    const bigExpenses = calculateBigExpenses(values);
-    return monthlyExpenses + (bigExpenses / 12);
-}
-
-function calculateTotalLiabilities(values) {
-    return (
-        (parseFloat(values.homeLoan) || 0) +
-        (parseFloat(values.carLoan) || 0) +
-        (parseFloat(values.creditCard) || 0) +
-        (parseFloat(values.educationLoan) || 0) +
-        calculateCustomLiabilities(values.liabilities || [])
-    );
-}
-
-function getFromLocalStorage(key) {
-    try {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
-    } catch (error) {
-        console.error(`Error reading ${key} from localStorage:`, error);
-        return null;
-    }
-}
-
-function calculateTotalAssets(values) {
-    return (
-        parseFloat(values.buildings || 0) +
-        parseFloat(values.plots || 0) +
-        parseFloat(values.land || 0) +
-        parseFloat(values.directEquity || 0) +
-        parseFloat(values.equityMF || 0) +
-        parseFloat(values.debtMF || 0) +
-        parseFloat(values.fixedDeposits || 0) +
-        parseFloat(values.gold || 0) +
-        parseFloat(values.cash || 0) +
-        (values.customAssets || []).reduce((sum, item) => sum + parseFloat(item.value || 0), 0)
-    );
-}
-
-function calculateMonthlyIncome(values) {
-    const annualIncome = (
-        (parseFloat(values.directEquity || 0) * (parseFloat(values.directEquityYield || 0) / 100)) +
-        (parseFloat(values.equityMF || 0) * (parseFloat(values.equityMFYield || 0) / 100)) +
-        (parseFloat(values.debtMF || 0) * (parseFloat(values.debtMFYield || 0) / 100)) +
-        (parseFloat(values.fixedDeposits || 0) * (parseFloat(values.fixedDepositsYield || 0) / 100)) +
-        (parseFloat(values.buildings || 0) * (parseFloat(values.buildingsYield || 0) / 100))
-    );
-    return annualIncome / 12;
-}
-
-function updateCharts(networthValues, expenseValues) {
-    try {
-        console.log('Updating charts with values:', { networthValues, expenseValues });
-
-        // Update Income Chart
+        // Get income data from both sources
         const incomeData = calculateYieldIncome(networthValues);
+        
+        // Add manual and custom income to incomeData
+        if (incomeValues.salary > 0) incomeData.salary = parseFloat(incomeValues.salary);
+        if (incomeValues.fixed > 0) incomeData.fixed = parseFloat(incomeValues.fixed);
+        
+        const customTotal = (incomeValues.customSources || []).reduce((sum, source) => 
+            sum + (parseFloat(source.amount) || 0), 0);
+        if (customTotal > 0) incomeData.custom = customTotal;
+
         console.log('Raw income data:', incomeData);
         if (window.incomeChart) {
             const filteredData = {
@@ -436,6 +389,7 @@ function updateCharts(networthValues, expenseValues) {
                 data: []
             };
             
+            // Process all income sources
             Object.entries(incomeData).forEach(([key, value]) => {
                 if (value > 0) {
                     const label = key.replace(/([A-Z])/g, ' $1')
@@ -447,11 +401,16 @@ function updateCharts(networthValues, expenseValues) {
                 }
             });
             
-            window.incomeChart.data.labels = filteredData.labels;
-            window.incomeChart.data.datasets[0].data = filteredData.data;
-            window.incomeChart.data.datasets[0].backgroundColor = colors.blue.slice(0, filteredData.data.length);
-            window.incomeChart.update('none');
-            console.log('Income chart updated with filtered data:', filteredData);
+            // Only update chart if there's data
+            if (filteredData.data.length > 0) {
+                window.incomeChart.data.labels = filteredData.labels;
+                window.incomeChart.data.datasets[0].data = filteredData.data;
+                window.incomeChart.data.datasets[0].backgroundColor = colors.blue.slice(0, filteredData.data.length);
+                window.incomeChart.update('none');
+                console.log('Income chart updated with filtered data:', filteredData);
+            } else {
+                resetCharts();
+            }
         }
 
         // Update Expense Chart
@@ -603,4 +562,175 @@ function createIncomeOverviewChart(data) {
     });
     
     return incomeOverviewChart;
+}
+
+function calculateYieldIncome(values) {
+    return {
+        directEquityDividend: (parseFloat(values.directEquity) || 0) * (parseFloat(values.directEquityYield) || 0) / 100,
+        equityMFDividend: (parseFloat(values.equityMF) || 0) * (parseFloat(values.equityMFYield) || 0) / 100,
+        debtMFInterest: (parseFloat(values.debtMF) || 0) * (parseFloat(values.debtMFYield) || 0) / 100,
+        fixedDepositsInterest: (parseFloat(values.fixedDeposits) || 0) * (parseFloat(values.fixedDepositsYield) || 0) / 100,
+        otherFixedIncome: (parseFloat(values.otherFixedIncome) || 0) * (parseFloat(values.otherFixedIncomeYield) || 0) / 100,
+        commodityIncome: (parseFloat(values.commodity) || 0) * (parseFloat(values.commodityYield) || 0) / 100,
+        rentalIncome: calculateRentalIncome(values)
+    };
+}
+
+function calculateRentalIncome(values) {
+    const buildingsRent = (parseFloat(values.buildings) || 0) * (parseFloat(values.buildingsYield) || 0) / 100;
+    const plotsRent = (parseFloat(values.plots) || 0) * (parseFloat(values.plotsYield) || 0) / 100;
+    const landRent = (parseFloat(values.land) || 0) * (parseFloat(values.landYield) || 0) / 100;
+    return buildingsRent + plotsRent + landRent;
+}
+
+function calculateFFScore(netWorth, monthlyExpenses) {
+    if (monthlyExpenses <= 0) return 'N/A';
+    const years = (netWorth / (monthlyExpenses * 12)).toFixed(1);
+    return `${years} years`;
+}
+
+function updateChartData(chart, newData) {
+    chart.data.datasets[0].data = newData;
+    chart.update();
+}
+
+function calculateMonthlyExpenses(values) {
+    const regularExpenses = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining'];
+    const total = regularExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
+    return total + calculateCustomExpenses(values.monthly || []);
+}
+
+function calculateBigExpenses(values) {
+    const bigExpenses = ['carEMI', 'homeEMI', 'electronics', 'vacations'];
+    const total = bigExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
+    return total + calculateCustomExpenses(values.big || []);
+}
+
+function calculateCustomExpenses(items) {
+    return items.reduce((total, item) => total + (parseFloat(item.value) || 0), 0);
+}
+
+function calculateCustomLiabilities(items) {
+    return items.reduce((total, item) => total + (parseFloat(item.value) || 0), 0);
+}
+
+function calculateRealEstateTotal(values) {
+    return (
+        (parseFloat(values.buildings) || 0) +
+        (parseFloat(values.plots) || 0) +
+        (parseFloat(values.land) || 0)
+    );
+}
+
+function calculateInvestmentsTotal(values) {
+    return (
+        (parseFloat(values.directEquity) || 0) +
+        (parseFloat(values.equityMF) || 0) +
+        (parseFloat(values.debtMF) || 0)
+    );
+}
+
+function calculateFixedIncomeTotal(values) {
+    return (
+        (parseFloat(values.fixedDeposits) || 0) +
+        (parseFloat(values.otherFixedIncome) || 0)
+    );
+}
+
+function calculateCustomAssetsTotal(items) {
+    return items.reduce((total, item) => total + (parseFloat(item.value) || 0), 0);
+}
+
+function calculateTotalMonthlyExpenses(values) {
+    const monthlyExpenses = calculateMonthlyExpenses(values);
+    const bigExpenses = calculateBigExpenses(values);
+    return monthlyExpenses + (bigExpenses / 12);
+}
+
+function calculateTotalLiabilities(values) {
+    return (
+        (parseFloat(values.homeLoan) || 0) +
+        (parseFloat(values.carLoan) || 0) +
+        (parseFloat(values.creditCard) || 0) +
+        (parseFloat(values.educationLoan) || 0) +
+        calculateCustomLiabilities(values.liabilities || [])
+    );
+}
+
+function getFromLocalStorage(key) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch (error) {
+        console.error(`Error reading ${key} from localStorage:`, error);
+        return null;
+    }
+}
+
+function calculateTotalAssets(values) {
+    return (
+        parseFloat(values.buildings || 0) +
+        parseFloat(values.plots || 0) +
+        parseFloat(values.land || 0) +
+        parseFloat(values.directEquity || 0) +
+        parseFloat(values.equityMF || 0) +
+        parseFloat(values.debtMF || 0) +
+        parseFloat(values.fixedDeposits || 0) +
+        parseFloat(values.gold || 0) +
+        parseFloat(values.cash || 0) +
+        (values.customAssets || []).reduce((sum, item) => sum + parseFloat(item.value || 0), 0)
+    );
+}
+
+function calculateMonthlyIncome(networthValues, incomeValues) {
+    // Get income values from both sources
+    const incomeData = getFromLocalStorage('incomeData') || {};
+    
+    // Get yield-based income (from assets)
+    const yieldBasedIncome = (
+        (parseFloat(networthValues.directEquity || 0) * (parseFloat(networthValues.directEquityYield || 0) / 100)) +
+        (parseFloat(networthValues.equityMF || 0) * (parseFloat(networthValues.equityMFYield || 0) / 100)) +
+        (parseFloat(networthValues.debtMF || 0) * (parseFloat(networthValues.debtMFYield || 0) / 100)) +
+        (parseFloat(networthValues.fixedDeposits || 0) * (parseFloat(networthValues.fixedDepositsYield || 0) / 100)) +
+        (parseFloat(networthValues.buildings || 0) * (parseFloat(networthValues.buildingsYield || 0) / 100))
+    ) / 12;  // Convert to monthly
+
+    // Get manually entered income
+    const manualIncome = (
+        parseFloat(incomeValues.salary || 0) +
+        parseFloat(incomeValues.fixed || 0)
+    );
+
+    // Get custom income sources
+    const customIncome = (incomeValues.customSources || []).reduce((sum, source) => 
+        sum + (parseFloat(source.amount) || 0), 0);
+
+    return yieldBasedIncome + manualIncome + customIncome;
+}
+
+function resetCharts() {
+    if (window.incomeChart) {
+        window.incomeChart.data.labels = [];
+        window.incomeChart.data.datasets[0].data = [];
+        window.incomeChart.update('none');
+    }
+    if (window.expenseChart) {
+        window.expenseChart.data.labels = [];
+        window.expenseChart.data.datasets[0].data = [];
+        window.expenseChart.update('none');
+    }
+    if (window.assetChart) {
+        window.assetChart.data.labels = [];
+        window.assetChart.data.datasets[0].data = [];
+        window.assetChart.update('none');
+    }
+    if (window.liabilityChart) {
+        window.liabilityChart.data.labels = [];
+        window.liabilityChart.data.datasets[0].data = [];
+        window.liabilityChart.update('none');
+    }
+}
+
+function formatCurrency(value) {
+    return '₹' + value.toLocaleString();
 } 

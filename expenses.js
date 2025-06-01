@@ -1,83 +1,237 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Expenses page initialization started');
     
-    // Load saved values
-    const savedValues = getFromLocalStorage('expenseValues') || {};
+    // Reset all input fields to empty
+    resetAllFields();
     
-    // Set input values from saved data
-    const monthlyInputs = {
-        groceries: savedValues.groceries || '',
-        utilities: savedValues.utilities || '',
-        subscriptions: savedValues.subscriptions || '',
-        shopping: savedValues.shopping || '',
-        dining: savedValues.dining || '',
-        carEMI: savedValues.carEMI || '',
-        homeEMI: savedValues.homeEMI || ''
-    };
+    // Set up event listeners
+    setupEventListeners();
     
-    const bigInputs = {
-        electronics: savedValues.electronics || '',
-        vacations: savedValues.vacations || '',
-        medical: savedValues.medical || '',
-        education: savedValues.education || '',
-        vehicle: savedValues.vehicle || ''
-    };
-    
-    console.log('Loaded expense values:', { monthlyInputs, bigInputs });
-    
-    // Initialize custom expenses
-    initCustomFields('customMonthlyList', 'monthly', savedValues.monthly || []);
-    initCustomFields('customBigList', 'big', savedValues.big || []);
-    
-    // Set values to input fields and update words
-    Object.keys(monthlyInputs).forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = monthlyInputs[id];
-            updateNumberInWords(id);
-        }
-    });
-    
-    Object.keys(bigInputs).forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = bigInputs[id];
-            updateNumberInWords(id);
-        }
-    });
-    
-    // Add event listeners to all input fields for auto-update
-    document.querySelectorAll('input').forEach(input => {
+    // Load any saved data
+    loadSavedData();
+});
+
+function setupEventListeners() {
+    // Add input event listeners
+    document.querySelectorAll('input[type="number"]').forEach(input => {
         input.addEventListener('input', () => {
-            console.log(`Input changed: ${input.id}`);
+            if (input.value === '') {
+                input.placeholder = '₹0';
+            }
             updateNumberInWords(input.id);
             calculateExpenses();
         });
+        
+        // Prevent negative values
+        input.addEventListener('change', function() {
+            if (parseFloat(this.value) < 0) {
+                this.value = '';
+                this.placeholder = '₹0';
+                updateNumberInWords(this.id);
+                calculateExpenses();
+            }
+        });
     });
     
-    // Add event listeners for buttons
+    // Add custom expense buttons
     document.getElementById('addMonthly').addEventListener('click', () => {
-        console.log('Adding new monthly expense');
         addCustomField('customMonthlyList', 'monthly');
     });
     
     document.getElementById('addBig').addEventListener('click', () => {
-        console.log('Adding new big expense');
         addCustomField('customBigList', 'big');
     });
-    
-    // Initial calculation
-    calculateExpenses();
-});
+}
 
-function initCustomFields(containerId, type, savedItems = []) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
+function resetAllFields() {
+    // Reset monthly expense fields
+    const monthlyFields = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'];
+    monthlyFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.value = '';
+            field.placeholder = '₹0';
+            updateNumberInWords(id);
+        }
+    });
     
-    if (savedItems && savedItems.length > 0) {
-        savedItems.forEach(item => {
-            addCustomField(containerId, type, item);
+    // Reset big expense fields
+    const bigFields = ['electronics', 'vacations', 'medical', 'education', 'vehicle'];
+    bigFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.value = '';
+            field.placeholder = '₹0';
+            updateNumberInWords(id);
+        }
+    });
+    
+    // Clear custom expense lists
+    document.getElementById('customMonthlyList').innerHTML = '';
+    document.getElementById('customBigList').innerHTML = '';
+    
+    // Reset summary values
+    updateDisplayValues({
+        totalMonthlyRecurring: 0,
+        totalBigExpenses: 0,
+        monthlyBigExpenses: 0,
+        totalMonthlyExpenses: 0
+    });
+}
+
+function loadSavedData() {
+    const savedValues = getFromLocalStorage('expenseValues') || {};
+    
+    // Set monthly expense values
+    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
+        setFieldValueIfValid(id, savedValues[id]);
+    });
+    
+    // Set big expense values
+    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
+        setFieldValueIfValid(id, savedValues[id]);
+    });
+    
+    // Load custom monthly expenses
+    if (savedValues.monthly && savedValues.monthly.length > 0) {
+        savedValues.monthly.forEach(item => {
+            if (item.value && parseFloat(item.value) > 0) {
+                addCustomField('customMonthlyList', 'monthly', item);
+            }
         });
+    }
+    
+    // Load custom big expenses
+    if (savedValues.big && savedValues.big.length > 0) {
+        savedValues.big.forEach(item => {
+            if (item.value && parseFloat(item.value) > 0) {
+                addCustomField('customBigList', 'big', item);
+            }
+        });
+    }
+    
+    // Calculate totals
+    calculateExpenses();
+}
+
+function setFieldValueIfValid(fieldId, value) {
+    const field = document.getElementById(fieldId);
+    if (field && value && parseFloat(value) > 0) {
+        field.value = value;
+        updateNumberInWords(fieldId);
+    } else if (field) {
+        field.value = '';
+        field.placeholder = '₹0';
+        updateNumberInWords(fieldId);
+    }
+}
+
+function calculateExpenses() {
+    console.log('Calculating expenses');
+    
+    // Calculate monthly recurring expenses
+    let totalMonthlyRecurring = 0;
+    let hasMonthlyValues = false;
+    
+    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
+        const value = getNumericValue(id);
+        if (value > 0) hasMonthlyValues = true;
+        totalMonthlyRecurring += value;
+    });
+    
+    // Add custom monthly expenses
+    document.querySelectorAll('#customMonthlyList .custom-value').forEach(input => {
+        const value = getNumericValue(input);
+        if (value > 0) hasMonthlyValues = true;
+        totalMonthlyRecurring += value;
+    });
+    
+    // Calculate big expenses
+    let totalBigExpenses = 0;
+    let hasBigValues = false;
+    
+    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
+        const value = getNumericValue(id);
+        if (value > 0) hasBigValues = true;
+        totalBigExpenses += value;
+    });
+    
+    // Add custom big expenses
+    document.querySelectorAll('#customBigList .custom-value').forEach(input => {
+        const value = getNumericValue(input);
+        if (value > 0) hasBigValues = true;
+        totalBigExpenses += value;
+    });
+    
+    // Calculate monthly equivalent of big expenses
+    const monthlyBigExpenses = totalBigExpenses / 12;
+    
+    // Calculate total monthly expenses
+    const totalMonthlyExpenses = totalMonthlyRecurring + monthlyBigExpenses;
+    
+    // Update display and save data if we have actual values
+    if (hasMonthlyValues || hasBigValues) {
+        updateDisplayValues({
+            totalMonthlyRecurring,
+            totalBigExpenses,
+            monthlyBigExpenses,
+            totalMonthlyExpenses
+        });
+        saveExpenseData();
+    } else {
+        updateDisplayValues({
+            totalMonthlyRecurring: 0,
+            totalBigExpenses: 0,
+            monthlyBigExpenses: 0,
+            totalMonthlyExpenses: 0
+        });
+        localStorage.removeItem('expenseValues');
+    }
+    
+    // Notify other pages
+    notifyUpdate();
+}
+
+function getNumericValue(inputOrId) {
+    const input = typeof inputOrId === 'string' ? 
+        document.getElementById(inputOrId) : inputOrId;
+    return input && input.value ? parseFloat(input.value) || 0 : 0;
+}
+
+function updateDisplayValues(values) {
+    // Update currency displays
+    updateDisplay('totalMonthlyRecurring', values.totalMonthlyRecurring);
+    updateDisplay('totalBigExpenses', values.totalBigExpenses);
+    updateDisplay('monthlyBigExpenses', values.monthlyBigExpenses);
+    updateDisplay('totalMonthlyExpenses', values.totalMonthlyExpenses);
+    
+    // Update annual values
+    const annualRecurring = values.totalMonthlyRecurring * 12;
+    const annualTotal = values.totalMonthlyExpenses * 12;
+    
+    updateDisplay('annualRecurring', annualRecurring);
+    updateDisplay('annualTotal', annualTotal);
+    
+    // Update words displays
+    updateWordsDisplay('totalMonthlyRecurringWords', values.totalMonthlyRecurring);
+    updateWordsDisplay('totalBigExpensesWords', values.totalBigExpenses);
+    updateWordsDisplay('monthlyBigExpensesWords', values.monthlyBigExpenses);
+    updateWordsDisplay('totalMonthlyExpensesWords', values.totalMonthlyExpenses);
+    updateWordsDisplay('annualRecurringWords', annualRecurring);
+    updateWordsDisplay('annualTotalWords', annualTotal);
+}
+
+function updateDisplay(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value > 0 ? formatCurrency(value) : '₹0';
+    }
+}
+
+function updateWordsDisplay(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value > 0 ? `₹${numberToWords(value)}` : '₹Zero';
     }
 }
 
@@ -89,146 +243,80 @@ function addCustomField(containerId, type, item = { name: '', value: '' }) {
         <div class="custom-item" id="${fieldId}">
             <input type="text" placeholder="${type === 'monthly' ? 'Monthly Expense Name' : 'Big Expense Name'}" 
                    value="${item.name || ''}" class="custom-name">
-            <input type="number" placeholder="Amount (₹)" 
+            <input type="number" placeholder="₹0" 
                    value="${item.value || ''}" class="custom-value">
-            <button class="remove-btn" onclick="document.getElementById('${fieldId}').remove(); calculateExpenses();">
+            <button class="remove-btn">
                 <i class="fas fa-times"></i>
             </button>
         </div>
     `;
     
     container.insertAdjacentHTML('beforeend', fieldHTML);
-}
-
-function calculateExpenses() {
-    console.log('Calculating expenses');
     
-    // Calculate monthly recurring expenses
-    let totalMonthlyRecurring = 0;
-    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
-        const value = parseFloat(document.getElementById(id).value) || 0;
-        totalMonthlyRecurring += value;
-        console.log(`${id}: ${value}`);
+    // Add event listeners
+    const newField = document.getElementById(fieldId);
+    newField.querySelector('.remove-btn').addEventListener('click', () => {
+        newField.remove();
+        calculateExpenses();
     });
     
-    // Add custom monthly expenses
-    document.querySelectorAll('#customMonthlyList .custom-value').forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        totalMonthlyRecurring += value;
-        console.log(`Custom monthly: ${value}`);
-    });
-    
-    // Calculate big expenses
-    let totalBigExpenses = 0;
-    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
-        const value = parseFloat(document.getElementById(id).value) || 0;
-        totalBigExpenses += value;
-        console.log(`${id}: ${value}`);
-    });
-    
-    // Add custom big expenses
-    document.querySelectorAll('#customBigList .custom-value').forEach(input => {
-        const value = parseFloat(input.value) || 0;
-        totalBigExpenses += value;
-        console.log(`Custom big: ${value}`);
-    });
-    
-    // Calculate monthly equivalent of big expenses
-    const monthlyBigExpenses = totalBigExpenses / 12;
-    
-    // Calculate total monthly expenses
-    const totalMonthlyExpenses = totalMonthlyRecurring + monthlyBigExpenses;
-    
-    console.log('Expense totals:', {
-        totalMonthlyRecurring,
-        totalBigExpenses,
-        monthlyBigExpenses,
-        totalMonthlyExpenses
-    });
-    
-    // Update display
-    updateDisplayValues({
-        totalMonthlyRecurring,
-        totalBigExpenses,
-        monthlyBigExpenses,
-        totalMonthlyExpenses
-    });
-    
-    // Save and propagate changes
-    saveExpenseData({
-        totalMonthlyRecurring,
-        totalBigExpenses,
-        monthlyBigExpenses,
-        totalMonthlyExpenses
+    newField.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', calculateExpenses);
+        if (input.type === 'number') {
+            input.addEventListener('change', function() {
+                if (parseFloat(this.value) < 0) {
+                    this.value = '';
+                    this.placeholder = '₹0';
+                    calculateExpenses();
+                }
+            });
+        }
     });
 }
 
-function updateDisplayValues(values) {
-    // Update currency display
-    document.getElementById('totalMonthlyRecurring').textContent = formatCurrency(values.totalMonthlyRecurring);
-    document.getElementById('totalBigExpenses').textContent = formatCurrency(values.totalBigExpenses);
-    document.getElementById('monthlyBigExpenses').textContent = formatCurrency(values.monthlyBigExpenses);
-    document.getElementById('totalMonthlyExpenses').textContent = formatCurrency(values.totalMonthlyExpenses);
-    
-    // Update words display
-    document.getElementById('totalMonthlyRecurringWords').textContent = `₹${numberToWords(values.totalMonthlyRecurring)}`;
-    document.getElementById('totalBigExpensesWords').textContent = `₹${numberToWords(values.totalBigExpenses)}`;
-    document.getElementById('monthlyBigExpensesWords').textContent = `₹${numberToWords(values.monthlyBigExpenses)}`;
-    document.getElementById('totalMonthlyExpensesWords').textContent = `₹${numberToWords(values.totalMonthlyExpenses)}`;
-    
-    // Calculate and display annual values
-    const annualRecurring = values.totalMonthlyRecurring * 12;
-    const annualTotal = values.totalMonthlyExpenses * 12;
-    
-    document.getElementById('annualRecurring').textContent = formatCurrency(annualRecurring);
-    document.getElementById('annualTotal').textContent = formatCurrency(annualTotal);
-    
-    document.getElementById('annualRecurringWords').textContent = `₹${numberToWords(annualRecurring)}`;
-    document.getElementById('annualTotalWords').textContent = `₹${numberToWords(annualTotal)}`;
-}
-
-function saveExpenseData(values) {
-    // Save expense data
+function saveExpenseData() {
     const expenseData = {
         // Monthly recurring expenses
-        groceries: document.getElementById('groceries').value,
-        utilities: document.getElementById('utilities').value,
-        subscriptions: document.getElementById('subscriptions').value,
-        shopping: document.getElementById('shopping').value,
-        dining: document.getElementById('dining').value,
-        carEMI: document.getElementById('carEMI').value,
-        homeEMI: document.getElementById('homeEMI').value,
+        groceries: document.getElementById('groceries').value || '',
+        utilities: document.getElementById('utilities').value || '',
+        subscriptions: document.getElementById('subscriptions').value || '',
+        shopping: document.getElementById('shopping').value || '',
+        dining: document.getElementById('dining').value || '',
+        carEMI: document.getElementById('carEMI').value || '',
+        homeEMI: document.getElementById('homeEMI').value || '',
         
         // Big expenses
-        electronics: document.getElementById('electronics').value,
-        vacations: document.getElementById('vacations').value,
-        medical: document.getElementById('medical').value,
-        education: document.getElementById('education').value,
-        vehicle: document.getElementById('vehicle').value,
+        electronics: document.getElementById('electronics').value || '',
+        vacations: document.getElementById('vacations').value || '',
+        medical: document.getElementById('medical').value || '',
+        education: document.getElementById('education').value || '',
+        vehicle: document.getElementById('vehicle').value || '',
         
         // Custom expenses
-        monthly: Array.from(document.querySelectorAll('#customMonthlyList .custom-item')).map(item => ({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        })),
-        big: Array.from(document.querySelectorAll('#customBigList .custom-item')).map(item => ({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        })),
-        
-        // Totals
-        ...values,
+        monthly: Array.from(document.querySelectorAll('#customMonthlyList .custom-item'))
+            .map(item => ({
+                name: item.querySelector('.custom-name').value,
+                value: item.querySelector('.custom-value').value || ''
+            }))
+            .filter(item => item.value && parseFloat(item.value) > 0),
+            
+        big: Array.from(document.querySelectorAll('#customBigList .custom-item'))
+            .map(item => ({
+                name: item.querySelector('.custom-name').value,
+                value: item.querySelector('.custom-value').value || ''
+            }))
+            .filter(item => item.value && parseFloat(item.value) > 0),
+            
         lastUpdated: new Date().toISOString()
     };
     
     // Save to localStorage
     saveToLocalStorage('expenseValues', expenseData);
-    
-    // Dispatch events to notify other pages
+}
+
+function notifyUpdate() {
     window.dispatchEvent(new Event('storage'));
     window.dispatchEvent(new CustomEvent('localStorageUpdated'));
-    
-    console.log('Expense data saved and events dispatched');
 }
 
 function updateNumberInWords(inputId) {
@@ -236,26 +324,20 @@ function updateNumberInWords(inputId) {
     const wordsSpan = document.getElementById(inputId + 'Words');
     if (input && wordsSpan) {
         const value = parseFloat(input.value) || 0;
-        wordsSpan.textContent = `₹${numberToWords(value)}`;
+        wordsSpan.textContent = value > 0 ? `₹${numberToWords(value)}` : '₹Zero';
     }
 }
 
 function numberToWords(num) {
     if (num === 0) return 'Zero';
     
-    const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
-    const teens = ['Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+                  'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
     const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
     
-    if (num < 0) return 'Negative ' + numberToWords(Math.abs(num));
-    if (num < 11) return units[num];
-    if (num < 20) return teens[num - 11];
-    if (num < 100) {
-        const ten = Math.floor(num / 10);
-        const one = num % 10;
-        return tens[ten] + (one ? ' ' + units[one] : '');
-    }
-    if (num < 1000) return units[Math.floor(num / 100)] + ' Hundred' + (num % 100 ? ' and ' + numberToWords(num % 100) : '');
+    if (num < 20) return units[num];
+    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? ' ' + units[num % 10] : '');
+    if (num < 1000) return units[Math.floor(num / 100)] + ' Hundred' + (num % 100 ? ' ' + numberToWords(num % 100) : '');
     if (num < 100000) return numberToWords(Math.floor(num / 1000)) + ' Thousand' + (num % 1000 ? ' ' + numberToWords(num % 1000) : '');
     if (num < 10000000) return numberToWords(Math.floor(num / 100000)) + ' Lakh' + (num % 100000 ? ' ' + numberToWords(num % 100000) : '');
     return numberToWords(Math.floor(num / 10000000)) + ' Crore' + (num % 10000000 ? ' ' + numberToWords(num % 10000000) : '');
