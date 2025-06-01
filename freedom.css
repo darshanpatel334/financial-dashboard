@@ -54,3 +54,55 @@
     font-weight: 600;
     margin-bottom: 20px;
 }
+
+.ff-matrix {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ff-matrix th, .ff-matrix td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ff-matrix th {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.ff-matrix tr:last-child td {
+    border-bottom: none;
+}
+
+.ff-matrix tr:hover {
+    background: var(--light);
+}
+
+.ff-matrix .emoji {
+    font-size: 1.2em;
+    margin-left: 5px;
+}
+
+.ff-matrix tr.highlighted {
+    background: var(--light);
+    font-weight: 600;
+}
+
+.ff-matrix tr.highlighted td {
+    border-left: 4px solid var(--success);
+}
+
+/* FF Score Range Colors */
+.ff-ultimate { color: #2ecc71; }  /* Green */
+.ff-achieved { color: #27ae60; }  /* Dark Green */
+.ff-close { color: #3498db; }     /* Blue */
+.ff-progress { color: #f1c40f; }  /* Yellow */
+.ff-dependent { color: #e67e22; } /* Orange */
+.ff-insecure { color: #e74c3c; }  /* Red */

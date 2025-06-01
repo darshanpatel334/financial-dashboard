@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update display
         scoreElement.textContent = years.toFixed(1);
-        yearsLabel.textContent = `years without active income`;
+        yearsLabel.textContent = `${years === 1 ? 'year' : 'years'} without active income`;
         
         // Update progress bar (assuming 65 years as maximum)
-        const progressPercentage = Math.min(100, (years / 65) * 100);
+        const progressPercentage = Math.min((years / 65) * 100, 100);
         progressBar.style.width = `${progressPercentage}%`;
         
         // Update summary
@@ -61,6 +61,18 @@ document.addEventListener('DOMContentLoaded', function() {
         updateNumberInWords('monthlyExpense', monthlyExpense);
         updateNumberInWords('returnRate', returnRate);
         updateNumberInWords('inflationRate', inflationRate);
+
+        // Highlight the appropriate range in the FF matrix
+        const ffMatrixRows = document.querySelectorAll('#ffMatrixBody tr');
+        ffMatrixRows.forEach(row => {
+            row.classList.remove('highlighted');
+            const minYears = parseFloat(row.dataset.min);
+            const maxYears = row.dataset.max ? parseFloat(row.dataset.max) : Infinity;
+            
+            if (years >= minYears && years <= maxYears) {
+                row.classList.add('highlighted');
+            }
+        });
     }
 });
 
