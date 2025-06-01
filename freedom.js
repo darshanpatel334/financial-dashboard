@@ -44,42 +44,65 @@ document.addEventListener('DOMContentLoaded', function() {
         const returnRate = parseFloat(document.getElementById('returnRate').value) || 0;
         const inflationRate = parseFloat(document.getElementById('inflationRate').value) || 0;
         
-        // Calculate years of freedom
+        // Calculate annual expense
         const annualExpense = monthlyExpense * 12;
-        const realReturnRate = (1 + returnRate/100) / (1 + inflationRate/100) - 1;
+        
+        // Calculate real return rate (accounting for inflation)
+        const realReturnRate = ((1 + returnRate/100) / (1 + inflationRate/100) - 1) * 100;
+        
+        // Calculate years of freedom
         let years = 0;
         
         if (netWorth > 0 && annualExpense > 0) {
             if (realReturnRate > 0) {
-                // If real return rate is positive, calculate using compound interest formula
-                years = Math.log(1 - (netWorth * realReturnRate / annualExpense)) / Math.log(1 + realReturnRate);
-                years = Math.max(0, -years);
+                // If real return rate is positive, calculate using perpetual withdrawal rate
+                const withdrawalRate = (annualExpense / netWorth) * 100;
+                if (withdrawalRate <= realReturnRate) {
+                    years = 100; // Infinite/Perpetual freedom
+                } else {
+                    // Calculate years until depletion using compound interest formula
+                    const r = realReturnRate / 100;
+                    years = Math.log(1 - (netWorth * r / annualExpense)) / Math.log(1 + r);
+                    years = Math.max(0, -years); // Convert negative years to positive
+                }
             } else {
                 // If real return rate is zero or negative, simple division
                 years = netWorth / annualExpense;
             }
         }
         
+        // Round to 1 decimal place
+        years = Math.round(years * 10) / 10;
+        
         // Update display
-        scoreElement.textContent = years.toFixed(1);
-        yearsLabel.textContent = `${years === 1 ? 'year' : 'years'} without active income`;
+        const scoreElement = document.getElementById('score');
+        const yearsLabel = document.getElementById('yearsLabel');
+        const progressBar = document.getElementById('progressBar');
         
-        // Update progress bar (assuming 65 years as maximum)
+        if (scoreElement) scoreElement.textContent = years.toFixed(1);
+        if (yearsLabel) yearsLabel.textContent = `${years === 1 ? 'year' : 'years'} without active income`;
+        
+        // Update progress bar (max 100%)
         const progressPercentage = Math.min((years / 65) * 100, 100);
-        progressBar.style.width = `${progressPercentage}%`;
+        if (progressBar) progressBar.style.width = `${progressPercentage}%`;
         
-        // Update summary
-        initialNetWorthElement.textContent = formatCurrency(netWorth);
-        annualExpenseElement.textContent = formatCurrency(annualExpense);
-        returnRateValue.textContent = `${returnRate}%`;
-        inflationRateValue.textContent = `${inflationRate}%`;
+        // Update summary values
+        const initialNetWorthElement = document.getElementById('initialNetWorth');
+        const annualExpenseElement = document.getElementById('annualExpense');
+        const returnRateValue = document.getElementById('returnRateValue');
+        const inflationRateValue = document.getElementById('inflationRateValue');
+        
+        if (initialNetWorthElement) initialNetWorthElement.textContent = formatCurrency(netWorth);
+        if (annualExpenseElement) annualExpenseElement.textContent = formatCurrency(annualExpense);
+        if (returnRateValue) returnRateValue.textContent = `${returnRate}%`;
+        if (inflationRateValue) inflationRateValue.textContent = `${inflationRate}%`;
         
         // Update number in words
         updateNumberInWords('netWorth', netWorth);
         updateNumberInWords('monthlyExpense', monthlyExpense);
         updateNumberInWords('returnRate', returnRate);
         updateNumberInWords('inflationRate', inflationRate);
-
+        
         // Highlight the appropriate range in the FF matrix
         const ffMatrixRows = document.querySelectorAll('#ffMatrixBody tr');
         ffMatrixRows.forEach(row => {
@@ -105,8 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         saveToLocalStorage('freedomValues', freedomValues);
         
-        // Dispatch storage event for other pages
+        // Dispatch events to notify other pages
         window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new CustomEvent('localStorageUpdated'));
     }
 });
 
@@ -162,7 +186,11 @@ function loadSavedValues() {
         // Calculate total assets
         const assets = Object.keys(networthValues)
             .filter(key => !key.includes('Yield') && !key.includes('custom') && !['lastUpdated', 'totalAssets', 'totalLiabilities', 'netWorth'].includes(key))
-            .reduce((sum, key) => sum + (parseFloat(networthValues[key]) || 0), 0);
+            .reduce((sum, key) => {
+                const value = parseFloat(networthValues[key]) || 0;
+                // Only add positive values (assets)
+                return sum + (value > 0 ? value : 0);
+            }, 0);
         
         // Add custom assets
         if (networthValues.customAssets) {
@@ -191,7 +219,7 @@ function loadSavedValues() {
             .reduce((sum, key) => sum + (parseFloat(expenseValues[key]) || 0), 0);
         
         // Big expenses converted to monthly
-        const bigExpenses = ['electronics', 'vacations']
+        const bigExpenses = ['electronics', 'vacations', 'medical', 'education', 'vehicle']
             .reduce((sum, key) => sum + (parseFloat(expenseValues[key]) || 0), 0);
         
         // Custom expenses
@@ -214,13 +242,25 @@ function loadSavedValues() {
     
     // Load other saved values
     const savedValues = getFromLocalStorage('freedomValues') || {};
-    if (savedValues.userName) document.getElementById('userName').value = savedValues.userName;
-    if (savedValues.currentAge) document.getElementById('currentAge').value = savedValues.currentAge;
-    if (savedValues.returnRate) document.getElementById('returnRate').value = savedValues.returnRate;
-    if (savedValues.inflationRate) document.getElementById('inflationRate').value = savedValues.inflationRate;
+    const userName = document.getElementById('userName');
+    const currentAge = document.getElementById('currentAge');
+    const returnRate = document.getElementById('returnRate');
+    const inflationRate = document.getElementById('inflationRate');
+    
+    if (userName && savedValues.userName) userName.value = savedValues.userName;
+    if (currentAge && savedValues.currentAge) currentAge.value = savedValues.currentAge;
+    if (returnRate && savedValues.returnRate) returnRate.value = savedValues.returnRate;
+    if (inflationRate && savedValues.inflationRate) inflationRate.value = savedValues.inflationRate;
     
     // Trigger calculation
     calculateScore();
+    
+    // Log the values for debugging
+    console.log('Loaded values:', {
+        totalNetWorth,
+        totalMonthlyExpenses,
+        savedValues
+    });
 }
 
 function calculateFinancialFreedom() {
