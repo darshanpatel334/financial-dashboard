@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Load saved values
-    const savedValues = getFromLocalStorage('expenseValues');
+    const savedValues = getFromLocalStorage('expenseValues') || {};
     
     // Initialize custom expenses
     initCustomFields('custom-monthly', 'monthly', savedValues.monthly);
@@ -23,10 +23,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Calculate expenses on load
-    calculateTotalExpenses();
+    // Add save button event listener
+    document.getElementById('saveDataBtn').addEventListener('click', () => {
+        saveExpenseValues();
+        // Show feedback to user
+        const btn = document.getElementById('saveDataBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+        btn.style.background = '#27ae60';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+        }, 2000);
+    });
     
-    // Event listeners
+    // Event listeners for adding custom expenses
     document.getElementById('addMonthlyExpenseBtn').addEventListener('click', () => {
         addCustomField('custom-monthly', 'monthly');
     });
@@ -35,11 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
         addCustomField('custom-big', 'big');
     });
     
-    // Remove the updateFFBtn since we're using automatic updates
-    const updateFFExpensesBtn = document.getElementById('updateFFExpensesBtn');
-    if (updateFFExpensesBtn) {
-        updateFFExpensesBtn.style.display = 'none';
-    }
+    // Calculate expenses on load
+    calculateTotalExpenses();
 });
 
 function initCustomFields(containerId, type, savedItems = []) {
@@ -127,17 +135,30 @@ function calculateBigExpenses() {
 
 function saveExpenseValues() {
     const expenseValues = {
+        // Monthly expenses
         groceries: document.getElementById('groceries').value,
         utilities: document.getElementById('utilities').value,
         subscriptions: document.getElementById('subscriptions').value,
         shopping: document.getElementById('shopping').value,
         dining: document.getElementById('dining').value,
+        
+        // Big expenses
         carEMI: document.getElementById('carEMI').value,
         homeEMI: document.getElementById('homeEMI').value,
         electronics: document.getElementById('electronics').value,
         vacations: document.getElementById('vacations').value,
+        
+        // Custom expenses
         monthly: [],
-        big: []
+        big: [],
+        
+        // Totals
+        monthlyTotal: calculateMonthlyExpenses(),
+        bigTotal: calculateBigExpenses(),
+        totalExpenses: calculateMonthlyExpenses() + calculateBigExpenses(),
+        
+        // Metadata
+        lastUpdated: new Date().toISOString()
     };
     
     // Save custom monthly expenses
@@ -156,6 +177,7 @@ function saveExpenseValues() {
         });
     });
     
+    // Save to localStorage
     saveToLocalStorage('expenseValues', expenseValues);
 }
 

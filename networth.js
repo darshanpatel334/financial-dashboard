@@ -1,42 +1,76 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Load saved values
-    const savedValues = getFromLocalStorage('networthValues');
+    const savedValues = getFromLocalStorage('networthValues') || {};
     
     // Initialize custom assets and liabilities
-    initCustomFields('custom-assets', 'asset', savedValues.assets);
-    initCustomFields('custom-liabilities', 'liability', savedValues.liabilities);
+    initCustomFields('customAssetsList', 'asset', savedValues.customAssets || []);
+    initCustomFields('customLiabilitiesList', 'liability', savedValues.customLiabilities || []);
     
-    // Set input values and update words
-    const inputs = ['realEstate', 'gold', 'cash', 'savings', 'investments', 'homeLoan', 'carLoan', 'creditCard', 'educationLoan'];
-    inputs.forEach(id => {
-        if (savedValues[id]) document.getElementById(id).value = savedValues[id];
-        updateNumberInWords(id);
+    // Set input values from saved data
+    const inputs = {
+        buildings: savedValues.buildings || '',
+        buildingsYield: savedValues.buildingsYield || '',
+        plots: savedValues.plots || '',
+        plotsYield: savedValues.plotsYield || '',
+        land: savedValues.land || '',
+        landYield: savedValues.landYield || '',
+        directEquity: savedValues.directEquity || '',
+        directEquityYield: savedValues.directEquityYield || '',
+        equityMF: savedValues.equityMF || '',
+        equityMFYield: savedValues.equityMFYield || '',
+        debtMF: savedValues.debtMF || '',
+        debtMFYield: savedValues.debtMFYield || '',
+        fixedDeposits: savedValues.fixedDeposits || '',
+        fixedDepositsYield: savedValues.fixedDepositsYield || '',
+        otherFixedIncome: savedValues.otherFixedIncome || '',
+        otherFixedIncomeYield: savedValues.otherFixedIncomeYield || '',
+        gold: savedValues.gold || '',
+        commodity: savedValues.commodity || '',
+        cash: savedValues.cash || '',
+        homeLoan: savedValues.homeLoan || '',
+        carLoan: savedValues.carLoan || '',
+        creditCard: savedValues.creditCard || '',
+        educationLoan: savedValues.educationLoan || ''
+    };
+    
+    // Set values to input fields
+    Object.keys(inputs).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = inputs[id];
+        }
     });
     
     // Add event listeners to all input fields for auto-update
     document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('input', () => {
-            if (input.type === 'number') {
-                updateNumberInWords(input.id);
-            }
-            calculateNetWorth();
-        });
+        input.addEventListener('input', calculateNetWorth);
+    });
+    
+    // Add event listeners for buttons
+    document.getElementById('addAsset').addEventListener('click', () => {
+        addCustomField('customAssetsList', 'asset');
+    });
+    
+    document.getElementById('addLiability').addEventListener('click', () => {
+        addCustomField('customLiabilitiesList', 'liability');
+    });
+
+    // Add save button event listener
+    document.getElementById('saveDataBtn').addEventListener('click', () => {
+        saveNetWorthValues();
+        // Show feedback to user
+        const btn = document.getElementById('saveDataBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+        btn.style.background = '#27ae60';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+        }, 2000);
     });
     
     // Calculate net worth on load
     calculateNetWorth();
-    
-    // Event listeners
-    document.getElementById('addAssetBtn').addEventListener('click', () => {
-        addCustomField('custom-assets', 'asset');
-    });
-    
-    document.getElementById('addLiabilityBtn').addEventListener('click', () => {
-        addCustomField('custom-liabilities', 'liability');
-    });
-    
-    document.getElementById('calculateAssetsBtn').addEventListener('click', calculateNetWorth);
-    document.getElementById('calculateLiabilitiesBtn').addEventListener('click', calculateNetWorth);
 });
 
 function initCustomFields(containerId, type, savedItems = []) {
@@ -97,7 +131,7 @@ function calculateTotalAssets() {
     totalAssets += parseFloat(document.getElementById('investments').value) || 0;
     
     // Custom assets
-    document.querySelectorAll('#custom-assets .custom-value').forEach(input => {
+    document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
         totalAssets += parseFloat(input.value) || 0;
     });
     
@@ -114,7 +148,7 @@ function calculateTotalLiabilities() {
     totalLiabilities += parseFloat(document.getElementById('educationLoan').value) || 0;
     
     // Custom liabilities
-    document.querySelectorAll('#custom-liabilities .custom-value').forEach(input => {
+    document.querySelectorAll('#customLiabilitiesList .custom-value').forEach(input => {
         totalLiabilities += parseFloat(input.value) || 0;
     });
     
@@ -123,35 +157,62 @@ function calculateTotalLiabilities() {
 
 function saveNetWorthValues() {
     const networthValues = {
-        realEstate: document.getElementById('realEstate').value,
+        // Real Estate
+        buildings: document.getElementById('buildings').value,
+        buildingsYield: document.getElementById('buildingsYield').value,
+        plots: document.getElementById('plots').value,
+        plotsYield: document.getElementById('plotsYield').value,
+        land: document.getElementById('land').value,
+        landYield: document.getElementById('landYield').value,
+        
+        // Investments
+        directEquity: document.getElementById('directEquity').value,
+        directEquityYield: document.getElementById('directEquityYield').value,
+        equityMF: document.getElementById('equityMF').value,
+        equityMFYield: document.getElementById('equityMFYield').value,
+        debtMF: document.getElementById('debtMF').value,
+        debtMFYield: document.getElementById('debtMFYield').value,
+        
+        // Fixed Income
+        fixedDeposits: document.getElementById('fixedDeposits').value,
+        fixedDepositsYield: document.getElementById('fixedDepositsYield').value,
+        otherFixedIncome: document.getElementById('otherFixedIncome').value,
+        otherFixedIncomeYield: document.getElementById('otherFixedIncomeYield').value,
+        
+        // Other Assets
         gold: document.getElementById('gold').value,
+        commodity: document.getElementById('commodity').value,
         cash: document.getElementById('cash').value,
-        savings: document.getElementById('savings').value,
-        investments: document.getElementById('investments').value,
+        
+        // Liabilities
         homeLoan: document.getElementById('homeLoan').value,
         carLoan: document.getElementById('carLoan').value,
         creditCard: document.getElementById('creditCard').value,
         educationLoan: document.getElementById('educationLoan').value,
-        assets: [],
-        liabilities: []
+        
+        // Custom fields
+        customAssets: [],
+        customLiabilities: []
     };
     
     // Save custom assets
-    document.querySelectorAll('#custom-assets .custom-item').forEach(item => {
-        networthValues.assets.push({
+    document.querySelectorAll('#customAssetsList .custom-item').forEach(item => {
+        networthValues.customAssets.push({
             name: item.querySelector('.custom-name').value,
             value: item.querySelector('.custom-value').value
         });
     });
     
     // Save custom liabilities
-    document.querySelectorAll('#custom-liabilities .custom-item').forEach(item => {
-        networthValues.liabilities.push({
+    document.querySelectorAll('#customLiabilitiesList .custom-item').forEach(item => {
+        networthValues.customLiabilities.push({
             name: item.querySelector('.custom-name').value,
             value: item.querySelector('.custom-value').value
         });
     });
     
+    // Save to localStorage with timestamp
+    networthValues.lastUpdated = new Date().toISOString();
     saveToLocalStorage('networthValues', networthValues);
 }
 

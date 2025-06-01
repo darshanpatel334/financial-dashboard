@@ -12,6 +12,20 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('input', calculateTotalIncome);
     });
 
+    // Add save button event listener
+    document.getElementById('saveDataBtn').addEventListener('click', () => {
+        saveIncomeData();
+        // Show feedback to user
+        const btn = document.getElementById('saveDataBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+        btn.style.background = '#27ae60';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+        }, 2000);
+    });
+
     // Initial calculation
     calculateTotalIncome();
 });
@@ -103,4 +117,37 @@ function addCustomIncomeSource(name = '', amount = '') {
     });
 
     customIncomeDiv.appendChild(newRow);
+}
+
+function saveIncomeData() {
+    const incomeValues = {
+        salary: document.getElementById('salary').value,
+        rental: document.getElementById('rental').value,
+        dividend: document.getElementById('dividend').value,
+        interest: document.getElementById('interest').value,
+        fixed: document.getElementById('fixed').value,
+        customSources: [],
+        lastUpdated: new Date().toISOString()
+    };
+
+    // Save custom income sources
+    document.querySelectorAll('.custom-income-row').forEach(row => {
+        incomeValues.customSources.push({
+            name: row.querySelector('.custom-source').value,
+            amount: row.querySelector('.custom-amount').value
+        });
+    });
+
+    // Calculate totals
+    const regularIncome = parseFloat(incomeValues.salary) + parseFloat(incomeValues.rental) + 
+                         parseFloat(incomeValues.dividend) + parseFloat(incomeValues.interest);
+    const additionalIncome = parseFloat(incomeValues.fixed) + 
+                            incomeValues.customSources.reduce((sum, source) => sum + (parseFloat(source.amount) || 0), 0);
+    
+    incomeValues.regularIncome = regularIncome;
+    incomeValues.additionalIncome = additionalIncome;
+    incomeValues.totalIncome = regularIncome + additionalIncome;
+
+    // Save to localStorage
+    saveToLocalStorage('incomeValues', incomeValues);
 } 
