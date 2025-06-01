@@ -88,18 +88,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add completion buttons to each page
     if (currentPage === 'personal-info.html') {
         setupAutoSave('personalInfoForm', 'personalInfo');
-        addCompletionButton('Continue to Net Worth', './networth.html');
+        addCompletionButton('Continue to Net Worth', '/networth.html');
     } else if (currentPage === 'networth.html') {
-        addCompletionButton('Continue to Income', './income.html');
+        addCompletionButton('Continue to Income', '/income.html');
         setupAutoSave('networthForm', 'networthValues');
     } else if (currentPage === 'income.html') {
-        addCompletionButton('Continue to Expenses', './expenses.html');
+        addCompletionButton('Continue to Expenses', '/expenses.html');
         setupAutoSave('incomeForm', 'incomeValues');
     } else if (currentPage === 'expenses.html') {
-        addCompletionButton('View Dashboard', './dashboard.html');
+        addCompletionButton('View Dashboard', '/dashboard.html');
         setupAutoSave('expensesForm', 'expenseValues');
     } else if (currentPage === 'dashboard.html') {
-        addCompletionButton('Calculate FF Score', './freedom.html');
+        addCompletionButton('Calculate FF Score', '/freedom.html');
     }
 
     // Add input event listeners for number-to-words conversion
@@ -112,12 +112,12 @@ function updateNavigation(currentPage) {
 
     // Show only Home on index page
     if (currentPage === 'index.html') {
-        const links = navLinks.querySelectorAll('.nav-link:not([href="./index.html"])');
+        const links = navLinks.querySelectorAll('.nav-link:not([href="/index.html"])');
         links.forEach(link => link.style.display = 'none');
     }
 
     // Update active state
-    const activeLink = navLinks.querySelector(`[href="./${currentPage}"]`);
+    const activeLink = navLinks.querySelector(`[href="/${currentPage}"]`);
     if (activeLink) {
         navLinks.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
         activeLink.classList.add('active');
