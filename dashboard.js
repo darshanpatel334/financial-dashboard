@@ -38,9 +38,18 @@ function initializeCharts(colors) {
     const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+            padding: {
+                left: 0,
+                right: 120,  // Add padding for legend
+                top: 20,
+                bottom: 20
+            }
+        },
         plugins: {
             legend: {
                 position: 'right',
+                align: 'center',
                 labels: {
                     color: '#1a2942',
                     font: {
@@ -118,10 +127,15 @@ function initializeCharts(colors) {
                 ],
                 datasets: [{
                     data: [0, 0, 0, 0, 0, 0],
-                    backgroundColor: colors.blue
+                    backgroundColor: colors.blue,
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
                 }]
             },
-            options: commonOptions
+            options: {
+                ...commonOptions,
+                radius: '75%'  // Control pie chart size
+            }
         });
 
         // Expense Chart
@@ -136,10 +150,15 @@ function initializeCharts(colors) {
                 labels: ['Monthly', 'Big Expenses'],
                 datasets: [{
                     data: [0, 0],
-                    backgroundColor: colors.orange.slice(0, 2)
+                    backgroundColor: colors.orange.slice(0, 2),
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
                 }]
             },
-            options: commonOptions
+            options: {
+                ...commonOptions,
+                radius: '75%'
+            }
         });
 
         // Asset Chart
@@ -164,10 +183,15 @@ function initializeCharts(colors) {
                 ],
                 datasets: [{
                     data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    backgroundColor: colors.green
+                    backgroundColor: colors.green,
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
                 }]
             },
-            options: commonOptions
+            options: {
+                ...commonOptions,
+                radius: '75%'
+            }
         });
 
         // Liability Chart
@@ -182,10 +206,15 @@ function initializeCharts(colors) {
                 labels: ['Home Loan', 'Car Loan', 'Credit Card', 'Education Loan', 'Other'],
                 datasets: [{
                     data: [0, 0, 0, 0, 0],
-                    backgroundColor: colors.purple
+                    backgroundColor: colors.purple,
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
                 }]
             },
-            options: commonOptions
+            options: {
+                ...commonOptions,
+                radius: '75%'
+            }
         });
         
         console.log('All charts initialized successfully');

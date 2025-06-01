@@ -7,9 +7,29 @@
 
 .chart-container {
     position: relative;
-    height: 300px;
+    height: 400px;
     width: 100%;
     margin: 20px 0;
+    display: flex;
+    align-items: center;
+}
+
+.card {
+    padding: 25px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card .section-title {
+    margin-bottom: 15px;
+}
+
+.card .summary {
+    margin-top: auto;
+    background: var(--light);
+    border-radius: var(--border-radius);
+    padding: 15px;
 }
 
 .summary-card {
@@ -52,9 +72,13 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 450px;
     }
 }
 
