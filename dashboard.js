@@ -1,47 +1,68 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard initialization started');
-    
-    // Professional color palette with full opacity
-    const colors = {
-        blue: ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60', '#2c3e50'],
-        green: ['#2ecc71', '#27ae60', '#229954', '#1abc9c', '#16a085', '#2c3e50'],
-        purple: ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'],
-        orange: ['#e67e22', '#d35400', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041']
-    };
-
-    try {
-        // Check if Chart is available
-        if (typeof Chart === 'undefined') {
-            console.error('Chart.js is not loaded');
-            return;
-        }
-        console.log('Chart.js is loaded');
-
-        // Register Chart.js plugins
-        Chart.register(ChartDataLabels);
-        console.log('ChartDataLabels plugin registered');
-
-        // Set default Chart.js options
-        Chart.defaults.font.family = "'Poppins', 'Helvetica', 'Arial', sans-serif";
-        Chart.defaults.font.size = 12;
-        Chart.defaults.plugins.tooltip.enabled = true;
-        Chart.defaults.plugins.legend.display = true;
-        Chart.defaults.responsive = true;
-        Chart.defaults.maintainAspectRatio = false;
-
-        // Initialize charts
-        initializeCharts(colors);
-        console.log('Charts initialized');
-        
-        // Update dashboard data
-        setTimeout(() => {
-            updateDashboard();
-            console.log('Dashboard updated');
-        }, 100); // Small delay to ensure DOM is ready
-    } catch (error) {
-        console.error('Error initializing dashboard:', error);
-    }
+    initializeDashboard();
 });
+
+function initializeDashboard() {
+    console.log('Initializing dashboard');
+    
+    // Initialize charts first
+    initializeCharts(colors);
+    
+    // Add event listeners for data updates
+    window.addEventListener('storage', function(e) {
+        console.log('Storage event triggered:', e.key);
+        if (['networthValues', 'expenseValues', 'incomeData', 'freedomValues'].includes(e.key)) {
+            updateDashboard();
+        }
+    });
+    
+    window.addEventListener('localStorageUpdated', function(e) {
+        console.log('LocalStorage updated event received');
+        updateDashboard();
+    });
+    
+    // Initial update
+    updateDashboard();
+}
+
+// Professional color palette with full opacity
+const colors = {
+    blue: ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60', '#2c3e50'],
+    green: ['#2ecc71', '#27ae60', '#229954', '#1abc9c', '#16a085', '#2c3e50'],
+    purple: ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'],
+    orange: ['#e67e22', '#d35400', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041']
+};
+
+function loadDependencies() {
+    return new Promise((resolve, reject) => {
+        // Load Chart.js
+        const chartScript = document.createElement('script');
+        chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        
+        // Load Chart.js data labels plugin
+        const dataLabelsScript = document.createElement('script');
+        dataLabelsScript.src = 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels';
+        
+        let loadedCount = 0;
+        const totalScripts = 2;
+        
+        function checkAllLoaded() {
+            loadedCount++;
+            if (loadedCount === totalScripts) {
+                resolve();
+            }
+        }
+        
+        chartScript.onload = checkAllLoaded;
+        dataLabelsScript.onload = checkAllLoaded;
+        chartScript.onerror = reject;
+        dataLabelsScript.onerror = reject;
+        
+        document.head.appendChild(chartScript);
+        document.head.appendChild(dataLabelsScript);
+    });
+}
 
 function initializeCharts(colors) {
     // Common chart options

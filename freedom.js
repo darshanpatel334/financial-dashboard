@@ -17,21 +17,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const returnRateValue = document.getElementById('returnRateValue');
     const inflationRateValue = document.getElementById('inflationRateValue');
     
-    // Add input event listeners
-    [netWorthInput, monthlyExpenseInput, returnRateInput, inflationRateInput].forEach(input => {
-        input.addEventListener('input', calculateScore);
-    });
-    
-    // Add storage event listener to update when data changes in other pages
+    // Add storage event listeners for cross-page updates
     window.addEventListener('storage', function(e) {
+        console.log('Storage event triggered:', e.key);
         if (e.key === 'networthValues' || e.key === 'expenseValues') {
             loadSavedValues();
+            calculateScore();
         }
     });
     
     // Add custom event listener for localStorage changes within the same page
     window.addEventListener('localStorageUpdated', function(e) {
+        console.log('LocalStorage updated event received');
         loadSavedValues();
+        calculateScore();
+    });
+    
+    // Add input event listeners
+    [netWorthInput, monthlyExpenseInput, returnRateInput, inflationRateInput].forEach(input => {
+        if (input) {
+            input.addEventListener('input', () => {
+                updateNumberInWords(input.id);
+                calculateScore();
+            });
+        }
     });
     
     // Initial calculation
@@ -205,9 +214,13 @@ function numberToWords(num) {
 }
 
 function loadSavedValues() {
+    console.log('Loading saved values for FF Score calculation');
+    
     // Load net worth from networthValues
     const networthValues = getFromLocalStorage('networthValues') || {};
     const expenseValues = getFromLocalStorage('expenseValues') || {};
+    
+    console.log('Loaded values:', { networthValues, expenseValues });
     
     // Calculate total net worth
     let totalNetWorth = 0;
@@ -262,12 +275,23 @@ function loadSavedValues() {
         totalMonthlyExpenses = monthlyExpenses + customMonthly + (bigExpenses + customBig) / 12;
     }
     
+    console.log('Calculated values:', {
+        totalNetWorth,
+        totalMonthlyExpenses
+    });
+    
     // Set the calculated values
     const netWorthInput = document.getElementById('netWorth');
     const monthlyExpenseInput = document.getElementById('monthlyExpense');
     
-    if (netWorthInput) netWorthInput.value = totalNetWorth.toFixed(2);
-    if (monthlyExpenseInput) monthlyExpenseInput.value = totalMonthlyExpenses.toFixed(2);
+    if (netWorthInput) {
+        netWorthInput.value = totalNetWorth.toFixed(2);
+        updateNumberInWords('netWorth');
+    }
+    if (monthlyExpenseInput) {
+        monthlyExpenseInput.value = totalMonthlyExpenses.toFixed(2);
+        updateNumberInWords('monthlyExpense');
+    }
     
     // Load other saved values
     const savedValues = getFromLocalStorage('freedomValues') || {};
@@ -281,14 +305,9 @@ function loadSavedValues() {
     if (returnRate && savedValues.returnRate) returnRate.value = savedValues.returnRate;
     if (inflationRate && savedValues.inflationRate) inflationRate.value = savedValues.inflationRate;
     
-    // Trigger calculation
-    calculateScore();
-    
-    // Log the values for debugging
-    console.log('Loaded values:', {
-        totalNetWorth,
-        totalMonthlyExpenses,
-        savedValues
+    // Update words display for all values
+    ['userName', 'currentAge', 'returnRate', 'inflationRate'].forEach(id => {
+        updateNumberInWords(id);
     });
 }
 
