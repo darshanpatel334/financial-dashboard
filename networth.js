@@ -139,6 +139,33 @@ function calculateNetWorth() {
         monthly: Object.values(incomeData.monthly).reduce((sum, val) => sum + val, 0)
     };
     
+    // Add detailed breakdown for income page
+    incomeData.breakdown = {
+        rental: {
+            total: incomeData.annual.rental,
+            sources: {
+                buildings: (parseFloat(document.getElementById('buildings').value || 0) * parseFloat(document.getElementById('buildingsYield').value || 0) / 100),
+                plots: (parseFloat(document.getElementById('plots').value || 0) * parseFloat(document.getElementById('plotsYield').value || 0) / 100),
+                land: (parseFloat(document.getElementById('land').value || 0) * parseFloat(document.getElementById('landYield').value || 0) / 100)
+            }
+        },
+        dividend: {
+            total: incomeData.annual.dividend,
+            sources: {
+                directEquity: (parseFloat(document.getElementById('directEquity').value || 0) * parseFloat(document.getElementById('directEquityYield').value || 0) / 100),
+                equityMF: (parseFloat(document.getElementById('equityMF').value || 0) * parseFloat(document.getElementById('equityMFYield').value || 0) / 100)
+            }
+        },
+        interest: {
+            total: incomeData.annual.interest,
+            sources: {
+                debtMF: (parseFloat(document.getElementById('debtMF').value || 0) * parseFloat(document.getElementById('debtMFYield').value || 0) / 100),
+                fixedDeposits: (parseFloat(document.getElementById('fixedDeposits').value || 0) * parseFloat(document.getElementById('fixedDepositsYield').value || 0) / 100),
+                otherFixedIncome: (parseFloat(document.getElementById('otherFixedIncome').value || 0) * parseFloat(document.getElementById('otherFixedIncomeYield').value || 0) / 100)
+            }
+        }
+    };
+    
     // Save income data
     saveToLocalStorage('incomeData', incomeData);
     
@@ -156,14 +183,55 @@ function calculateNetWorth() {
         calculateTotalIncome();
     }
     
-    // Save net worth for FF Score
-    saveToLocalStorage('networthValues', {
-        ...getFromLocalStorage('networthValues'),
+    // Save net worth data
+    const networthData = {
+        // Save all input values
+        buildings: document.getElementById('buildings').value,
+        buildingsYield: document.getElementById('buildingsYield').value,
+        plots: document.getElementById('plots').value,
+        plotsYield: document.getElementById('plotsYield').value,
+        land: document.getElementById('land').value,
+        landYield: document.getElementById('landYield').value,
+        directEquity: document.getElementById('directEquity').value,
+        directEquityYield: document.getElementById('directEquityYield').value,
+        equityMF: document.getElementById('equityMF').value,
+        equityMFYield: document.getElementById('equityMFYield').value,
+        debtMF: document.getElementById('debtMF').value,
+        debtMFYield: document.getElementById('debtMFYield').value,
+        fixedDeposits: document.getElementById('fixedDeposits').value,
+        fixedDepositsYield: document.getElementById('fixedDepositsYield').value,
+        otherFixedIncome: document.getElementById('otherFixedIncome').value,
+        otherFixedIncomeYield: document.getElementById('otherFixedIncomeYield').value,
+        gold: document.getElementById('gold').value,
+        commodity: document.getElementById('commodity').value,
+        cash: document.getElementById('cash').value,
+        homeLoan: document.getElementById('homeLoan').value,
+        carLoan: document.getElementById('carLoan').value,
+        creditCard: document.getElementById('creditCard').value,
+        educationLoan: document.getElementById('educationLoan').value,
+        
+        // Save custom fields
+        customAssets: Array.from(document.querySelectorAll('#customAssetsList .custom-item')).map(item => ({
+            name: item.querySelector('.custom-name').value,
+            value: item.querySelector('.custom-value').value
+        })),
+        customLiabilities: Array.from(document.querySelectorAll('#customLiabilitiesList .custom-item')).map(item => ({
+            name: item.querySelector('.custom-name').value,
+            value: item.querySelector('.custom-value').value
+        })),
+        
+        // Save calculated totals
         totalAssets,
         totalLiabilities,
         netWorth,
         lastUpdated: new Date().toISOString()
-    });
+    };
+    
+    // Save to localStorage
+    saveToLocalStorage('networthValues', networthData);
+    
+    // Dispatch storage event for other pages
+    window.dispatchEvent(new Event('storage'));
 }
 
 function calculateRentalIncome() {
