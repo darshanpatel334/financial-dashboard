@@ -64,10 +64,12 @@ function calculateTotalIncome() {
     let customTotal = 0;
     const customSources = [];
     document.querySelectorAll('.custom-income-row').forEach(row => {
-        const amount = parseFloat(row.querySelector('input[type="number"]').value) || 0;
-        const name = row.querySelector('input[type="text"]').value;
+        const amount = parseFloat(row.querySelector('.custom-amount').value) || 0;
+        const name = row.querySelector('.custom-source').value;
         customTotal += amount;
-        customSources.push({ name, amount });
+        if (name || amount) {
+            customSources.push({ name, amount });
+        }
     });
 
     const regularIncome = salary + rental + dividend + interest;
@@ -79,7 +81,7 @@ function calculateTotalIncome() {
     document.getElementById('additionalIncome').textContent = formatCurrency(additionalIncome);
     document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
 
-    // Save values
+    // Save values automatically
     const incomeValues = {
         salary,
         rental,
@@ -87,7 +89,10 @@ function calculateTotalIncome() {
         interest,
         fixed,
         customSources,
-        total: totalIncome
+        regularIncome,
+        additionalIncome,
+        totalIncome,
+        lastUpdated: new Date().toISOString()
     };
     saveToLocalStorage('incomeValues', incomeValues);
 }
@@ -99,7 +104,7 @@ function addCustomIncomeSource(name = '', amount = '') {
     newRow.innerHTML = `
         <div class="custom-income-inputs">
             <input type="text" placeholder="Income Source" value="${name}" class="custom-source">
-            <input type="number" placeholder="Amount (₹)" value="${amount}" class="custom-amount">
+            <input type="number" placeholder="Amount (₹)" value="${amount}" class="custom-amount no-spinner">
         </div>
         <button type="button" class="remove-income">
             <i class="fas fa-trash"></i>
@@ -117,6 +122,7 @@ function addCustomIncomeSource(name = '', amount = '') {
     });
 
     customIncomeDiv.appendChild(newRow);
+    calculateTotalIncome(); // Calculate totals after adding new row
 }
 
 function saveIncomeData() {
