@@ -747,65 +747,56 @@ input[type="number"].no-spinner {
 
 /* Features Section */
 .features {
-    padding: 4rem 2rem;
-    background-color: var(--light);
+    padding: 40px 0;
 }
 
 .features h2 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 40px;
     color: var(--primary);
+    font-size: 2rem;
 }
 
-.features-content {
-    max-width: 800px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
-.features-content p {
-    margin-bottom: 1.5rem;
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-}
-
-.features-grid {
+.feature-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 30px;
-    margin-top: 40px;
+    margin-top: 30px;
 }
 
 .feature-card {
-    background: var(--card-bg);
+    background: white;
     border-radius: var(--border-radius);
     padding: 30px;
-    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: var(--transition);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .feature-card:hover {
-    transform: translateY(-10px);
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: var(--shadow);
-}
-
-.feature-card i {
-    font-size: 2.5rem;
-    color: var(--accent);
-    margin-bottom: 20px;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 .feature-card h3 {
+    color: var(--primary);
     font-size: 1.4rem;
-    margin-bottom: 15px;
-    color: white;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature-card h3 i {
+    color: var(--success);
 }
 
 .feature-card p {
-    color: #c0d6e4;
+    color: var(--text);
     line-height: 1.6;
+    margin: 0;
 }
 
 /* About Section */
@@ -895,9 +886,8 @@ input[type="number"].no-spinner {
         font-size: 2rem;
     }
 
-    .feature-card,
-    .tool-card {
-        padding: 20px;
+    .feature-cards {
+        grid-template-columns: 1fr;
     }
 
     .footer-content {
