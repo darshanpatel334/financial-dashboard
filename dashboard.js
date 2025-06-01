@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard initialization started');
     
-    // Professional color palette
+    // Professional color palette with full opacity
     const colors = {
-        blue: ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60', '#2c3e50'].map(color => color + 'ee'),
-        green: ['#2ecc71', '#27ae60', '#229954', '#1abc9c', '#16a085', '#2c3e50'].map(color => color + 'ee'),
-        purple: ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'].map(color => color + 'ee'),
-        orange: ['#e67e22', '#d35400', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041'].map(color => color + 'ee')
+        blue: ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#27ae60', '#2c3e50'],
+        green: ['#2ecc71', '#27ae60', '#229954', '#1abc9c', '#16a085', '#2c3e50'],
+        purple: ['#9b59b6', '#8e44ad', '#7d3c98', '#6c3483', '#5b2c6f', '#4a235a'],
+        orange: ['#e67e22', '#d35400', '#f39c12', '#f1c40f', '#f4d03f', '#f5b041']
     };
 
     try {
@@ -21,13 +21,23 @@ document.addEventListener('DOMContentLoaded', function() {
         Chart.register(ChartDataLabels);
         console.log('ChartDataLabels plugin registered');
 
+        // Set default Chart.js options
+        Chart.defaults.font.family = "'Poppins', 'Helvetica', 'Arial', sans-serif";
+        Chart.defaults.font.size = 12;
+        Chart.defaults.plugins.tooltip.enabled = true;
+        Chart.defaults.plugins.legend.display = true;
+        Chart.defaults.responsive = true;
+        Chart.defaults.maintainAspectRatio = false;
+
         // Initialize charts
         initializeCharts(colors);
         console.log('Charts initialized');
         
         // Update dashboard data
-        updateDashboard();
-        console.log('Dashboard updated');
+        setTimeout(() => {
+            updateDashboard();
+            console.log('Dashboard updated');
+        }, 100); // Small delay to ensure DOM is ready
     } catch (error) {
         console.error('Error initializing dashboard:', error);
     }
@@ -41,22 +51,24 @@ function initializeCharts(colors) {
         layout: {
             padding: {
                 left: 20,
-                right: 120,  // Add padding for legend
+                right: 120,
                 top: 20,
                 bottom: 20
             }
         },
         plugins: {
             legend: {
+                display: true,
                 position: 'right',
                 align: 'center',
                 labels: {
+                    boxWidth: 15,
+                    padding: 15,
                     color: '#1a2942',
                     font: {
                         size: 12,
                         weight: 'bold'
                     },
-                    padding: 20,
                     generateLabels: function(chart) {
                         const data = chart.data;
                         if (data.labels.length && data.datasets.length) {
@@ -67,7 +79,7 @@ function initializeCharts(colors) {
                                 return {
                                     text: `${label}: ${percentage}%`,
                                     fillStyle: data.datasets[0].backgroundColor[i],
-                                    strokeStyle: data.datasets[0].backgroundColor[i],
+                                    strokeStyle: '#ffffff',
                                     lineWidth: 2,
                                     hidden: isNaN(value) || value === 0,
                                     index: i
@@ -79,6 +91,7 @@ function initializeCharts(colors) {
                 }
             },
             datalabels: {
+                display: true,
                 color: '#ffffff',
                 font: {
                     weight: 'bold',
@@ -97,7 +110,8 @@ function initializeCharts(colors) {
 
     const pieOptions = {
         ...commonOptions,
-        radius: '75%',  // Control pie chart size
+        cutout: 0,  // Make it a pie chart (not doughnut)
+        radius: '75%',
         plugins: {
             ...commonOptions.plugins,
             tooltip: {
@@ -136,8 +150,8 @@ function initializeCharts(colors) {
                 datasets: [{
                     data: [0, 0, 0, 0, 0, 0],
                     backgroundColor: colors.blue,
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
+                    borderColor: '#ffffff',
+                    borderWidth: 2
                 }]
             },
             options: pieOptions
@@ -156,8 +170,8 @@ function initializeCharts(colors) {
                 datasets: [{
                     data: [0, 0],
                     backgroundColor: colors.orange.slice(0, 2),
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
+                    borderColor: '#ffffff',
+                    borderWidth: 2
                 }]
             },
             options: pieOptions
@@ -186,8 +200,8 @@ function initializeCharts(colors) {
                 datasets: [{
                     data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
                     backgroundColor: colors.green,
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
+                    borderColor: '#ffffff',
+                    borderWidth: 2
                 }]
             },
             options: pieOptions
@@ -206,8 +220,8 @@ function initializeCharts(colors) {
                 datasets: [{
                     data: [0, 0, 0, 0, 0],
                     backgroundColor: colors.purple,
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
+                    borderColor: '#ffffff',
+                    borderWidth: 2
                 }]
             },
             options: pieOptions
@@ -415,7 +429,7 @@ function updateCharts(networthValues, expenseValues) {
             window.incomeChart.data.labels = filteredData.labels;
             window.incomeChart.data.datasets[0].data = filteredData.data;
             window.incomeChart.data.datasets[0].backgroundColor = colors.blue.slice(0, filteredData.data.length);
-            window.incomeChart.update('none'); // Disable animation for immediate update
+            window.incomeChart.update('none');
             console.log('Income chart updated with filtered data:', filteredData);
         }
 

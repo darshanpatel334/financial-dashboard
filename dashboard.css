@@ -12,13 +12,19 @@
     margin: 20px 0;
     display: flex;
     align-items: center;
+    background: #ffffff;
+    border-radius: var(--border-radius);
+    overflow: visible;
 }
 
 .card {
+    background: #ffffff;
     padding: 25px;
     min-height: 500px;
     display: flex;
     flex-direction: column;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .card .section-title {
@@ -70,6 +76,11 @@
     font-weight: 700;
     color: #ffffff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+canvas {
+    max-width: 100%;
+    height: 100%;
 }
 
 @media (max-width: 1400px) {
