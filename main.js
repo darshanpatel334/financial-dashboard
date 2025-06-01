@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add completion buttons to each page
     if (currentPage === 'personal-info.html') {
         setupAutoSave('personalInfoForm', 'personalInfo');
-        addCompletionButton('Continue to Net Worth', '/networth.html');
     } else if (currentPage === 'networth.html') {
         addCompletionButton('Continue to Income', '/income.html');
         setupAutoSave('networthForm', 'networthValues');
