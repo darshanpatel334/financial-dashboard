@@ -412,4 +412,61 @@ function updateCharts(networthValues, expenseValues) {
     } catch (error) {
         console.error('Error updating charts:', error);
     }
+}
+
+function createIncomeOverviewChart(data) {
+    const ctx = document.getElementById('incomeOverviewChart').getContext('2d');
+    
+    // Calculate total for percentages
+    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+    
+    const incomeOverviewChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: '#1a2942',
+                        font: {
+                            size: 14
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map(function(label, i) {
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${percentage}%`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        strokeStyle: data.datasets[0].backgroundColor[i],
+                                        lineWidth: 2,
+                                        hidden: isNaN(data.datasets[0].data[i]) || data.datasets[0].data[i] === 0,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ₹${value.toLocaleString()} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+    
+    return incomeOverviewChart;
 } 

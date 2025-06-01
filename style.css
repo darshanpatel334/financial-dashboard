@@ -225,13 +225,19 @@ body {
 
 .section-header #downloadPDFBtn {
     margin: 1rem auto;
-    background: var(--danger);
+    background: var(--success);
+    color: white;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
 }
 
 .section-header #downloadPDFBtn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
 }
 
 /* Common Card Styles */
@@ -680,37 +686,25 @@ input[type="number"].no-spinner {
 }
 
 .btn-back {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: var(--light);
+    color: var(--primary);
+    border: 2px solid var(--border-color);
 }
 
 .btn-next {
-    background: linear-gradient(to right, var(--accent), var(--secondary));
+    background: var(--accent);
     color: white;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .btn-back:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-color);
     transform: translateX(-5px);
 }
 
 .btn-next:hover {
     transform: translateX(5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
-
-@media (max-width: 768px) {
-    .navigation-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .btn-back, .btn-next {
-        text-align: center;
-        justify-content: center;
-    }
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Personal Information Page */

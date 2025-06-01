@@ -2,17 +2,66 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load saved values from localStorage
     loadSavedValues();
     
-    // Add input event listeners for automatic updates
-    document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('input', () => {
-            updateNumberInWords(input.id);
-            calculateFinancialFreedom();
-        });
+    // Get input elements
+    const netWorthInput = document.getElementById('netWorth');
+    const monthlyExpenseInput = document.getElementById('monthlyExpense');
+    const returnRateInput = document.getElementById('returnRate');
+    const inflationRateInput = document.getElementById('inflationRate');
+    
+    // Get display elements
+    const scoreElement = document.getElementById('score');
+    const progressBar = document.getElementById('progressBar');
+    const yearsLabel = document.getElementById('yearsLabel');
+    const initialNetWorthElement = document.getElementById('initialNetWorth');
+    const annualExpenseElement = document.getElementById('annualExpense');
+    const returnRateValue = document.getElementById('returnRateValue');
+    const inflationRateValue = document.getElementById('inflationRateValue');
+    
+    // Add input event listeners
+    [netWorthInput, monthlyExpenseInput, returnRateInput, inflationRateInput].forEach(input => {
+        input.addEventListener('input', calculateScore);
     });
     
-    // Initial calculation and word updates
-    updateAllNumbersInWords();
-    calculateFinancialFreedom();
+    // Initial calculation
+    calculateScore();
+    
+    function calculateScore() {
+        // Get values
+        const netWorth = parseFloat(netWorthInput.value) || 0;
+        const monthlyExpense = parseFloat(monthlyExpenseInput.value) || 0;
+        const returnRate = parseFloat(returnRateInput.value) || 0;
+        const inflationRate = parseFloat(inflationRateInput.value) || 0;
+        
+        // Calculate years of freedom
+        const annualExpense = monthlyExpense * 12;
+        const realReturnRate = (1 + returnRate/100) / (1 + inflationRate/100) - 1;
+        let years = 0;
+        
+        if (realReturnRate > 0 && netWorth > 0 && annualExpense > 0) {
+            years = Math.log(1 - (netWorth * realReturnRate / annualExpense)) / Math.log(1 + realReturnRate);
+            years = Math.max(0, -years);
+        }
+        
+        // Update display
+        scoreElement.textContent = years.toFixed(1);
+        yearsLabel.textContent = `years without active income`;
+        
+        // Update progress bar (assuming 65 years as maximum)
+        const progressPercentage = Math.min(100, (years / 65) * 100);
+        progressBar.style.width = `${progressPercentage}%`;
+        
+        // Update summary
+        initialNetWorthElement.textContent = `₹${formatNumber(netWorth)}`;
+        annualExpenseElement.textContent = `₹${formatNumber(annualExpense)}`;
+        returnRateValue.textContent = `${returnRate}%`;
+        inflationRateValue.textContent = `${inflationRate}%`;
+        
+        // Update number in words
+        updateNumberInWords('netWorth', netWorth);
+        updateNumberInWords('monthlyExpense', monthlyExpense);
+        updateNumberInWords('returnRate', returnRate);
+        updateNumberInWords('inflationRate', inflationRate);
+    }
 });
 
 function updateAllNumbersInWords() {
