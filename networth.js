@@ -114,6 +114,9 @@ function calculateNetWorth() {
     document.getElementById('totalLiabilities').textContent = formatCurrency(totalLiabilities);
     document.getElementById('netWorth').textContent = formatCurrency(netWorth);
     
+    // Calculate category totals
+    calculateCategoryTotals();
+    
     // Calculate and update income data
     const incomeData = {
         annual: {
@@ -125,9 +128,15 @@ function calculateNetWorth() {
     
     // Convert annual to monthly
     incomeData.monthly = {
-        rental: incomeData.annual.rental / 12,
-        dividend: incomeData.annual.dividend / 12,
-        interest: incomeData.annual.interest / 12
+        rental: Math.round(incomeData.annual.rental / 12),
+        dividend: Math.round(incomeData.annual.dividend / 12),
+        interest: Math.round(incomeData.annual.interest / 12)
+    };
+    
+    // Calculate totals
+    incomeData.totals = {
+        annual: Object.values(incomeData.annual).reduce((sum, val) => sum + val, 0),
+        monthly: Object.values(incomeData.monthly).reduce((sum, val) => sum + val, 0)
     };
     
     // Save income data
@@ -138,14 +147,23 @@ function calculateNetWorth() {
     const dividendInput = document.getElementById('dividend');
     const interestInput = document.getElementById('interest');
     
-    if (rentalInput) rentalInput.value = Math.round(incomeData.monthly.rental);
-    if (dividendInput) dividendInput.value = Math.round(incomeData.monthly.dividend);
-    if (interestInput) interestInput.value = Math.round(incomeData.monthly.interest);
+    if (rentalInput) rentalInput.value = incomeData.monthly.rental;
+    if (dividendInput) dividendInput.value = incomeData.monthly.dividend;
+    if (interestInput) interestInput.value = incomeData.monthly.interest;
     
     // Trigger income calculations if on income page
     if (typeof calculateTotalIncome === 'function') {
         calculateTotalIncome();
     }
+    
+    // Save net worth for FF Score
+    saveToLocalStorage('networthValues', {
+        ...getFromLocalStorage('networthValues'),
+        totalAssets,
+        totalLiabilities,
+        netWorth,
+        lastUpdated: new Date().toISOString()
+    });
 }
 
 function calculateRentalIncome() {

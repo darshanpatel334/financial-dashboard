@@ -125,12 +125,26 @@ function loadSavedValues() {
     // Calculate total net worth
     let totalNetWorth = 0;
     if (networthValues) {
+        // Calculate total assets
         const assets = Object.keys(networthValues)
-            .filter(key => !key.includes('Yield') && !key.includes('custom'))
+            .filter(key => !key.includes('Yield') && !key.includes('custom') && key !== 'lastUpdated')
             .reduce((sum, key) => sum + (parseFloat(networthValues[key]) || 0), 0);
         
+        // Add custom assets
+        if (networthValues.customAssets) {
+            totalNetWorth += networthValues.customAssets.reduce((sum, asset) => 
+                sum + (parseFloat(asset.value) || 0), 0);
+        }
+        
+        // Calculate total liabilities
         const liabilities = ['homeLoan', 'carLoan', 'creditCard', 'educationLoan']
             .reduce((sum, key) => sum + (parseFloat(networthValues[key]) || 0), 0);
+        
+        // Add custom liabilities
+        if (networthValues.customLiabilities) {
+            liabilities += networthValues.customLiabilities.reduce((sum, liability) => 
+                sum + (parseFloat(liability.value) || 0), 0);
+        }
         
         totalNetWorth = assets - liabilities;
     }
@@ -153,6 +167,7 @@ function loadSavedValues() {
         const customBig = (expenseValues.big || [])
             .reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
         
+        // Calculate total monthly (including big expenses spread over 12 months)
         totalMonthlyExpenses = monthlyExpenses + customMonthly + (bigExpenses + customBig) / 12;
     }
     
@@ -166,6 +181,9 @@ function loadSavedValues() {
     if (savedValues.currentAge) document.getElementById('currentAge').value = savedValues.currentAge;
     if (savedValues.returnRate) document.getElementById('returnRate').value = savedValues.returnRate;
     if (savedValues.inflationRate) document.getElementById('inflationRate').value = savedValues.inflationRate;
+    
+    // Trigger initial calculation
+    calculateScore();
 }
 
 function calculateFinancialFreedom() {
