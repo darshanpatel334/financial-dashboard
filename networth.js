@@ -104,20 +104,65 @@ function addCustomField(containerId, type, item = { name: '', value: '' }) {
 }
 
 function calculateNetWorth() {
-    // Calculate total assets
-    let totalAssets = calculateTotalAssets();
+    // Calculate totals
+    const totalAssets = calculateTotalAssets();
+    const totalLiabilities = calculateTotalLiabilities();
+    const netWorth = totalAssets - totalLiabilities;
+    
+    // Update display
     document.getElementById('totalAssets').textContent = formatCurrency(totalAssets);
-    
-    // Calculate total liabilities
-    let totalLiabilities = calculateTotalLiabilities();
     document.getElementById('totalLiabilities').textContent = formatCurrency(totalLiabilities);
-    
-    // Calculate net worth
-    let netWorth = totalAssets - totalLiabilities;
     document.getElementById('netWorth').textContent = formatCurrency(netWorth);
     
-    // Calculate category totals
-    calculateCategoryTotals();
+    // Calculate and update income data
+    const incomeData = {
+        annual: {
+            rental: calculateRentalIncome(),
+            dividend: calculateDividendIncome(),
+            interest: calculateInterestIncome()
+        }
+    };
+    
+    // Convert annual to monthly
+    incomeData.monthly = {
+        rental: incomeData.annual.rental / 12,
+        dividend: incomeData.annual.dividend / 12,
+        interest: incomeData.annual.interest / 12
+    };
+    
+    // Save income data
+    saveToLocalStorage('incomeData', incomeData);
+    
+    // Update income page if it exists
+    const rentalInput = document.getElementById('rental');
+    const dividendInput = document.getElementById('dividend');
+    const interestInput = document.getElementById('interest');
+    
+    if (rentalInput) rentalInput.value = Math.round(incomeData.monthly.rental);
+    if (dividendInput) dividendInput.value = Math.round(incomeData.monthly.dividend);
+    if (interestInput) interestInput.value = Math.round(incomeData.monthly.interest);
+    
+    // Trigger income calculations if on income page
+    if (typeof calculateTotalIncome === 'function') {
+        calculateTotalIncome();
+    }
+}
+
+function calculateRentalIncome() {
+    return (parseFloat(document.getElementById('buildings').value || 0) * parseFloat(document.getElementById('buildingsYield').value || 0) / 100) +
+           (parseFloat(document.getElementById('plots').value || 0) * parseFloat(document.getElementById('plotsYield').value || 0) / 100) +
+           (parseFloat(document.getElementById('land').value || 0) * parseFloat(document.getElementById('landYield').value || 0) / 100);
+}
+
+function calculateDividendIncome() {
+    return (parseFloat(document.getElementById('directEquity').value || 0) * parseFloat(document.getElementById('directEquityYield').value || 0) / 100) +
+           (parseFloat(document.getElementById('equityMF').value || 0) * parseFloat(document.getElementById('equityMFYield').value || 0) / 100);
+}
+
+function calculateInterestIncome() {
+    return (parseFloat(document.getElementById('debtMF').value || 0) * parseFloat(document.getElementById('debtMFYield').value || 0) / 100) +
+           (parseFloat(document.getElementById('fixedDeposits').value || 0) * parseFloat(document.getElementById('fixedDepositsYield').value || 0) / 100) +
+           (parseFloat(document.getElementById('otherFixedIncome').value || 0) * parseFloat(document.getElementById('otherFixedIncomeYield').value || 0) / 100);
 }
 
 function calculateTotalAssets() {

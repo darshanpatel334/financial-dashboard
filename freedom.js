@@ -118,17 +118,47 @@ function numberToWords(num) {
 }
 
 function loadSavedValues() {
-    // Load net worth
-    const savedNetWorth = localStorage.getItem('savedNetWorth');
-    if (savedNetWorth) {
-        document.getElementById('netWorth').value = parseFloat(savedNetWorth).toFixed(2);
+    // Load net worth from networthValues
+    const networthValues = getFromLocalStorage('networthValues') || {};
+    const expenseValues = getFromLocalStorage('expenseValues') || {};
+    
+    // Calculate total net worth
+    let totalNetWorth = 0;
+    if (networthValues) {
+        const assets = Object.keys(networthValues)
+            .filter(key => !key.includes('Yield') && !key.includes('custom'))
+            .reduce((sum, key) => sum + (parseFloat(networthValues[key]) || 0), 0);
+        
+        const liabilities = ['homeLoan', 'carLoan', 'creditCard', 'educationLoan']
+            .reduce((sum, key) => sum + (parseFloat(networthValues[key]) || 0), 0);
+        
+        totalNetWorth = assets - liabilities;
     }
     
-    // Load monthly expenses
-    const savedMonthlyExpenses = localStorage.getItem('savedMonthlyExpenses');
-    if (savedMonthlyExpenses) {
-        document.getElementById('monthlyExpense').value = parseFloat(savedMonthlyExpenses).toFixed(2);
+    // Calculate total monthly expenses
+    let totalMonthlyExpenses = 0;
+    if (expenseValues) {
+        // Regular monthly expenses
+        const monthlyExpenses = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI']
+            .reduce((sum, key) => sum + (parseFloat(expenseValues[key]) || 0), 0);
+        
+        // Big expenses converted to monthly
+        const bigExpenses = ['electronics', 'vacations']
+            .reduce((sum, key) => sum + (parseFloat(expenseValues[key]) || 0), 0);
+        
+        // Custom expenses
+        const customMonthly = (expenseValues.monthly || [])
+            .reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
+        
+        const customBig = (expenseValues.big || [])
+            .reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
+        
+        totalMonthlyExpenses = monthlyExpenses + customMonthly + (bigExpenses + customBig) / 12;
     }
+    
+    // Set the calculated values
+    document.getElementById('netWorth').value = totalNetWorth.toFixed(2);
+    document.getElementById('monthlyExpense').value = totalMonthlyExpenses.toFixed(2);
     
     // Load other saved values
     const savedValues = getFromLocalStorage('freedomValues') || {};

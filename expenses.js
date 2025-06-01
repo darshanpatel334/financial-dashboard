@@ -81,12 +81,54 @@ function calculateTotalExpenses() {
     let bigExpenses = calculateBigExpenses();
     document.getElementById('bigExpensesResult').textContent = formatCurrency(bigExpenses);
     
-    // Calculate total
-    let totalExpenses = monthlyExpenses + bigExpenses;
-    document.getElementById('totalExpenses').textContent = formatCurrency(totalExpenses);
+    // Calculate total monthly (including big expenses spread over 12 months)
+    let totalMonthlyExpenses = monthlyExpenses + (bigExpenses / 12);
+    document.getElementById('totalExpenses').textContent = formatCurrency(totalMonthlyExpenses);
     
-    // Automatically save to localStorage
-    localStorage.setItem('savedMonthlyExpenses', totalExpenses);
+    // Save expense data
+    const expenseValues = {
+        // Monthly expenses
+        groceries: document.getElementById('groceries').value,
+        utilities: document.getElementById('utilities').value,
+        subscriptions: document.getElementById('subscriptions').value,
+        shopping: document.getElementById('shopping').value,
+        dining: document.getElementById('dining').value,
+        carEMI: document.getElementById('carEMI').value,
+        homeEMI: document.getElementById('homeEMI').value,
+        
+        // Big expenses
+        electronics: document.getElementById('electronics').value,
+        vacations: document.getElementById('vacations').value,
+        
+        // Custom expenses
+        monthly: [],
+        big: [],
+        
+        // Totals
+        totalMonthly: monthlyExpenses,
+        totalBig: bigExpenses,
+        totalMonthlyWithBig: totalMonthlyExpenses,
+        lastUpdated: new Date().toISOString()
+    };
+    
+    // Save custom monthly expenses
+    document.querySelectorAll('#custom-monthly .custom-item').forEach(item => {
+        expenseValues.monthly.push({
+            name: item.querySelector('.custom-name').value,
+            value: item.querySelector('.custom-value').value
+        });
+    });
+    
+    // Save custom big expenses
+    document.querySelectorAll('#custom-big .custom-item').forEach(item => {
+        expenseValues.big.push({
+            name: item.querySelector('.custom-name').value,
+            value: item.querySelector('.custom-value').value
+        });
+    });
+    
+    // Save to localStorage
+    saveToLocalStorage('expenseValues', expenseValues);
 }
 
 function calculateMonthlyExpenses() {
