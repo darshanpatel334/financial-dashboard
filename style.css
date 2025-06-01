@@ -41,7 +41,7 @@ body {
 
 /* Navigation */
 .navbar {
-    background: #ffffff;
+    background: var(--primary);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
@@ -50,7 +50,6 @@ body {
     top: 0;
     z-index: 1000;
     box-shadow: var(--shadow);
-    border-bottom: 1px solid var(--border-color);
 }
 
 .logo {
@@ -59,7 +58,7 @@ body {
     gap: 12px;
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--primary);
+    color: white;
 }
 
 .logo img {
@@ -82,16 +81,15 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--light);
+    background: rgba(255, 255, 255, 0.1);
     text-decoration: none;
-    color: var(--text-primary);
+    color: white;
 }
 
 .nav-link:hover, .nav-link.active {
     background: var(--accent);
-    color: white;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
 }
 
 /* Hero Section */
@@ -238,7 +236,7 @@ body {
 
 /* Common Card Styles */
 .card {
-    background: #ffffff;
+    background: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     overflow: hidden;
@@ -287,21 +285,36 @@ body {
     margin-bottom: 20px;
 }
 
-.form-group label {
-    color: var(--text-primary);
+label {
+    display: block;
+    margin-bottom: 10px;
     font-weight: 600;
-    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.form-group input {
-    background: #ffffff;
+input {
+    width: 100%;
+    padding: 16px 20px;
     border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    background: #ffffff;
     color: var(--text-primary);
 }
 
-.form-group input:focus {
+input:focus {
     border-color: var(--accent);
+    outline: none;
     box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+}
+
+input::placeholder {
+    color: #a0aec0;
 }
 
 .btn-calculate {
@@ -371,16 +384,14 @@ body {
     border-radius: 15px;
     padding: 25px;
     margin-bottom: 30px;
-    border: 1px solid var(--border-color);
 }
 
 .summary-item {
-    color: var(--text-primary);
-    padding: 15px;
-    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .summary-item:last-child {
@@ -581,7 +592,7 @@ input[type="number"].no-spinner {
 .asset-category {
     margin-bottom: 30px;
     padding: 20px;
-    background: var(--light);
+    background: var(--card-bg);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
 }
@@ -625,29 +636,27 @@ input[type="number"].no-spinner {
 .category-total {
     margin-top: 1rem;
     padding: 1rem;
-    background-color: var(--light);
+    background: var(--light);
     border-radius: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid var(--border-color);
     color: var(--text-primary);
 }
 
 .category-income {
     margin-top: 0.5rem;
     padding: 1rem;
-    background-color: rgba(46, 204, 113, 0.1);
+    background: rgba(46, 204, 113, 0.1);
     border-radius: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: var(--text-primary);
-    border: 1px solid #2ecc71;
 }
 
 .category-income .highlight {
-    color: #27ae60;
+    color: var(--success);
     font-weight: bold;
 }
 
