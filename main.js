@@ -38,7 +38,7 @@ function setupAutoSave(formId, storageKey) {
     const savedData = getFromLocalStorage(storageKey) || {};
     
     // Find all input elements within the form
-    const inputs = form.querySelectorAll('input[type="number"]');
+    const inputs = form.querySelectorAll('input[type="number"], input[type="text"], input[type="email"]');
     
     // Restore saved values
     inputs.forEach(input => {
@@ -51,7 +51,7 @@ function setupAutoSave(formId, storageKey) {
 
     // Setup auto-save on input
     form.addEventListener('input', (e) => {
-        if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
+        if (e.target.tagName === 'INPUT') {
             const formData = getFromLocalStorage(storageKey) || {};
             formData[e.target.id] = e.target.value;
             saveToLocalStorage(storageKey, formData);
@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add completion buttons to each page
     if (currentPage === 'personal-info.html') {
+        setupAutoSave('personalInfoForm', 'personalInfo');
         addCompletionButton('Continue to Net Worth', './networth.html');
     } else if (currentPage === 'networth.html') {
         addCompletionButton('Continue to Income', './income.html');

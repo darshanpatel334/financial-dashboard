@@ -29,6 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(personalInfo.email)) {
+            showMessage('Please enter a valid email address', 'error');
+            return;
+        }
+
         // Save to localStorage
         saveToLocalStorage('personalInfo', personalInfo);
         showMessage('Information saved successfully!', 'success');
