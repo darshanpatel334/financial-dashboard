@@ -1,33 +1,30 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Load saved data
+    // Load saved values
     loadSavedIncomeData();
-
-    // Add income source button
-    document.getElementById('addIncomeBtn').addEventListener('click', () => {
-        addCustomIncomeSource();
-    });
-
-    // Add event listeners to all inputs
-    document.querySelectorAll('input').forEach(input => {
+    
+    // Add event listeners for input changes
+    document.querySelectorAll('input[type="number"]').forEach(input => {
         input.addEventListener('input', calculateTotalIncome);
     });
-
-    // Add save button event listener
-    document.getElementById('saveDataBtn').addEventListener('click', () => {
-        saveIncomeData();
-        // Show feedback to user
-        const btn = document.getElementById('saveDataBtn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-        btn.style.background = '#27ae60';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = '';
-        }, 2000);
+    
+    // Add event listener for custom income sources
+    document.getElementById('addIncomeSource').addEventListener('click', () => {
+        addCustomIncomeSource();
     });
-
-    // Initial calculation
-    calculateTotalIncome();
+    
+    // Add save button event listener
+    document.getElementById('saveDataBtn').addEventListener('click', saveIncomeData);
+    
+    // Add storage event listeners
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'incomeData' || e.key === 'networthValues') {
+            loadSavedIncomeData();
+        }
+    });
+    
+    window.addEventListener('localStorageUpdated', function(e) {
+        loadSavedIncomeData();
+    });
 });
 
 function loadSavedIncomeData() {
@@ -35,10 +32,10 @@ function loadSavedIncomeData() {
     const savedValues = getFromLocalStorage('incomeValues') || {};
 
     // Set values from assets calculations
-    if (incomeData.breakdown) {
-        document.getElementById('rental').value = Math.round(incomeData.breakdown.rental.total / 12) || 0;
-        document.getElementById('dividend').value = Math.round(incomeData.breakdown.dividend.total / 12) || 0;
-        document.getElementById('interest').value = Math.round(incomeData.breakdown.interest.total / 12) || 0;
+    if (incomeData.monthly) {
+        document.getElementById('rental').value = incomeData.monthly.rental || 0;
+        document.getElementById('dividend').value = incomeData.monthly.dividend || 0;
+        document.getElementById('interest').value = incomeData.monthly.interest || 0;
     }
 
     // Set other saved values
@@ -46,11 +43,17 @@ function loadSavedIncomeData() {
     if (savedValues.fixed) document.getElementById('fixed').value = savedValues.fixed;
 
     // Load custom income sources
+    const customList = document.getElementById('customIncomeList');
+    customList.innerHTML = ''; // Clear existing custom sources
+    
     if (savedValues.customSources) {
         savedValues.customSources.forEach(source => {
             addCustomIncomeSource(source.name, source.amount);
         });
     }
+    
+    // Calculate total income
+    calculateTotalIncome();
 }
 
 function calculateTotalIncome() {
@@ -81,7 +84,7 @@ function calculateTotalIncome() {
     document.getElementById('additionalIncome').textContent = formatCurrency(additionalIncome);
     document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
 
-    // Save values automatically
+    // Save values
     const incomeValues = {
         salary,
         rental,
@@ -95,6 +98,10 @@ function calculateTotalIncome() {
         lastUpdated: new Date().toISOString()
     };
     saveToLocalStorage('incomeValues', incomeValues);
+    
+    // Dispatch events to notify other pages
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('localStorageUpdated'));
 }
 
 function addCustomIncomeSource(name = '', amount = '') {

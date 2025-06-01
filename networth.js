@@ -169,20 +169,6 @@ function calculateNetWorth() {
     // Save income data
     saveToLocalStorage('incomeData', incomeData);
     
-    // Update income page if it exists
-    const rentalInput = document.getElementById('rental');
-    const dividendInput = document.getElementById('dividend');
-    const interestInput = document.getElementById('interest');
-    
-    if (rentalInput) rentalInput.value = incomeData.monthly.rental;
-    if (dividendInput) dividendInput.value = incomeData.monthly.dividend;
-    if (interestInput) interestInput.value = incomeData.monthly.interest;
-    
-    // Trigger income calculations if on income page
-    if (typeof calculateTotalIncome === 'function') {
-        calculateTotalIncome();
-    }
-    
     // Save net worth data
     const networthData = {
         // Save all input values
@@ -230,8 +216,9 @@ function calculateNetWorth() {
     // Save to localStorage
     saveToLocalStorage('networthValues', networthData);
     
-    // Dispatch storage event for other pages
+    // Dispatch events to notify other pages
     window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('localStorageUpdated'));
 }
 
 function calculateRentalIncome() {
