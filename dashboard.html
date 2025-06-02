@@ -30,83 +30,92 @@
     <div class="container">
         <section class="section-header">
             <h2>Financial Dashboard</h2>
-            <p>A comprehensive view of your financial health</p>
-            <button type="button" id="downloadPDFBtn" class="btn-calculate">
-                <i class="fas fa-file-pdf"></i> Download Financial Report
-            </button>
+            <p>Your complete financial overview in one place</p>
         </section>
-        
+
         <div class="dashboard-grid">
+            <!-- Net Worth Summary -->
             <div class="card">
-                <h2 class="section-title"><i class="fas fa-wallet"></i> Income Overview</h2>
-                <div class="chart-container">
-                    <canvas id="incomeChart"></canvas>
-                </div>
-                <div class="summary">
-                    <div class="summary-item">
-                        <span>Total Monthly Income:</span>
-                        <span class="highlight" id="totalIncome">₹0</span>
+                <h2 class="section-title"><i class="fas fa-landmark"></i> Net Worth</h2>
+                <div class="metric-group">
+                    <div class="metric">
+                        <h3>Total Assets</h3>
+                        <p class="amount">₹<span id="totalAssets">0</span></p>
+                        <p class="words" id="totalAssetsWords">Zero Rupees</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Expense Breakdown</h2>
-                <div class="chart-container">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-                <div class="summary">
-                    <div class="summary-item">
-                        <span>Total Monthly Expenses:</span>
-                        <span class="highlight" id="totalExpenses">₹0</span>
+                    <div class="metric">
+                        <h3>Total Liabilities</h3>
+                        <p class="amount">₹<span id="totalLiabilities">0</span></p>
+                        <p class="words" id="totalLiabilitiesWords">Zero Rupees</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="section-title"><i class="fas fa-landmark"></i> Assets Distribution</h2>
-                <div class="chart-container">
-                    <canvas id="assetChart"></canvas>
-                </div>
-                <div class="summary">
-                    <div class="summary-item">
-                        <span>Total Assets:</span>
-                        <span class="highlight" id="totalAssets">₹0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="section-title"><i class="fas fa-exclamation-circle"></i> Liabilities Distribution</h2>
-                <div class="chart-container">
-                    <canvas id="liabilityChart"></canvas>
-                </div>
-                <div class="summary">
-                    <div class="summary-item">
-                        <span>Total Liabilities:</span>
-                        <span class="highlight" id="totalLiabilities">₹0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card summary-card" style="grid-column: 1 / -1;">
-                <h2 class="section-title"><i class="fas fa-chart-line"></i> Financial Summary</h2>
-                <div class="summary-grid">
-                    <div class="summary-block">
+                    <div class="metric highlight">
                         <h3>Net Worth</h3>
-                        <span class="highlight large" id="netWorth">₹0</span>
+                        <p class="amount">₹<span id="netWorth">0</span></p>
+                        <p class="words" id="netWorthWords">Zero Rupees</p>
                     </div>
-                    <div class="summary-block">
+                </div>
+            </div>
+
+            <!-- Income Summary -->
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-wallet"></i> Income</h2>
+                <div class="metric-group">
+                    <div class="metric">
+                        <h3>Monthly Income</h3>
+                        <p class="amount">₹<span id="monthlyIncome">0</span></p>
+                        <p class="words" id="monthlyIncomeWords">Zero Rupees</p>
+                    </div>
+                    <div class="metric highlight">
+                        <h3>Annual Income</h3>
+                        <p class="amount">₹<span id="annualIncome">0</span></p>
+                        <p class="words" id="annualIncomeWords">Zero Rupees</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Summary -->
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Expenses</h2>
+                <div class="metric-group">
+                    <div class="metric">
+                        <h3>Monthly Recurring</h3>
+                        <p class="amount">₹<span id="monthlyRecurringExpenses">0</span></p>
+                        <p class="words" id="monthlyRecurringExpensesWords">Zero Rupees</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Monthly Big Expense Share</h3>
+                        <p class="amount">₹<span id="monthlyBigExpenseShare">0</span></p>
+                        <p class="words" id="monthlyBigExpenseShareWords">Zero Rupees</p>
+                    </div>
+                    <div class="metric">
+                        <h3>Total Monthly</h3>
+                        <p class="amount">₹<span id="totalMonthlyExpenses">0</span></p>
+                        <p class="words" id="totalMonthlyExpensesWords">Zero Rupees</p>
+                    </div>
+                    <div class="metric highlight">
+                        <h3>Annual Total</h3>
+                        <p class="amount">₹<span id="annualExpenses">0</span></p>
+                        <p class="words" id="annualExpensesWords">Zero Rupees</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Metrics -->
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-chart-line"></i> Key Metrics</h2>
+                <div class="metric-group">
+                    <div class="metric">
                         <h3>Monthly Savings</h3>
-                        <span class="highlight large" id="monthlySavings">₹0</span>
+                        <p class="amount">₹<span id="monthlySavings">0</span></p>
+                        <p class="words" id="monthlySavingsWords">Zero Rupees</p>
                     </div>
-                    <div class="summary-block">
-                        <h3>FF Score</h3>
-                        <span class="highlight large" id="ffScore">0 years</span>
-                    </div>
-                    <div class="summary-block">
+                    <div class="metric">
                         <h3>Savings Rate</h3>
-                        <span class="highlight large" id="savingsRate">0%</span>
+                        <p class="amount"><span id="savingsRate">0</span>%</p>
+                    </div>
+                    <div class="metric highlight">
+                        <h3>Expense Coverage</h3>
+                        <p class="amount"><span id="expenseCoverage">0</span> months</p>
                     </div>
                 </div>
             </div>

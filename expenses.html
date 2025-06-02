@@ -131,48 +131,31 @@
             <div class="card result-card" style="grid-column: 1 / -1;">
                 <h2 class="section-title"><i class="fas fa-chart-pie"></i> Expense Summary</h2>
                 
-                <div class="summary">
-                    <!-- Monthly Summary -->
-                    <div class="summary-section">
-                        <h3 class="summary-subtitle">Monthly Breakdown</h3>
+                <div class="expense-summary">
+                    <h2>Expense Summary</h2>
+                    <div class="summary-grid">
                         <div class="summary-item">
-                            <span>Monthly Recurring Expenses:</span>
-                            <span class="highlight" id="totalMonthlyRecurring">₹0</span>
-                            <span class="number-in-words" id="totalMonthlyRecurringWords"></span>
+                            <h3>Monthly Recurring Expenses</h3>
+                            <p class="amount">₹<span id="totalMonthlyRecurring">0</span></p>
+                            <p class="words" id="totalMonthlyRecurringWords">Zero Rupees</p>
                         </div>
                         
                         <div class="summary-item">
-                            <span>Monthly Share of Big Expenses:</span>
-                            <span class="highlight" id="monthlyBigExpenses">₹0</span>
-                            <span class="number-in-words" id="monthlyBigExpensesWords"></span>
+                            <h3>Monthly Share of Big Expenses</h3>
+                            <p class="amount">₹<span id="monthlyBigExpenses">0</span></p>
+                            <p class="words" id="monthlyBigExpensesWords">Zero Rupees</p>
                         </div>
                         
-                        <div class="summary-item total-section">
-                            <span>Total Monthly Expenses:</span>
-                            <span class="highlight" id="totalMonthlyExpenses">₹0</span>
-                            <span class="number-in-words" id="totalMonthlyExpensesWords"></span>
-                        </div>
-                    </div>
-
-                    <!-- Annual Summary -->
-                    <div class="summary-section">
-                        <h3 class="summary-subtitle">Annual Breakdown</h3>
-                        <div class="summary-item">
-                            <span>Annual Recurring Expenses:</span>
-                            <span class="highlight" id="annualRecurring">₹0</span>
-                            <span class="number-in-words" id="annualRecurringWords"></span>
+                        <div class="summary-item highlight">
+                            <h3>Total Monthly Expenses</h3>
+                            <p class="amount">₹<span id="totalMonthlyExpenses">0</span></p>
+                            <p class="words" id="totalMonthlyExpensesWords">Zero Rupees</p>
                         </div>
                         
-                        <div class="summary-item">
-                            <span>Total Big Expenses:</span>
-                            <span class="highlight" id="totalBigExpenses">₹0</span>
-                            <span class="number-in-words" id="totalBigExpensesWords"></span>
-                        </div>
-                        
-                        <div class="summary-item total-section">
-                            <span>Total Annual Expenses:</span>
-                            <span class="highlight" id="annualTotal">₹0</span>
-                            <span class="number-in-words" id="annualTotalWords"></span>
+                        <div class="summary-item highlight">
+                            <h3>Annual Total Expenses</h3>
+                            <p class="amount">₹<span id="annualTotal">0</span></p>
+                            <p class="words" id="annualTotalWords">Zero Rupees</p>
                         </div>
                     </div>
                 </div>

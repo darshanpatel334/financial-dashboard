@@ -1,382 +1,327 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Load saved values from localStorage
-    loadSavedValues();
+    console.log('FF Score calculation initialization started');
     
-    // Get input elements
-    const netWorthInput = document.getElementById('netWorth');
-    const monthlyExpenseInput = document.getElementById('monthlyExpense');
-    const returnRateInput = document.getElementById('returnRate');
-    const inflationRateInput = document.getElementById('inflationRate');
+    // Set up event listeners
+    setupEventListeners();
     
-    // Get display elements
-    const scoreElement = document.getElementById('score');
-    const progressBar = document.getElementById('progressBar');
-    const yearsLabel = document.getElementById('yearsLabel');
-    const initialNetWorthElement = document.getElementById('initialNetWorth');
-    const annualExpenseElement = document.getElementById('annualExpense');
-    const returnRateValue = document.getElementById('returnRateValue');
-    const inflationRateValue = document.getElementById('inflationRateValue');
+    // Initial load
+    loadFFData();
     
-    // Add storage event listeners for cross-page updates
-    window.addEventListener('storage', function(e) {
-        console.log('Storage event triggered:', e.key);
-        if (e.key === 'networthValues' || e.key === 'expenseValues') {
-            loadSavedValues();
-            calculateScore();
-        }
-    });
-    
-    // Add custom event listener for localStorage changes within the same page
-    window.addEventListener('localStorageUpdated', function(e) {
-        console.log('LocalStorage updated event received');
-        loadSavedValues();
-        calculateScore();
-    });
-    
-    // Add input event listeners
-    [netWorthInput, monthlyExpenseInput, returnRateInput, inflationRateInput].forEach(input => {
+    // Listen for updates from other pages
+    window.addEventListener('storage', loadFFData);
+    window.addEventListener('localStorageUpdated', loadFFData);
+});
+
+function setupEventListeners() {
+    // Add input event listeners for return and inflation rates
+    ['expectedReturn', 'expectedInflation'].forEach(id => {
+        const input = document.getElementById(id);
         if (input) {
-        input.addEventListener('input', () => {
-            updateNumberInWords(input.id);
-                calculateScore();
+            input.addEventListener('input', () => {
+                if (parseFloat(input.value) < 0) {
+                    input.value = '0';
+                }
+                updateCurrentNumbers(); // Update current numbers
+                calculateFFScore();
             });
         }
     });
+}
+
+function loadFFData() {
+    // Load saved rates
+    const savedRates = getFromLocalStorage('ffRates') || {};
+    if (savedRates.return) {
+        document.getElementById('expectedReturn').value = savedRates.return;
+    }
+    if (savedRates.inflation) {
+        document.getElementById('expectedInflation').value = savedRates.inflation;
+    }
     
-    // Initial calculation
-    calculateScore();
+    // Update current numbers and calculate score
+    updateCurrentNumbers();
+    calculateFFScore();
+}
+
+function updateCurrentNumbers() {
+    // Get current net worth
+    const netWorthData = getFromLocalStorage('netWorthValues') || {};
+    let totalAssets = calculateTotalAssets(netWorthData);
+    let totalLiabilities = calculateTotalLiabilities(netWorthData);
+    let currentNetWorth = totalAssets - totalLiabilities;
     
-    function calculateScore() {
-        // Get values
-        const netWorth = parseFloat(document.getElementById('netWorth').value) || 0;
-        const monthlyExpense = parseFloat(document.getElementById('monthlyExpense').value) || 0;
-        const returnRate = parseFloat(document.getElementById('returnRate').value) || 0;
-        const inflationRate = parseFloat(document.getElementById('inflationRate').value) || 0;
+    // Get current annual expenses
+    const expenseData = getFromLocalStorage('expenseValues') || {};
+    let annualExpenses = calculateAnnualExpenses(expenseData);
+    
+    // Update the display
+    updateDisplay('currentNetWorth', currentNetWorth);
+    updateDisplay('annualExpenses', annualExpenses);
+    
+    // Add words display for better readability
+    updateWordsDisplay('currentNetWorthWords', currentNetWorth);
+    updateWordsDisplay('annualExpensesWords', annualExpenses);
+    
+    return { currentNetWorth, annualExpenses };
+}
+
+function calculateFFScore() {
+    // Get current numbers
+    const { currentNetWorth, annualExpenses } = updateCurrentNumbers();
+    
+    // Get rates
+    const expectedReturn = parseFloat(document.getElementById('expectedReturn').value) / 100 || 0;
+    const expectedInflation = parseFloat(document.getElementById('expectedInflation').value) / 100 || 0;
+    
+    // Save rates
+    saveToLocalStorage('ffRates', {
+        return: document.getElementById('expectedReturn').value,
+        inflation: document.getElementById('expectedInflation').value
+    });
+    
+    // Calculate FF Score
+    const ffScore = calculateYearsToDepletion(
+        currentNetWorth,
+        annualExpenses,
+        expectedReturn,
+        expectedInflation
+    );
+    
+    // Update display
+    updateFFDisplay(ffScore, currentNetWorth, annualExpenses);
+}
+
+function calculateYearsToDepletion(initialNetWorth, initialAnnualExpenses, returnRate, inflationRate) {
+    let years = 0;
+    let currentNetWorth = initialNetWorth;
+    let currentAnnualExpense = initialAnnualExpenses;
+    
+    console.log('Starting FF Score calculation:');
+    console.log(`Initial Net Worth: ₹${formatCurrency(currentNetWorth)}`);
+    console.log(`Initial Annual Expense: ₹${formatCurrency(currentAnnualExpense)}`);
+    console.log(`Return Rate: ${(returnRate * 100).toFixed(1)}%`);
+    console.log(`Inflation Rate: ${(inflationRate * 100).toFixed(1)}%`);
+    
+    while (currentNetWorth > 0 && years < 100) { // Cap at 100 years
+        console.log(`\nYear ${years}:`);
         
-        // Calculate annual expense
-        const annualExpense = monthlyExpense * 12;
+        // 1. Set aside this year's expenses at the start
+        currentNetWorth -= currentAnnualExpense;
+        console.log(`After setting aside expenses: ₹${formatCurrency(currentNetWorth)}`);
         
-        // Initialize variables for calculation
-        let currentNetWorth = netWorth;
-        let years = 0;
-        
-        // Calculate year by year until net worth becomes negative
-        while (currentNetWorth > 0) {
-            // Calculate inflated expenses for this year
-            const inflatedExpense = annualExpense * Math.pow(1 + inflationRate/100, years);
-            
-            // Set aside expenses at start of year
-            if (currentNetWorth < inflatedExpense) {
-                // If we can't cover this year's expenses, break
-                break;
-            }
-            
-            // Deduct expenses at start of year
-            currentNetWorth -= inflatedExpense;
-            
-            // Grow remaining net worth at return rate
-            currentNetWorth *= (1 + returnRate/100);
-            
-            years++;
-            
-            // Safety check to prevent infinite loop
-            if (years > 150) break;
+        // If net worth becomes negative after setting aside expenses, break
+        if (currentNetWorth <= 0) {
+            console.log('Net worth depleted after setting aside expenses');
+            break;
         }
         
-        // Round to 1 decimal place
-        years = Math.round(years * 10) / 10;
+        // 2. Grow remaining corpus at return rate
+        currentNetWorth *= (1 + returnRate);
+        console.log(`After growth at ${(returnRate * 100).toFixed(1)}%: ₹${formatCurrency(currentNetWorth)}`);
         
-        // Update display
-        const scoreElement = document.getElementById('score');
-        const yearsLabel = document.getElementById('yearsLabel');
-        const progressBar = document.getElementById('progressBar');
-        const initialNetWorthElement = document.getElementById('initialNetWorth');
-        const annualExpenseElement = document.getElementById('annualExpense');
-        const returnRateValue = document.getElementById('returnRateValue');
-        const inflationRateValue = document.getElementById('inflationRateValue');
+        // 3. Increase next year's expenses by inflation
+        currentAnnualExpense *= (1 + inflationRate);
+        console.log(`Next year's expenses (with ${(inflationRate * 100).toFixed(1)}% inflation): ₹${formatCurrency(currentAnnualExpense)}`);
         
-        if (scoreElement) {
-            scoreElement.textContent = years.toFixed(1);
-            // Update words display
-            const scoreWordsElement = document.getElementById('scoreWords');
-            if (scoreWordsElement) {
-                scoreWordsElement.textContent = `${numberToWords(years)} years`;
-            }
-        }
-        
-        if (yearsLabel) yearsLabel.textContent = `${years === 1 ? 'year' : 'years'} without active income`;
-        
-        // Update progress bar (max 100%)
-        const progressPercentage = Math.min((years / 65) * 100, 100);
-        if (progressBar) progressBar.style.width = `${progressPercentage}%`;
-        
-        // Update summary values with both numbers and words
-        if (initialNetWorthElement) {
-            initialNetWorthElement.textContent = formatCurrency(netWorth);
-            const netWorthWordsElement = document.getElementById('initialNetWorthWords');
-            if (netWorthWordsElement) {
-                netWorthWordsElement.textContent = `₹${numberToWords(netWorth)}`;
-            }
-        }
-        
-        if (annualExpenseElement) {
-            annualExpenseElement.textContent = formatCurrency(annualExpense);
-            const annualExpenseWordsElement = document.getElementById('annualExpenseWords');
-            if (annualExpenseWordsElement) {
-                annualExpenseWordsElement.textContent = `₹${numberToWords(annualExpense)}`;
-            }
-        }
-        
-        if (returnRateValue) {
-            returnRateValue.textContent = `${returnRate}%`;
-            const returnRateWordsElement = document.getElementById('returnRateWords');
-            if (returnRateWordsElement) {
-                returnRateWordsElement.textContent = `${numberToWords(returnRate)} percent`;
-            }
-        }
-        
-        if (inflationRateValue) {
-            inflationRateValue.textContent = `${inflationRate}%`;
-            const inflationRateWordsElement = document.getElementById('inflationRateWords');
-            if (inflationRateWordsElement) {
-                inflationRateWordsElement.textContent = `${numberToWords(inflationRate)} percent`;
-            }
-        }
-        
-        // Save the current values
-        const freedomValues = {
-            userName: document.getElementById('userName').value,
-            currentAge: document.getElementById('currentAge').value,
-            netWorth: netWorth,
-            monthlyExpense: monthlyExpense,
-            returnRate: returnRate,
-            inflationRate: inflationRate,
-            ffScore: years,
-            lastUpdated: new Date().toISOString()
-        };
-        saveToLocalStorage('freedomValues', freedomValues);
-        
-        // Dispatch events to notify other pages
-        window.dispatchEvent(new Event('storage'));
-        window.dispatchEvent(new CustomEvent('localStorageUpdated'));
-        
-        // Log the values for debugging
-        console.log('FF Score Calculation:', {
-            netWorth,
-            monthlyExpense,
-            annualExpense,
-            returnRate,
-            inflationRate,
-            years
+        years++;
+    }
+    
+    console.log(`\nFinal FF Score: ${years} years`);
+    return years;
+}
+
+function calculateTotalAssets(data) {
+    let total = 0;
+    
+    // Real Estate
+    ['primaryResidence', 'otherProperties'].forEach(id => {
+        total += parseFloat(data[id] || 0);
+    });
+    
+    // Investments
+    ['stocks', 'mutualFunds', 'bonds', 'ppf', 'epf', 'nps'].forEach(id => {
+        total += parseFloat(data[id] || 0);
+    });
+    
+    // Cash & Equivalents
+    ['bankBalance', 'cashInHand'].forEach(id => {
+        total += parseFloat(data[id] || 0);
+    });
+    
+    // Other Assets
+    ['gold', 'vehicle', 'otherAssets'].forEach(id => {
+        total += parseFloat(data[id] || 0);
+    });
+    
+    // Custom assets
+    if (data.customAssets) {
+        data.customAssets.forEach(item => {
+            total += parseFloat(item.value || 0);
         });
     }
-});
-
-function updateAllNumbersInWords() {
-    ['currentAge', 'netWorth', 'monthlyExpense', 'returnRate', 'inflationRate'].forEach(id => {
-        updateNumberInWords(id);
-    });
+    
+    return total;
 }
 
-function updateNumberInWords(inputId) {
-    const input = document.getElementById(inputId);
-    const wordsSpan = document.getElementById(inputId + 'Words');
-    const value = parseFloat(input.value) || 0;
+function calculateTotalLiabilities(data) {
+    let total = 0;
     
-    if (inputId === 'returnRate' || inputId === 'inflationRate') {
-        wordsSpan.textContent = `${numberToWords(value)} percent`;
-    } else if (inputId === 'currentAge') {
-        wordsSpan.textContent = `${numberToWords(value)} years old`;
+    // Loans
+    ['homeLoan', 'carLoan', 'personalLoan', 'educationLoan'].forEach(id => {
+        total += parseFloat(data[id] || 0);
+    });
+    
+    // Credit Card Debt
+    total += parseFloat(data.creditCardDebt || 0);
+    
+    // Custom liabilities
+    if (data.customLiabilities) {
+        data.customLiabilities.forEach(item => {
+            total += parseFloat(item.value || 0);
+        });
+    }
+    
+    return total;
+}
+
+function calculateAnnualExpenses(data) {
+    // Calculate monthly recurring expenses
+    let monthlyRecurring = 0;
+    
+    // Regular monthly expenses
+    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
+        monthlyRecurring += parseFloat(data[id] || 0);
+    });
+    
+    // Custom monthly expenses
+    if (data.monthly) {
+        data.monthly.forEach(item => {
+            monthlyRecurring += parseFloat(item.value || 0);
+        });
+    }
+    
+    // Calculate annual big expenses
+    let annualBigExpenses = 0;
+    
+    // Regular big expenses
+    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
+        annualBigExpenses += parseFloat(data[id] || 0);
+    });
+    
+    // Custom big expenses
+    if (data.big) {
+        data.big.forEach(item => {
+            annualBigExpenses += parseFloat(item.value || 0);
+        });
+    }
+    
+    // Total annual expenses = (monthly recurring × 12) + annual big expenses
+    return (monthlyRecurring * 12) + annualBigExpenses;
+}
+
+function updateFFDisplay(ffScore, netWorth, annualExpenses) {
+    // Update FF Score
+    updateDisplay('ffScore', ffScore);
+    updateDisplay('ffScoreYears', ffScore);
+    
+    // Update supporting numbers
+    updateDisplay('currentNetWorth', netWorth);
+    updateDisplay('annualExpenses', annualExpenses);
+    
+    // Update FF Status and colors
+    let ffStatus = '';
+    let ffDescription = '';
+    let colorRange = '';
+    
+    if (ffScore >= 100) {
+        ffStatus = 'Ultimate Financial Freedom 🏝️';
+        ffDescription = 'Congratulations! You have achieved complete financial independence';
+        colorRange = 'ultimate';
+    } else if (ffScore >= 70) {
+        ffStatus = 'Achieved FF ✅';
+        ffDescription = 'You have achieved financial freedom';
+        colorRange = 'achieved';
+    } else if (ffScore >= 50) {
+        ffStatus = 'Very Close 🔓';
+        ffDescription = 'You are very close to achieving financial freedom';
+        colorRange = 'close';
+    } else if (ffScore >= 25) {
+        ffStatus = 'Getting There — Keep Going 🚶';
+        ffDescription = 'You are making good progress towards financial freedom';
+        colorRange = 'progress';
+    } else if (ffScore >= 10) {
+        ffStatus = 'Still Dependent — Work & Build ⚙️';
+        ffDescription = 'Focus on increasing savings and investments';
+        colorRange = 'dependent';
     } else {
-        wordsSpan.textContent = `₹${numberToWords(value)}`;
-    }
-}
-
-function numberToWords(num) {
-    if (num === 0) return 'Zero';
-    
-    const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
-    const teens = ['Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    
-    if (num < 0) return 'Negative ' + numberToWords(Math.abs(num));
-    if (num < 11) return units[num];
-    if (num < 20) return teens[num - 11];
-    if (num < 100) {
-        const ten = Math.floor(num / 10);
-        const one = num % 10;
-        return tens[ten] + (one ? ' ' + units[one] : '');
-    }
-    if (num < 1000) return units[Math.floor(num / 100)] + ' Hundred' + (num % 100 ? ' and ' + numberToWords(num % 100) : '');
-    if (num < 100000) return numberToWords(Math.floor(num / 1000)) + ' Thousand' + (num % 1000 ? ' ' + numberToWords(num % 1000) : '');
-    if (num < 10000000) return numberToWords(Math.floor(num / 100000)) + ' Lakh' + (num % 100000 ? ' ' + numberToWords(num % 100000) : '');
-    return numberToWords(Math.floor(num / 10000000)) + ' Crore' + (num % 10000000 ? ' ' + numberToWords(num % 10000000) : '');
-}
-
-function loadSavedValues() {
-    console.log('Loading saved values for FF Score calculation');
-    
-    // Load net worth from networthValues
-    const networthValues = getFromLocalStorage('networthValues') || {};
-    const expenseValues = getFromLocalStorage('expenseValues') || {};
-    
-    console.log('Loaded values:', { networthValues, expenseValues });
-    
-    // Calculate total net worth
-    let totalNetWorth = 0;
-    if (networthValues) {
-        // Calculate total assets
-        const assets = Object.keys(networthValues)
-            .filter(key => !key.includes('Yield') && !key.includes('custom') && 
-                !['lastUpdated', 'totalAssets', 'totalLiabilities', 'netWorth'].includes(key))
-            .reduce((sum, key) => {
-                const value = parseFloat(networthValues[key]) || 0;
-                // Only add positive values (assets)
-                return sum + (value > 0 ? value : 0);
-            }, 0);
-        
-        // Add custom assets
-        if (networthValues.customAssets) {
-            totalNetWorth += networthValues.customAssets.reduce((sum, asset) => 
-                sum + (parseFloat(asset.value) || 0), 0);
-        }
-        
-        // Calculate total liabilities
-        const liabilities = ['homeLoan', 'carLoan', 'creditCard', 'educationLoan']
-            .reduce((sum, key) => sum + (parseFloat(networthValues[key]) || 0), 0);
-        
-        // Add custom liabilities
-        if (networthValues.customLiabilities) {
-            totalNetWorth -= networthValues.customLiabilities.reduce((sum, liability) => 
-                sum + (parseFloat(liability.value) || 0), 0);
-        }
-        
-        totalNetWorth = assets - liabilities;
+        ffStatus = 'Financially Insecure — Focus Now 🔴';
+        ffDescription = 'Prioritize building emergency fund and reducing debt';
+        colorRange = 'insecure';
     }
     
-    // Calculate total monthly expenses
-    let totalMonthlyExpenses = 0;
-    if (expenseValues) {
-        // Regular monthly expenses
-        const monthlyExpenses = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI']
-            .reduce((sum, key) => sum + (parseFloat(expenseValues[key]) || 0), 0);
-        
-        // Big expenses converted to monthly
-        const bigExpenses = ['electronics', 'vacations', 'medical', 'education', 'vehicle']
-            .reduce((sum, key) => sum + (parseFloat(expenseValues[key]) || 0), 0);
-        
-        // Custom expenses
-        const customMonthly = (expenseValues.monthly || [])
-            .reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
-        
-        const customBig = (expenseValues.big || [])
-            .reduce((sum, item) => sum + (parseFloat(item.value) || 0), 0);
-        
-        // Calculate total monthly (including big expenses spread over 12 months)
-        totalMonthlyExpenses = monthlyExpenses + customMonthly + (bigExpenses + customBig) / 12;
-    }
+    document.getElementById('ffStatus').textContent = ffStatus;
+    document.getElementById('ffDescription').textContent = ffDescription;
     
-    console.log('Calculated values:', {
-        totalNetWorth,
-        totalMonthlyExpenses
+    // Update colors
+    const scoreCircle = document.querySelector('.score-circle');
+    const progressBar = document.getElementById('ffProgressBar');
+    
+    // Remove all existing range classes
+    const ranges = ['ultimate', 'achieved', 'close', 'progress', 'dependent', 'insecure'];
+    ranges.forEach(range => {
+        scoreCircle.removeAttribute('data-range');
+        progressBar.removeAttribute('data-range');
     });
     
-    // Set the calculated values
-    const netWorthInput = document.getElementById('netWorth');
-    const monthlyExpenseInput = document.getElementById('monthlyExpense');
-    
-    if (netWorthInput) {
-        netWorthInput.value = totalNetWorth.toFixed(2);
-        updateNumberInWords('netWorth');
-    }
-    if (monthlyExpenseInput) {
-        monthlyExpenseInput.value = totalMonthlyExpenses.toFixed(2);
-        updateNumberInWords('monthlyExpense');
-    }
-    
-    // Load other saved values
-    const savedValues = getFromLocalStorage('freedomValues') || {};
-    const userName = document.getElementById('userName');
-    const currentAge = document.getElementById('currentAge');
-    const returnRate = document.getElementById('returnRate');
-    const inflationRate = document.getElementById('inflationRate');
-    
-    if (userName && savedValues.userName) userName.value = savedValues.userName;
-    if (currentAge && savedValues.currentAge) currentAge.value = savedValues.currentAge;
-    if (returnRate && savedValues.returnRate) returnRate.value = savedValues.returnRate;
-    if (inflationRate && savedValues.inflationRate) inflationRate.value = savedValues.inflationRate;
-    
-    // Update words display for all values
-    ['userName', 'currentAge', 'returnRate', 'inflationRate'].forEach(id => {
-        updateNumberInWords(id);
-    });
-}
-
-function calculateFinancialFreedom() {
-    // Save values to localStorage
-    const freedomValues = {
-        userName: document.getElementById('userName').value,
-        currentAge: document.getElementById('currentAge').value,
-        netWorth: document.getElementById('netWorth').value,
-        monthlyExpense: document.getElementById('monthlyExpense').value,
-        returnRate: document.getElementById('returnRate').value,
-        inflationRate: document.getElementById('inflationRate').value
-    };
-    saveToLocalStorage('freedomValues', freedomValues);
-    
-    // Get user name
-    const userName = document.getElementById('userName').value || "Friend";
-    document.getElementById('personalizedResult').innerHTML = `${userName}, your financial freedom score is:`;
-    
-    // Get input values
-    const currentAge = parseInt(document.getElementById('currentAge').value) || 0;
-    const netWorth = parseFloat(document.getElementById('netWorth').value) || 0;
-    const monthlyExpense = parseFloat(document.getElementById('monthlyExpense').value) || 0;
-    const returnRatePercent = parseFloat(document.getElementById('returnRate').value) || 0;
-    const inflationRatePercent = parseFloat(document.getElementById('inflationRate').value) || 0;
-    
-    // Calculate annual expense
-    const annualExpense = monthlyExpense * 12;
-    
-    // Update summary with current values
-    document.getElementById('initialNetWorth').textContent = formatCurrency(netWorth);
-    document.getElementById('annualExpense').textContent = formatCurrency(annualExpense);
-    document.getElementById('returnRateValue').textContent = `${returnRatePercent}%`;
-    document.getElementById('inflationRateValue').textContent = `${inflationRatePercent}%`;
-    
-    // Convert percentage rates to decimal
-    const returnRate = returnRatePercent / 100.0;
-    const inflationRate = inflationRatePercent / 100.0;
-    
-    // Simulate year-by-year until net worth is depleted
-    let yearCount = 0;
-    let currentNetWorth = netWorth;
-    const maxYears = 150; // Allow for up to 150 years
-    
-    while (currentNetWorth > 0 && yearCount < maxYears) {
-        // Calculate inflated expenses for the current year
-        const inflationFactor = Math.pow(1 + inflationRate, yearCount);
-        const currentAnnualExpense = annualExpense * inflationFactor;
-        
-        // Check if net worth can cover this year's expenses
-        if (currentNetWorth < currentAnnualExpense) break;
-        
-        // Deduct expenses at the start of the year
-        currentNetWorth -= currentAnnualExpense;
-        
-        // Grow the remaining net worth at the end of the year
-        currentNetWorth *= (1 + returnRate);
-        
-        // Move to next year
-        yearCount++;
-    }
-    
-    // Update the UI with results
-    document.getElementById('score').textContent = yearCount;
-    document.getElementById('yearsLabel').textContent = `${yearCount} years without active income`;
+    // Add new range class
+    scoreCircle.setAttribute('data-range', colorRange);
+    progressBar.setAttribute('data-range', colorRange);
     
     // Update progress bar
-    const remainingLife = 100 - currentAge;
-    const progressPercentage = Math.min((yearCount / remainingLife) * 100, 100);
-    document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+    updateProgressBar(ffScore);
+}
+
+function updateProgressBar(score) {
+    const progressBar = document.getElementById('ffProgressBar');
+    const maxScore = 100; // Changed to 100 to match Ultimate FF threshold
+    const percentage = Math.min((score / maxScore) * 100, 100);
+    progressBar.style.width = percentage + '%';
+}
+
+function updateDisplay(elementId, value, isYears = false) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        if (isYears) {
+            element.textContent = value.toFixed(1) + ' years';
+        } else if (typeof value === 'number' && !isYears) {
+            element.textContent = formatCurrency(value);
+        } else {
+            element.textContent = value;
+        }
+    }
+}
+
+function formatCurrency(amount) {
+    return amount.toLocaleString('en-IN', {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0
+    });
+}
+
+function getFromLocalStorage(key) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch (error) {
+        console.error(`Error reading ${key} from localStorage:`, error);
+        return null;
+    }
+}
+
+function saveToLocalStorage(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+        console.error(`Error saving ${key} to localStorage:`, error);
+    }
 }

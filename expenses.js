@@ -131,68 +131,53 @@ function calculateExpenses() {
     
     // Calculate monthly recurring expenses
     let totalMonthlyRecurring = 0;
-    let hasMonthlyValues = false;
     
     // Regular monthly expenses including EMIs
     ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
-        const value = getNumericValue(id);
-        if (value > 0) hasMonthlyValues = true;
-        totalMonthlyRecurring += value;
+        totalMonthlyRecurring += getNumericValue(id);
     });
     
     // Add custom monthly expenses
     document.querySelectorAll('#customMonthlyList .custom-value').forEach(input => {
-        const value = getNumericValue(input);
-        if (value > 0) hasMonthlyValues = true;
-        totalMonthlyRecurring += value;
+        totalMonthlyRecurring += getNumericValue(input);
     });
     
-    // Calculate big/annual expenses
+    // Calculate annual big expenses
     let totalBigExpenses = 0;
-    let hasBigValues = false;
     
     // Regular big expenses
     ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
-        const value = getNumericValue(id);
-        if (value > 0) hasBigValues = true;
-        totalBigExpenses += value;
+        totalBigExpenses += getNumericValue(id);
     });
     
     // Add custom big expenses
     document.querySelectorAll('#customBigList .custom-value').forEach(input => {
-        const value = getNumericValue(input);
-        if (value > 0) hasBigValues = true;
-        totalBigExpenses += value;
+        totalBigExpenses += getNumericValue(input);
     });
     
-    // Calculate monthly equivalent of big expenses
+    // Calculate monthly share of big expenses
     const monthlyBigExpenses = totalBigExpenses / 12;
     
     // Calculate total monthly expenses
     const totalMonthlyExpenses = totalMonthlyRecurring + monthlyBigExpenses;
     
-    // Calculate annual values
-    const annualRecurring = totalMonthlyRecurring * 12;
-    const annualTotal = annualRecurring + totalBigExpenses;
+    // Calculate annual total
+    const annualTotal = totalMonthlyExpenses * 12;
     
-    // Update display if we have actual values
-    if (hasMonthlyValues || hasBigValues) {
+    // Update display if we have any values
+    if (totalMonthlyRecurring > 0 || totalBigExpenses > 0) {
         updateDisplayValues({
             totalMonthlyRecurring,
-            totalBigExpenses,
             monthlyBigExpenses,
             totalMonthlyExpenses,
-            annualRecurring,
             annualTotal
         });
         saveExpenseData();
     } else {
         updateDisplayValues({
             totalMonthlyRecurring: 0,
-            totalBigExpenses: 0,
             monthlyBigExpenses: 0,
             totalMonthlyExpenses: 0,
-            annualRecurring: 0,
             annualTotal: 0
         });
         localStorage.removeItem('expenseValues');
@@ -213,16 +198,12 @@ function updateDisplayValues(values) {
     updateDisplay('totalMonthlyRecurring', values.totalMonthlyRecurring);
     updateDisplay('monthlyBigExpenses', values.monthlyBigExpenses);
     updateDisplay('totalMonthlyExpenses', values.totalMonthlyExpenses);
-    updateDisplay('annualRecurring', values.annualRecurring);
-    updateDisplay('totalBigExpenses', values.totalBigExpenses);
     updateDisplay('annualTotal', values.annualTotal);
     
     // Update words displays
     updateWordsDisplay('totalMonthlyRecurringWords', values.totalMonthlyRecurring);
     updateWordsDisplay('monthlyBigExpensesWords', values.monthlyBigExpenses);
     updateWordsDisplay('totalMonthlyExpensesWords', values.totalMonthlyExpenses);
-    updateWordsDisplay('annualRecurringWords', values.annualRecurring);
-    updateWordsDisplay('totalBigExpensesWords', values.totalBigExpenses);
     updateWordsDisplay('annualTotalWords', values.annualTotal);
 }
 

@@ -1,0 +1,62 @@
+.expense-summary {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+}
+
+.expense-summary h2 {
+    color: #1a2942;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.summary-item {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+}
+
+.summary-item.highlight {
+    background-color: #1a2942;
+    color: white;
+}
+
+.summary-item.highlight h3 {
+    color: white;
+}
+
+.summary-item h3 {
+    color: #1a2942;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.summary-item .amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.summary-item .words {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.summary-item.highlight .words {
+    color: #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+} 
