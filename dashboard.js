@@ -500,7 +500,7 @@ function updateCharts(networthValues, expenseValues, incomeValues) {
         document.getElementById('monthlySavings').textContent = formatCurrency(monthlySavings);
         document.getElementById('ffScore').textContent = calculateFFScore(netWorth, totalMonthlyExpenses);
         document.getElementById('savingsRate').textContent = `${savingsRate.toFixed(1)}%`;
-
+        
         console.log('Charts and summary updated successfully');
     } catch (error) {
         console.error('Error updating charts:', error);
@@ -733,22 +733,22 @@ function calculateMonthlyIncome(networthValues, incomeValues) {
 }
 
 function resetCharts() {
-    if (window.incomeChart) {
+        if (window.incomeChart) {
         window.incomeChart.data.labels = [];
         window.incomeChart.data.datasets[0].data = [];
         window.incomeChart.update('none');
-    }
-    if (window.expenseChart) {
+        }
+        if (window.expenseChart) {
         window.expenseChart.data.labels = [];
         window.expenseChart.data.datasets[0].data = [];
         window.expenseChart.update('none');
     }
-    if (window.assetChart) {
+        if (window.assetChart) {
         window.assetChart.data.labels = [];
         window.assetChart.data.datasets[0].data = [];
         window.assetChart.update('none');
     }
-    if (window.liabilityChart) {
+        if (window.liabilityChart) {
         window.liabilityChart.data.labels = [];
         window.liabilityChart.data.datasets[0].data = [];
         window.liabilityChart.update('none');

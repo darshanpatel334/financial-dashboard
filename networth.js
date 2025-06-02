@@ -39,7 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
         otherFixedIncomeYield: savedValues.otherFixedIncomeYield || '',
         gold: savedValues.gold || '',
         commodity: savedValues.commodity || '',
-        cash: savedValues.cash || '',
+        cashAtBank: savedValues.cashAtBank || '',
+        cashInHand: savedValues.cashInHand || '',
         homeLoan: savedValues.homeLoan || '',
         carLoan: savedValues.carLoan || '',
         creditCard: savedValues.creditCard || '',
@@ -170,7 +171,8 @@ function calculateNetWorth() {
         otherFixedIncomeYield: document.getElementById('otherFixedIncomeYield').value,
         gold: document.getElementById('gold').value,
         commodity: document.getElementById('commodity').value,
-        cash: document.getElementById('cash').value,
+        cashAtBank: document.getElementById('cashAtBank').value,
+        cashInHand: document.getElementById('cashInHand').value,
         homeLoan: document.getElementById('homeLoan').value,
         carLoan: document.getElementById('carLoan').value,
         creditCard: document.getElementById('creditCard').value,
@@ -283,7 +285,8 @@ function calculateTotalAssets() {
     // Other Assets
     totalAssets += parseFloat(document.getElementById('gold').value) || 0;
     totalAssets += parseFloat(document.getElementById('commodity').value) || 0;
-    totalAssets += parseFloat(document.getElementById('cash').value) || 0;
+    totalAssets += parseFloat(document.getElementById('cashAtBank').value) || 0;
+    totalAssets += parseFloat(document.getElementById('cashInHand').value) || 0;
     
     // Custom assets
     document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
@@ -345,7 +348,7 @@ function calculateCategoryTotals() {
     document.getElementById('totalCommodity').textContent = formatCurrency(commodityTotal);
     
     // Cash Total
-    const cashTotal = parseFloat(document.getElementById('cash').value) || 0;
+    const cashTotal = parseFloat(document.getElementById('cashAtBank').value) || 0 + parseFloat(document.getElementById('cashInHand').value) || 0;
     document.getElementById('totalCash').textContent = formatCurrency(cashTotal);
     
     // Other Assets Total
@@ -383,7 +386,8 @@ function saveNetWorthValues() {
         // Other Assets
         gold: document.getElementById('gold').value,
         commodity: document.getElementById('commodity').value,
-        cash: document.getElementById('cash').value,
+        cashAtBank: document.getElementById('cashAtBank').value,
+        cashInHand: document.getElementById('cashInHand').value,
         
         // Liabilities
         homeLoan: document.getElementById('homeLoan').value,

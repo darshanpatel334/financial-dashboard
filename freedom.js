@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add input event listeners
     [netWorthInput, monthlyExpenseInput, returnRateInput, inflationRateInput].forEach(input => {
         if (input) {
-            input.addEventListener('input', () => {
-                updateNumberInWords(input.id);
+        input.addEventListener('input', () => {
+            updateNumberInWords(input.id);
                 calculateScore();
             });
         }
@@ -227,7 +227,8 @@ function loadSavedValues() {
     if (networthValues) {
         // Calculate total assets
         const assets = Object.keys(networthValues)
-            .filter(key => !key.includes('Yield') && !key.includes('custom') && !['lastUpdated', 'totalAssets', 'totalLiabilities', 'netWorth'].includes(key))
+            .filter(key => !key.includes('Yield') && !key.includes('custom') && 
+                !['lastUpdated', 'totalAssets', 'totalLiabilities', 'netWorth'].includes(key))
             .reduce((sum, key) => {
                 const value = parseFloat(networthValues[key]) || 0;
                 // Only add positive values (assets)

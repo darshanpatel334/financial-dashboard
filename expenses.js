@@ -18,7 +18,7 @@ function setupEventListeners() {
             if (input.value === '') {
                 input.placeholder = '₹0';
             }
-            updateNumberInWords(input.id);
+                updateNumberInWords(input.id);
             calculateExpenses();
         });
         
@@ -175,7 +175,7 @@ function calculateExpenses() {
     const annualRecurring = totalMonthlyRecurring * 12;
     const annualTotal = annualRecurring + totalBigExpenses;
     
-    // Update display and save data if we have actual values
+    // Update display if we have actual values
     if (hasMonthlyValues || hasBigValues) {
         updateDisplayValues({
             totalMonthlyRecurring,
@@ -211,18 +211,18 @@ function getNumericValue(inputOrId) {
 function updateDisplayValues(values) {
     // Update currency displays
     updateDisplay('totalMonthlyRecurring', values.totalMonthlyRecurring);
-    updateDisplay('totalBigExpenses', values.totalBigExpenses);
     updateDisplay('monthlyBigExpenses', values.monthlyBigExpenses);
     updateDisplay('totalMonthlyExpenses', values.totalMonthlyExpenses);
     updateDisplay('annualRecurring', values.annualRecurring);
+    updateDisplay('totalBigExpenses', values.totalBigExpenses);
     updateDisplay('annualTotal', values.annualTotal);
     
     // Update words displays
     updateWordsDisplay('totalMonthlyRecurringWords', values.totalMonthlyRecurring);
-    updateWordsDisplay('totalBigExpensesWords', values.totalBigExpenses);
     updateWordsDisplay('monthlyBigExpensesWords', values.monthlyBigExpenses);
     updateWordsDisplay('totalMonthlyExpensesWords', values.totalMonthlyExpenses);
     updateWordsDisplay('annualRecurringWords', values.annualRecurring);
+    updateWordsDisplay('totalBigExpensesWords', values.totalBigExpenses);
     updateWordsDisplay('annualTotalWords', values.annualTotal);
 }
 

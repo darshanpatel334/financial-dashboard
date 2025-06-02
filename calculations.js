@@ -36,26 +36,28 @@ function updateCategoryTotals() {
     updateTotal('monthlyRentalIncome', monthlyRentalIncome);
 
     // Investments
-    const investmentsTotal = 
-        parseInputValue('directEquity') +
-        parseInputValue('equityMF') +
-        parseInputValue('debtMF');
+    const directEquity = parseInputValue('directEquity');
+    const equityMF = parseInputValue('equityMF');
+    const debtMF = parseInputValue('debtMF');
+    const investmentsTotal = directEquity + equityMF + debtMF;
     updateTotal('totalInvestments', investmentsTotal);
 
     // Fixed Income
-    const fixedIncomeTotal = 
-        parseInputValue('fixedDeposits') +
-        parseInputValue('otherFixedIncome');
+    const fixedDeposits = parseInputValue('fixedDeposits');
+    const otherFixedIncome = parseInputValue('otherFixedIncome');
+    const fixedIncomeTotal = fixedDeposits + otherFixedIncome;
     updateTotal('totalFixedIncome', fixedIncomeTotal);
 
     // Commodities (including gold)
-    const commodityTotal = 
-        parseInputValue('gold') +
-        parseInputValue('commodity');
+    const gold = parseInputValue('gold');
+    const commodity = parseInputValue('commodity');
+    const commodityTotal = gold + commodity;
     updateTotal('totalCommodity', commodityTotal);
 
     // Cash
-    const cashTotal = parseInputValue('cash');
+    const cashAtBank = parseInputValue('cashAtBank');
+    const cashInHand = parseInputValue('cashInHand');
+    const cashTotal = cashAtBank + cashInHand;
     updateTotal('totalCash', cashTotal);
 
     // Custom Assets
@@ -82,11 +84,11 @@ function updateCategoryTotals() {
     updateTotal('totalAssets', totalAssets);
 
     // Calculate Liabilities
-    const liabilitiesTotal = 
-        parseInputValue('homeLoan') +
-        parseInputValue('carLoan') +
-        parseInputValue('creditCard') +
-        parseInputValue('educationLoan');
+    const homeLoan = parseInputValue('homeLoan');
+    const carLoan = parseInputValue('carLoan');
+    const creditCard = parseInputValue('creditCard');
+    const educationLoan = parseInputValue('educationLoan');
+    const liabilitiesTotal = homeLoan + carLoan + creditCard + educationLoan;
 
     // Custom Liabilities
     const customLiabilitiesList = document.getElementById('customLiabilitiesList');
@@ -115,9 +117,12 @@ function updateCategoryTotals() {
         },
         investments: investmentsTotal,
         fixedIncome: fixedIncomeTotal,
-        gold: parseInputValue('gold'),
         commodity: commodityTotal,
-        cash: cashTotal,
+        cash: {
+            total: cashTotal,
+            atBank: cashAtBank,
+            inHand: cashInHand
+        },
         customAssets: customAssetsTotal,
         totalAssets: totalAssets,
         totalLiabilities: totalLiabilities,

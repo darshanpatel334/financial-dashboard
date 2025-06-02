@@ -58,15 +58,21 @@ function loadSavedData() {
     // Reset all fields first
     resetAllFields();
     
-    // Get saved data
+    // Get saved data from both sources
     const incomeData = getFromLocalStorage('incomeData') || {};
     const savedValues = getFromLocalStorage('incomeValues') || {};
+    const networthValues = getFromLocalStorage('networthValues') || {};
     
-    // Only set values if they exist and are greater than 0
+    // Calculate monthly income from networth assets
+    const monthlyIncome = calculateMonthlyIncomeFromNetworth(networthValues);
+    
+    // Set values from networth calculations first
+    setFieldValueIfValid('rental', monthlyIncome.rental);
+    setFieldValueIfValid('dividend', monthlyIncome.dividend);
+    setFieldValueIfValid('interest', monthlyIncome.interest);
+    
+    // Set other values from saved income data
     setFieldValueIfValid('salary', savedValues.salary);
-    setFieldValueIfValid('rental', incomeData.monthly?.rental);
-    setFieldValueIfValid('dividend', incomeData.monthly?.dividend);
-    setFieldValueIfValid('interest', incomeData.monthly?.interest);
     setFieldValueIfValid('fixed', savedValues.fixed);
     
     // Load custom sources
@@ -74,6 +80,32 @@ function loadSavedData() {
     
     // Update calculations
     updateCalculations();
+}
+
+function calculateMonthlyIncomeFromNetworth(values) {
+    // Calculate rental income (annual)
+    const rentalIncome = 
+        (parseFloat(values.buildings || 0) * parseFloat(values.buildingsYield || 0) / 100) +
+        (parseFloat(values.plots || 0) * parseFloat(values.plotsYield || 0) / 100) +
+        (parseFloat(values.land || 0) * parseFloat(values.landYield || 0) / 100);
+    
+    // Calculate dividend income (annual)
+    const dividendIncome = 
+        (parseFloat(values.directEquity || 0) * parseFloat(values.directEquityYield || 0) / 100) +
+        (parseFloat(values.equityMF || 0) * parseFloat(values.equityMFYield || 0) / 100);
+    
+    // Calculate interest income (annual)
+    const interestIncome = 
+        (parseFloat(values.debtMF || 0) * parseFloat(values.debtMFYield || 0) / 100) +
+        (parseFloat(values.fixedDeposits || 0) * parseFloat(values.fixedDepositsYield || 0) / 100) +
+        (parseFloat(values.otherFixedIncome || 0) * parseFloat(values.otherFixedIncomeYield || 0) / 100);
+    
+    // Convert to monthly
+    return {
+        rental: Math.round(rentalIncome / 12),
+        dividend: Math.round(dividendIncome / 12),
+        interest: Math.round(interestIncome / 12)
+    };
 }
 
 function setFieldValueIfValid(fieldId, value) {
