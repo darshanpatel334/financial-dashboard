@@ -1,11 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
-    initializeAnimations();
     checkUserStatus();
+    initializeAnimations();
 });
 
 function initializeAnimations() {
     // Add fade-in animation to sections as they come into view
     const sections = document.querySelectorAll('section');
+    
+    // Add initial CSS classes
+    sections.forEach(section => {
+        section.classList.add('animate-on-scroll');
+    });
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -18,7 +24,6 @@ function initializeAnimations() {
     });
 
     sections.forEach(section => {
-        section.style.opacity = '0';
         observer.observe(section);
     });
 }
