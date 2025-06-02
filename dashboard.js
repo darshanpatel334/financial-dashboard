@@ -2,225 +2,328 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard initialization started');
     
     // Initial load
-    loadDashboardData();
+    updateDashboard();
     
     // Listen for updates from other pages
-    window.addEventListener('storage', loadDashboardData);
-    window.addEventListener('localStorageUpdated', loadDashboardData);
+    window.addEventListener('storage', updateDashboard);
+    window.addEventListener('localStorageUpdated', updateDashboard);
 });
 
-function loadDashboardData() {
-    // Load data from localStorage
+function updateDashboard() {
+    // Get data from other pages
     const netWorthData = getFromLocalStorage('netWorthValues') || {};
     const incomeData = getFromLocalStorage('incomeValues') || {};
     const expenseData = getFromLocalStorage('expenseValues') || {};
     
-    // Calculate and update summaries
-    updateNetWorthSummary(netWorthData);
-    updateIncomeSummary(incomeData);
-    updateExpenseSummary(expenseData);
-    updateFinancialMetrics();
+    // Calculate and update all sections
+    updateAssetSection(netWorthData);
+    updateLiabilitySection(netWorthData);
+    updateIncomeSection(incomeData);
+    updateExpenseSection(expenseData);
+    updateFinancialSummary(netWorthData, incomeData, expenseData);
 }
 
-function updateNetWorthSummary(data) {
-    let totalAssets = calculateTotalAssets(data);
-    let totalLiabilities = calculateTotalLiabilities(data);
-    let netWorth = totalAssets - totalLiabilities;
+function updateAssetSection(data) {
+    // Prepare asset data
+    const assetData = {
+        'Real Estate': calculateRealEstate(data),
+        'Investments': calculateInvestments(data),
+        'Cash & Equivalents': calculateCashEquivalents(data),
+        'Other Assets': calculateOtherAssets(data)
+    };
     
+    // Calculate total assets
+    const totalAssets = Object.values(assetData).reduce((a, b) => a + b, 0);
+    
+    // Update total display
     updateDisplay('totalAssets', totalAssets);
-    updateDisplay('totalLiabilities', totalLiabilities);
-    updateDisplay('netWorth', netWorth);
-    
     updateWordsDisplay('totalAssetsWords', totalAssets);
-    updateWordsDisplay('totalLiabilitiesWords', totalLiabilities);
-    updateWordsDisplay('netWorthWords', netWorth);
+    
+    // Create/Update pie chart
+    createPieChart('assetChart', assetData, {
+        title: 'Asset Distribution',
+        colors: ['#4CAF50', '#2196F3', '#FFC107', '#9C27B0']
+    });
 }
 
-function calculateTotalAssets(data) {
-    let total = 0;
+function updateLiabilitySection(data) {
+    // Prepare liability data
+    const liabilityData = {
+        'Home Loan': parseFloat(data.homeLoan || 0),
+        'Car Loan': parseFloat(data.carLoan || 0),
+        'Personal Loan': parseFloat(data.personalLoan || 0),
+        'Education Loan': parseFloat(data.educationLoan || 0),
+        'Credit Card': parseFloat(data.creditCardDebt || 0)
+    };
     
-    // Real Estate
-    ['primaryResidence', 'otherProperties'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Investments
-    ['stocks', 'mutualFunds', 'bonds', 'ppf', 'epf', 'nps'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Cash & Equivalents
-    ['bankBalance', 'cashInHand'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Other Assets
-    ['gold', 'vehicle', 'otherAssets'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Custom assets
-    if (data.customAssets) {
-        data.customAssets.forEach(item => {
-            total += parseFloat(item.value || 0);
-        });
-    }
-    
-    return total;
-}
-
-function calculateTotalLiabilities(data) {
-    let total = 0;
-    
-    // Loans
-    ['homeLoan', 'carLoan', 'personalLoan', 'educationLoan'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Credit Card Debt
-    total += parseFloat(data.creditCardDebt || 0);
-    
-    // Custom liabilities
+    // Add custom liabilities
     if (data.customLiabilities) {
-        data.customLiabilities.forEach(item => {
-            total += parseFloat(item.value || 0);
-        });
+        liabilityData['Other Liabilities'] = data.customLiabilities.reduce((total, item) => 
+            total + parseFloat(item.value || 0), 0);
     }
     
-    return total;
+    // Calculate total liabilities
+    const totalLiabilities = Object.values(liabilityData).reduce((a, b) => a + b, 0);
+    
+    // Update total display
+    updateDisplay('totalLiabilities', totalLiabilities);
+    updateWordsDisplay('totalLiabilitiesWords', totalLiabilities);
+    
+    // Create/Update pie chart
+    createPieChart('liabilityChart', liabilityData, {
+        title: 'Liability Distribution',
+        colors: ['#F44336', '#FF5722', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5']
+    });
 }
 
-function updateIncomeSummary(data) {
-    let monthlyIncome = calculateMonthlyIncome(data);
-    let annualIncome = monthlyIncome * 12;
+function updateIncomeSection(data) {
+    // Prepare income data
+    const incomeData = {
+        'Salary': parseFloat(data.salary || 0),
+        'Business': parseFloat(data.business || 0),
+        'Investments': parseFloat(data.investments || 0),
+        'Rental': parseFloat(data.rental || 0),
+        'Other': parseFloat(data.other || 0)
+    };
     
-    updateDisplay('monthlyIncome', monthlyIncome);
-    updateDisplay('annualIncome', annualIncome);
-    
-    updateWordsDisplay('monthlyIncomeWords', monthlyIncome);
-    updateWordsDisplay('annualIncomeWords', annualIncome);
-}
-
-function calculateMonthlyIncome(data) {
-    let total = 0;
-    
-    // Salary
-    total += parseFloat(data.salary || 0);
-    
-    // Rental Income
-    total += parseFloat(data.rentalIncome || 0);
-    
-    // Business Income
-    total += parseFloat(data.businessIncome || 0);
-    
-    // Investment Income (monthly equivalent)
-    const annualInvestmentIncome = calculateAnnualInvestmentIncome(data);
-    total += annualInvestmentIncome / 12;
-    
-    // Custom income
-    if (data.customIncome) {
-        data.customIncome.forEach(item => {
-            total += parseFloat(item.value || 0);
-        });
+    // Add custom income sources
+    if (data.customSources) {
+        incomeData['Other Sources'] = data.customSources.reduce((total, item) => 
+            total + parseFloat(item.value || 0), 0);
     }
     
-    return total;
+    // Calculate total monthly income
+    const totalIncome = Object.values(incomeData).reduce((a, b) => a + b, 0);
+    
+    // Update total display
+    updateDisplay('totalIncome', totalIncome);
+    updateWordsDisplay('totalIncomeWords', totalIncome);
+    
+    // Create/Update pie chart
+    createPieChart('incomeChart', incomeData, {
+        title: 'Income Distribution',
+        colors: ['#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800']
+    });
+    
+    return totalIncome;
 }
 
-function calculateAnnualInvestmentIncome(data) {
-    let total = 0;
-    
-    // Dividend Income
-    total += (parseFloat(data.stocks || 0) * (parseFloat(data.stockYield || 0) / 100));
-    total += (parseFloat(data.mutualFunds || 0) * (parseFloat(data.mutualFundYield || 0) / 100));
-    
-    // Interest Income
-    total += (parseFloat(data.bonds || 0) * (parseFloat(data.bondYield || 0) / 100));
-    total += (parseFloat(data.ppf || 0) * (parseFloat(data.ppfYield || 0) / 100));
-    total += (parseFloat(data.epf || 0) * (parseFloat(data.epfYield || 0) / 100));
-    total += (parseFloat(data.nps || 0) * (parseFloat(data.npsYield || 0) / 100));
-    
-    return total;
-}
-
-function updateExpenseSummary(data) {
+function updateExpenseSection(data) {
     // Calculate monthly recurring expenses
-    let monthlyRecurring = calculateMonthlyRecurring(data);
+    const monthlyExpenses = {
+        'Groceries': parseFloat(data.groceries || 0),
+        'Utilities': parseFloat(data.utilities || 0),
+        'Subscriptions': parseFloat(data.subscriptions || 0),
+        'Shopping': parseFloat(data.shopping || 0),
+        'Dining': parseFloat(data.dining || 0),
+        'EMIs': parseFloat(data.carEMI || 0) + parseFloat(data.homeEMI || 0)
+    };
+    
+    // Add custom monthly expenses
+    if (data.monthly) {
+        monthlyExpenses['Other Monthly'] = data.monthly.reduce((total, item) => 
+            total + parseFloat(item.value || 0), 0);
+    }
     
     // Calculate monthly share of big expenses
-    let annualBigExpenses = calculateAnnualBigExpenses(data);
-    let monthlyBigExpenses = annualBigExpenses / 12;
+    const annualExpenses = {
+        'Electronics': parseFloat(data.electronics || 0),
+        'Vacations': parseFloat(data.vacations || 0),
+        'Medical': parseFloat(data.medical || 0),
+        'Education': parseFloat(data.education || 0),
+        'Vehicle': parseFloat(data.vehicle || 0)
+    };
     
-    // Calculate totals
-    let totalMonthlyExpenses = monthlyRecurring + monthlyBigExpenses;
-    let annualExpenses = totalMonthlyExpenses * 12;
-    
-    // Update displays
-    updateDisplay('monthlyRecurringExpenses', monthlyRecurring);
-    updateDisplay('monthlyBigExpenseShare', monthlyBigExpenses);
-    updateDisplay('totalMonthlyExpenses', totalMonthlyExpenses);
-    updateDisplay('annualExpenses', annualExpenses);
-    
-    updateWordsDisplay('monthlyRecurringExpensesWords', monthlyRecurring);
-    updateWordsDisplay('monthlyBigExpenseShareWords', monthlyBigExpenses);
-    updateWordsDisplay('totalMonthlyExpensesWords', totalMonthlyExpenses);
-    updateWordsDisplay('annualExpensesWords', annualExpenses);
-}
-
-function calculateMonthlyRecurring(data) {
-    let total = 0;
-    
-    // Regular monthly expenses
-    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Custom monthly expenses
-    if (data.monthly) {
-        data.monthly.forEach(item => {
-            total += parseFloat(item.value || 0);
-        });
-    }
-    
-    return total;
-}
-
-function calculateAnnualBigExpenses(data) {
-    let total = 0;
-    
-    // Regular big expenses
-    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Custom big expenses
+    // Add custom big expenses
     if (data.big) {
-        data.big.forEach(item => {
-            total += parseFloat(item.value || 0);
-        });
+        annualExpenses['Other Annual'] = data.big.reduce((total, item) => 
+            total + parseFloat(item.value || 0), 0);
     }
     
+    // Convert annual to monthly
+    const monthlyShare = {};
+    Object.entries(annualExpenses).forEach(([key, value]) => {
+        monthlyShare[key + ' (Monthly)'] = value / 12;
+    });
+    
+    // Combine all monthly expenses
+    const totalMonthlyExpenses = {
+        ...monthlyExpenses,
+        ...monthlyShare
+    };
+    
+    // Calculate total
+    const totalExpenses = Object.values(totalMonthlyExpenses).reduce((a, b) => a + b, 0);
+    
+    // Update total display
+    updateDisplay('totalExpenses', totalExpenses);
+    updateWordsDisplay('totalExpensesWords', totalExpenses);
+    
+    // Create/Update pie chart
+    createPieChart('expenseChart', totalMonthlyExpenses, {
+        title: 'Expense Distribution',
+        colors: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', 
+                '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39']
+    });
+    
+    return totalExpenses;
+}
+
+function updateFinancialSummary(netWorthData, incomeData, expenseData) {
+    // Calculate total monthly income
+    const monthlyIncome = updateIncomeSection(incomeData);
+    
+    // Calculate total monthly expenses
+    const monthlyExpenses = updateExpenseSection(expenseData);
+    
+    // Calculate monthly savings
+    const monthlySavings = monthlyIncome - monthlyExpenses;
+    updateDisplay('monthlySavings', monthlySavings);
+    updateWordsDisplay('monthlySavingsWords', monthlySavings);
+    
+    // Calculate annual savings
+    const annualSavings = monthlySavings * 12;
+    updateDisplay('annualSavings', annualSavings);
+    updateWordsDisplay('annualSavingsWords', annualSavings);
+    
+    // Calculate saving rate
+    const savingRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome) * 100 : 0;
+    document.getElementById('savingRate').textContent = savingRate.toFixed(1) + '%';
+    updateProgressBar('savingRateProgress', savingRate, {
+        good: 30,
+        warning: 15,
+        danger: 0
+    });
+    
+    // Calculate liability to net worth ratio
+    const { totalAssets, totalLiabilities } = calculateNetWorthFromData(netWorthData);
+    const netWorth = totalAssets - totalLiabilities;
+    const liabilityRatio = netWorth > 0 ? (totalLiabilities / netWorth) * 100 : 0;
+    document.getElementById('liabilityRatio').textContent = liabilityRatio.toFixed(1) + '%';
+    updateProgressBar('liabilityRatioProgress', liabilityRatio, {
+        good: 0,
+        warning: 40,
+        danger: 80
+    });
+}
+
+function createPieChart(canvasId, data, options) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    // Filter out zero values
+    const filteredData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => value > 0)
+    );
+    
+    // Calculate total for percentages
+    const total = Object.values(filteredData).reduce((a, b) => a + b, 0);
+    
+    // Prepare chart data
+    const chartData = {
+        labels: Object.keys(filteredData),
+        datasets: [{
+            data: Object.values(filteredData),
+            backgroundColor: options.colors,
+            borderWidth: 1
+        }]
+    };
+    
+    // Destroy existing chart if it exists
+    if (window[canvasId]) {
+        window[canvasId].destroy();
+    }
+    
+    // Create new chart
+    window[canvasId] = new Chart(ctx, {
+        type: 'pie',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${percentage}%`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ₹${formatCurrency(value)} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateProgressBar(elementId, value, thresholds) {
+    const progress = document.getElementById(elementId);
+    progress.style.width = Math.min(value, 100) + '%';
+    
+    // Remove existing range classes
+    progress.removeAttribute('data-range');
+    
+    // Set new range class
+    if (value >= thresholds.good) {
+        progress.setAttribute('data-range', 'good');
+    } else if (value >= thresholds.warning) {
+        progress.setAttribute('data-range', 'warning');
+    } else {
+        progress.setAttribute('data-range', 'danger');
+    }
+}
+
+// Helper functions for asset calculations
+function calculateRealEstate(data) {
+    return parseFloat(data.primaryResidence || 0) + parseFloat(data.otherProperties || 0);
+}
+
+function calculateInvestments(data) {
+    return ['stocks', 'mutualFunds', 'bonds', 'ppf', 'epf', 'nps'].reduce((total, id) => 
+        total + parseFloat(data[id] || 0), 0);
+}
+
+function calculateCashEquivalents(data) {
+    return parseFloat(data.bankBalance || 0) + parseFloat(data.cashInHand || 0);
+}
+
+function calculateOtherAssets(data) {
+    let total = parseFloat(data.gold || 0) + parseFloat(data.vehicle || 0) + parseFloat(data.otherAssets || 0);
+    if (data.customAssets) {
+        total += data.customAssets.reduce((sum, item) => sum + parseFloat(item.value || 0), 0);
+    }
     return total;
 }
 
-function updateFinancialMetrics() {
-    const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').textContent.replace(/[₹,]/g, '')) || 0;
-    const monthlyExpenses = parseFloat(document.getElementById('totalMonthlyExpenses').textContent.replace(/[₹,]/g, '')) || 0;
-    const netWorth = parseFloat(document.getElementById('netWorth').textContent.replace(/[₹,]/g, '')) || 0;
+function calculateNetWorthFromData(data) {
+    const totalAssets = calculateRealEstate(data) + calculateInvestments(data) + 
+                       calculateCashEquivalents(data) + calculateOtherAssets(data);
     
-    // Calculate savings rate
-    const monthlySavings = monthlyIncome - monthlyExpenses;
-    const savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome) * 100 : 0;
+    const totalLiabilities = ['homeLoan', 'carLoan', 'personalLoan', 'educationLoan', 'creditCardDebt']
+        .reduce((total, id) => total + parseFloat(data[id] || 0), 0) + 
+        (data.customLiabilities ? data.customLiabilities.reduce((total, item) => 
+            total + parseFloat(item.value || 0), 0) : 0);
     
-    // Calculate expense coverage (months of expenses that can be covered by net worth)
-    const expenseCoverage = monthlyExpenses > 0 ? netWorth / monthlyExpenses : 0;
-    
-    // Update metrics display
-    updateDisplay('monthlySavings', monthlySavings);
-    updateDisplay('savingsRate', savingsRate, true); // true for percentage
-    updateDisplay('expenseCoverage', expenseCoverage, false, true); // true for months
-    
-    updateWordsDisplay('monthlySavingsWords', monthlySavings);
+    return { totalAssets, totalLiabilities };
 }
 
 function updateDisplay(elementId, value, isPercentage = false, isMonths = false) {

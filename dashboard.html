@@ -10,6 +10,7 @@
     <link rel="icon" href="logo.svg" type="image/svg+xml">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -30,93 +31,91 @@
     <div class="container">
         <section class="section-header">
             <h2>Financial Dashboard</h2>
-            <p>Your complete financial overview in one place</p>
+            <p>Comprehensive view of your financial health</p>
         </section>
 
         <div class="dashboard-grid">
-            <!-- Net Worth Summary -->
+            <!-- Assets Section -->
             <div class="card">
-                <h2 class="section-title"><i class="fas fa-landmark"></i> Net Worth</h2>
-                <div class="metric-group">
-                    <div class="metric">
-                        <h3>Total Assets</h3>
-                        <p class="amount">₹<span id="totalAssets">0</span></p>
-                        <p class="words" id="totalAssetsWords">Zero Rupees</p>
-                    </div>
-                    <div class="metric">
-                        <h3>Total Liabilities</h3>
-                        <p class="amount">₹<span id="totalLiabilities">0</span></p>
-                        <p class="words" id="totalLiabilitiesWords">Zero Rupees</p>
-                    </div>
-                    <div class="metric highlight">
-                        <h3>Net Worth</h3>
-                        <p class="amount">₹<span id="netWorth">0</span></p>
-                        <p class="words" id="netWorthWords">Zero Rupees</p>
-                    </div>
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Asset Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="assetChart"></canvas>
+                </div>
+                <div class="total-value">
+                    Total Assets: ₹<span id="totalAssets">0</span>
+                    <p class="words" id="totalAssetsWords">Zero Rupees</p>
                 </div>
             </div>
 
-            <!-- Income Summary -->
+            <!-- Liabilities Section -->
             <div class="card">
-                <h2 class="section-title"><i class="fas fa-wallet"></i> Income</h2>
-                <div class="metric-group">
-                    <div class="metric">
-                        <h3>Monthly Income</h3>
-                        <p class="amount">₹<span id="monthlyIncome">0</span></p>
-                        <p class="words" id="monthlyIncomeWords">Zero Rupees</p>
-                    </div>
-                    <div class="metric highlight">
-                        <h3>Annual Income</h3>
-                        <p class="amount">₹<span id="annualIncome">0</span></p>
-                        <p class="words" id="annualIncomeWords">Zero Rupees</p>
-                    </div>
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Liability Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="liabilityChart"></canvas>
+                </div>
+                <div class="total-value">
+                    Total Liabilities: ₹<span id="totalLiabilities">0</span>
+                    <p class="words" id="totalLiabilitiesWords">Zero Rupees</p>
                 </div>
             </div>
 
-            <!-- Expense Summary -->
+            <!-- Income Section -->
             <div class="card">
-                <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Expenses</h2>
-                <div class="metric-group">
-                    <div class="metric">
-                        <h3>Monthly Recurring</h3>
-                        <p class="amount">₹<span id="monthlyRecurringExpenses">0</span></p>
-                        <p class="words" id="monthlyRecurringExpensesWords">Zero Rupees</p>
-                    </div>
-                    <div class="metric">
-                        <h3>Monthly Big Expense Share</h3>
-                        <p class="amount">₹<span id="monthlyBigExpenseShare">0</span></p>
-                        <p class="words" id="monthlyBigExpenseShareWords">Zero Rupees</p>
-                    </div>
-                    <div class="metric">
-                        <h3>Total Monthly</h3>
-                        <p class="amount">₹<span id="totalMonthlyExpenses">0</span></p>
-                        <p class="words" id="totalMonthlyExpensesWords">Zero Rupees</p>
-                    </div>
-                    <div class="metric highlight">
-                        <h3>Annual Total</h3>
-                        <p class="amount">₹<span id="annualExpenses">0</span></p>
-                        <p class="words" id="annualExpensesWords">Zero Rupees</p>
-                    </div>
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Income Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="incomeChart"></canvas>
+                </div>
+                <div class="total-value">
+                    Monthly Income: ₹<span id="totalIncome">0</span>
+                    <p class="words" id="totalIncomeWords">Zero Rupees</p>
                 </div>
             </div>
 
-            <!-- Financial Metrics -->
+            <!-- Expenses Section -->
             <div class="card">
-                <h2 class="section-title"><i class="fas fa-chart-line"></i> Key Metrics</h2>
-                <div class="metric-group">
-                    <div class="metric">
-                        <h3>Monthly Savings</h3>
-                        <p class="amount">₹<span id="monthlySavings">0</span></p>
-                        <p class="words" id="monthlySavingsWords">Zero Rupees</p>
+                <h2 class="section-title"><i class="fas fa-chart-pie"></i> Expense Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+                <div class="total-value">
+                    Monthly Expenses: ₹<span id="totalExpenses">0</span>
+                    <p class="words" id="totalExpensesWords">Zero Rupees</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Summary Section -->
+        <div class="card summary-card">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> Financial Summary</h2>
+            <div class="summary-grid">
+                <!-- Key Ratios -->
+                <div class="summary-item">
+                    <h3>Saving Rate</h3>
+                    <p class="highlight" id="savingRate">0%</p>
+                    <div class="progress-bar">
+                        <div id="savingRateProgress" class="progress"></div>
                     </div>
-                    <div class="metric">
-                        <h3>Savings Rate</h3>
-                        <p class="amount"><span id="savingsRate">0</span>%</p>
+                </div>
+
+                <div class="summary-item">
+                    <h3>Liability to Net Worth Ratio</h3>
+                    <p class="highlight" id="liabilityRatio">0%</p>
+                    <div class="progress-bar">
+                        <div id="liabilityRatioProgress" class="progress"></div>
                     </div>
-                    <div class="metric highlight">
-                        <h3>Expense Coverage</h3>
-                        <p class="amount"><span id="expenseCoverage">0</span> months</p>
-                    </div>
+                </div>
+
+                <!-- Savings Summary -->
+                <div class="summary-item highlight">
+                    <h3>Monthly Savings</h3>
+                    <p class="amount">₹<span id="monthlySavings">0</span></p>
+                    <p class="words" id="monthlySavingsWords">Zero Rupees</p>
+                </div>
+
+                <div class="summary-item highlight">
+                    <h3>Annual Savings</h3>
+                    <p class="amount">₹<span id="annualSavings">0</span></p>
+                    <p class="words" id="annualSavingsWords">Zero Rupees</p>
                 </div>
             </div>
         </div>
@@ -144,7 +143,6 @@
             }).format(amount);
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="main.js"></script>
     <script src="pdfGenerator.js"></script>
