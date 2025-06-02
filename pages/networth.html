@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Worth - Financial Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Dashboard</a>
+                <a href="personal-info.html" class="nav-link">Personal Info</a>
+                <a href="networth.html" class="nav-link active">Net Worth</a>
+                <a href="income.html" class="nav-link">Income</a>
+                <a href="expenses.html" class="nav-link">Expenses</a>
+                <a href="ff-score.html" class="nav-link">FF Score</a>
+                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
+                <a href="insurance.html" class="nav-link">Insurance</a>
+                <a href="advisor.html" class="nav-link">Financial Advisor</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1>Net Worth Tracker</h1>
+        
+        <!-- Summary Card -->
+        <div class="card">
+            <h2>Net Worth Summary</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <h4>Total Assets</h4>
+                    <p id="total-assets">₹0</p>
+                    <p id="total-assets-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Total Liabilities</h4>
+                    <p id="total-liabilities">₹0</p>
+                    <p id="total-liabilities-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Net Worth</h4>
+                    <p id="net-worth">₹0</p>
+                    <p id="net-worth-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Expected Annual Return</h4>
+                    <p id="expected-return">₹0</p>
+                </div>
+            </div>
+            <div style="margin-top: 2rem;">
+                <canvas id="networth-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Assets Section -->
+        <div class="card">
+            <h2>Assets</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showAssetModal()">Add Asset</button>
+            </div>
+
+            <!-- Asset Categories -->
+            <div id="asset-categories">
+                <!-- Real Estate -->
+                <div class="mb-3">
+                    <h3>Real Estate</h3>
+                    <div id="real-estate-assets"></div>
+                </div>
+
+                <!-- Equity -->
+                <div class="mb-3">
+                    <h3>Equity</h3>
+                    <div id="equity-assets"></div>
+                </div>
+
+                <!-- Fixed Income -->
+                <div class="mb-3">
+                    <h3>Fixed Income</h3>
+                    <div id="fixed-income-assets"></div>
+                </div>
+
+                <!-- Commodities -->
+                <div class="mb-3">
+                    <h3>Commodities</h3>
+                    <div id="commodities-assets"></div>
+                </div>
+
+                <!-- Others -->
+                <div class="mb-3">
+                    <h3>Others</h3>
+                    <div id="other-assets"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liabilities Section -->
+        <div class="card">
+            <h2>Liabilities</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showLiabilityModal()">Add Liability</button>
+            </div>
+            <div id="liabilities-list"></div>
+        </div>
+
+        <!-- Asset Modal -->
+        <div id="asset-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Asset</h3>
+                <form id="asset-form" onsubmit="return saveAsset(event)">
+                    <div class="form-group">
+                        <label for="asset-category">Category</label>
+                        <select id="asset-category" required onchange="updateAssetSubcategories()">
+                            <option value="">Select Category</option>
+                            <option value="realEstate">Real Estate</option>
+                            <option value="equity">Equity</option>
+                            <option value="fixedIncome">Fixed Income</option>
+                            <option value="commodities">Commodities</option>
+                            <option value="others">Others</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="asset-subcategory">Type</label>
+                        <select id="asset-subcategory" required>
+                            <option value="">Select Type</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="asset-name">Name</label>
+                        <input type="text" id="asset-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="asset-value">Value</label>
+                        <input type="number" id="asset-value" required min="0">
+                    </div>
+
+                    <div class="form-group" id="yield-group" style="display: none;">
+                        <label for="asset-yield">Expected Annual Yield (%)</label>
+                        <input type="number" id="asset-yield" min="0" max="100" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Asset</button>
+                        <button type="button" class="btn btn-danger" onclick="closeAssetModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Liability Modal -->
+        <div id="liability-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Liability</h3>
+                <form id="liability-form" onsubmit="return saveLiability(event)">
+                    <div class="form-group">
+                        <label for="liability-type">Type</label>
+                        <select id="liability-type" required>
+                            <option value="">Select Type</option>
+                            <option value="homeLoan">Home Loan</option>
+                            <option value="carLoan">Car Loan</option>
+                            <option value="educationLoan">Education Loan</option>
+                            <option value="personalLoan">Personal Loan</option>
+                            <option value="creditCards">Credit Cards</option>
+                            <option value="businessLoan">Business Loan</option>
+                            <option value="custom">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="liability-name-group" style="display: none;">
+                        <label for="liability-name">Name</label>
+                        <input type="text" id="liability-name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="liability-amount">Amount</label>
+                        <input type="number" id="liability-amount" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="liability-tenure">Remaining Tenure (months)</label>
+                        <input type="number" id="liability-tenure" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Liability</button>
+                        <button type="button" class="btn btn-danger" onclick="closeLiabilityModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container text-center" style="padding: 2rem 0;">
+        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
+    </footer>
+
+    <!-- Load JavaScript files -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/state.js"></script>
+    <script src="../js/networth.js"></script>
+</body>
+</html> 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance - Financial Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Dashboard</a>
+                <a href="personal-info.html" class="nav-link">Personal Info</a>
+                <a href="networth.html" class="nav-link">Net Worth</a>
+                <a href="income.html" class="nav-link">Income</a>
+                <a href="expenses.html" class="nav-link">Expenses</a>
+                <a href="ff-score.html" class="nav-link">FF Score</a>
+                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
+                <a href="insurance.html" class="nav-link active">Insurance</a>
+                <a href="advisor.html" class="nav-link">Financial Advisor</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1>Insurance Portfolio</h1>
+        
+        <!-- Insurance Summary -->
+        <div class="card">
+            <h2>Insurance Summary</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <h4>Total Life Coverage</h4>
+                    <p id="total-life-coverage">₹0</p>
+                    <p id="life-coverage-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Total Medical Coverage</h4>
+                    <p id="total-medical-coverage">₹0</p>
+                    <p id="medical-coverage-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Annual Premiums</h4>
+                    <p id="total-premiums">₹0</p>
+                    <p id="premiums-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Coverage Status</h4>
+                    <p id="coverage-status">Not Assessed</p>
+                </div>
+            </div>
+            <div style="margin-top: 2rem;">
+                <canvas id="insurance-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Life Insurance -->
+        <div class="card">
+            <h2>Life Insurance Policies</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showLifeInsuranceModal()">Add Life Insurance</button>
+            </div>
+            <div id="life-insurance-list"></div>
+        </div>
+
+        <!-- Medical Insurance -->
+        <div class="card">
+            <h2>Medical Insurance Policies</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showMedicalInsuranceModal()">Add Medical Insurance</button>
+            </div>
+            <div id="medical-insurance-list"></div>
+        </div>
+
+        <!-- Life Insurance Modal -->
+        <div id="life-insurance-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Life Insurance Policy</h3>
+                <form id="life-insurance-form" onsubmit="return saveLifeInsurance(event)">
+                    <div class="form-group">
+                        <label for="life-policy-name">Policy Name</label>
+                        <input type="text" id="life-policy-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="life-policy-type">Policy Type</label>
+                        <select id="life-policy-type" required>
+                            <option value="">Select Type</option>
+                            <option value="term">Term Insurance</option>
+                            <option value="endowment">Endowment Plan</option>
+                            <option value="ulip">ULIP</option>
+                            <option value="whole">Whole Life</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="life-sum-assured">Sum Assured</label>
+                        <input type="number" id="life-sum-assured" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="life-premium">Annual Premium</label>
+                        <input type="number" id="life-premium" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="life-term">Policy Term (years)</label>
+                        <input type="number" id="life-term" required min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="life-start-date">Policy Start Date</label>
+                        <input type="date" id="life-start-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Policy</button>
+                        <button type="button" class="btn btn-danger" onclick="closeLifeInsuranceModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Medical Insurance Modal -->
+        <div id="medical-insurance-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Medical Insurance Policy</h3>
+                <form id="medical-insurance-form" onsubmit="return saveMedicalInsurance(event)">
+                    <div class="form-group">
+                        <label for="medical-policy-name">Policy Name</label>
+                        <input type="text" id="medical-policy-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medical-policy-type">Policy Type</label>
+                        <select id="medical-policy-type" required>
+                            <option value="">Select Type</option>
+                            <option value="individual">Individual Health</option>
+                            <option value="family">Family Floater</option>
+                            <option value="critical">Critical Illness</option>
+                            <option value="accident">Personal Accident</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medical-sum-assured">Sum Assured</label>
+                        <input type="number" id="medical-sum-assured" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medical-premium">Annual Premium</label>
+                        <input type="number" id="medical-premium" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medical-room-limit">Room Rent Limit</label>
+                        <input type="number" id="medical-room-limit" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="medical-copay">
+                            Has Co-Pay
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medical-start-date">Policy Start Date</label>
+                        <input type="date" id="medical-start-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Policy</button>
+                        <button type="button" class="btn btn-danger" onclick="closeMedicalInsuranceModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Coverage Analysis -->
+        <div class="card">
+            <h2>Coverage Analysis</h2>
+            <div id="coverage-analysis">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container text-center" style="padding: 2rem 0;">
+        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
+    </footer>
+
+    <!-- Load JavaScript files -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/state.js"></script>
+    <script src="../js/insurance.js"></script>
+</body>
+</html> 

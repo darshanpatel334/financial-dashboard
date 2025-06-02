@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Tracker - Financial Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Dashboard</a>
+                <a href="personal-info.html" class="nav-link">Personal Info</a>
+                <a href="networth.html" class="nav-link">Net Worth</a>
+                <a href="income.html" class="nav-link active">Income</a>
+                <a href="expenses.html" class="nav-link">Expenses</a>
+                <a href="ff-score.html" class="nav-link">FF Score</a>
+                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
+                <a href="insurance.html" class="nav-link">Insurance</a>
+                <a href="advisor.html" class="nav-link">Financial Advisor</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1>Income Tracker</h1>
+        
+        <!-- Income Summary -->
+        <div class="card">
+            <h2>Income Summary</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <h4>Monthly Income</h4>
+                    <p id="monthly-income">₹0</p>
+                    <p id="monthly-income-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Annual Income</h4>
+                    <p id="annual-income">₹0</p>
+                    <p id="annual-income-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                </div>
+                <div>
+                    <h4>Passive Income</h4>
+                    <p id="passive-income">₹0</p>
+                    <p id="passive-ratio">0% of total income</p>
+                </div>
+            </div>
+            <div style="margin-top: 2rem;">
+                <canvas id="income-composition-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Regular Income -->
+        <div class="card">
+            <h2>Regular Income</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showRegularIncomeModal()">Add Regular Income</button>
+            </div>
+            <div id="regular-income-list"></div>
+        </div>
+
+        <!-- Passive Income -->
+        <div class="card">
+            <h2>Passive Income</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showPassiveIncomeModal()">Add Passive Income</button>
+            </div>
+            <div id="passive-income-list"></div>
+        </div>
+
+        <!-- Additional Income -->
+        <div class="card">
+            <h2>Additional Income</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showAdditionalIncomeModal()">Add Additional Income</button>
+            </div>
+            <div id="additional-income-list"></div>
+        </div>
+
+        <!-- Regular Income Modal -->
+        <div id="regular-income-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Regular Income</h3>
+                <form id="regular-income-form" onsubmit="return saveRegularIncome(event)">
+                    <div class="form-group">
+                        <label for="regular-income-amount">Monthly Amount</label>
+                        <input type="number" id="regular-income-amount" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-danger" onclick="closeRegularIncomeModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Passive Income Modal -->
+        <div id="passive-income-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Passive Income</h3>
+                <form id="passive-income-form" onsubmit="return savePassiveIncome(event)">
+                    <div class="form-group">
+                        <label for="passive-income-type">Type</label>
+                        <select id="passive-income-type" required>
+                            <option value="">Select Type</option>
+                            <option value="rental">Rental Income</option>
+                            <option value="dividend">Dividend Income</option>
+                            <option value="interest">Interest Income</option>
+                            <option value="custom">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="passive-income-name-group" style="display: none;">
+                        <label for="passive-income-name">Name</label>
+                        <input type="text" id="passive-income-name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passive-income-amount">Monthly Amount</label>
+                        <input type="number" id="passive-income-amount" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-danger" onclick="closePassiveIncomeModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Additional Income Modal -->
+        <div id="additional-income-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Additional Income</h3>
+                <form id="additional-income-form" onsubmit="return saveAdditionalIncome(event)">
+                    <div class="form-group">
+                        <label for="additional-income-name">Name</label>
+                        <input type="text" id="additional-income-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additional-income-amount">Amount</label>
+                        <input type="number" id="additional-income-amount" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additional-income-frequency">Frequency</label>
+                        <select id="additional-income-frequency" required>
+                            <option value="one-time">One Time</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="annually">Annually</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-danger" onclick="closeAdditionalIncomeModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container text-center" style="padding: 2rem 0;">
+        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
+    </footer>
+
+    <!-- Load JavaScript files -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/state.js"></script>
+    <script src="../js/income.js"></script>
+</body>
+</html> 

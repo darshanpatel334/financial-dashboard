@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Advisor - Financial Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Dashboard</a>
+                <a href="personal-info.html" class="nav-link">Personal Info</a>
+                <a href="networth.html" class="nav-link">Net Worth</a>
+                <a href="income.html" class="nav-link">Income</a>
+                <a href="expenses.html" class="nav-link">Expenses</a>
+                <a href="ff-score.html" class="nav-link">FF Score</a>
+                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
+                <a href="insurance.html" class="nav-link">Insurance</a>
+                <a href="advisor.html" class="nav-link active">Financial Advisor</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1>Financial Advisor</h1>
+        
+        <!-- Financial Health Score -->
+        <div class="card">
+            <h2>Financial Health Score</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <h4>Overall Score</h4>
+                    <p id="overall-score">0%</p>
+                    <p id="health-status" class="text-secondary">Not Assessed</p>
+                </div>
+                <div>
+                    <h4>Savings Rate</h4>
+                    <p id="savings-rate">0%</p>
+                </div>
+                <div>
+                    <h4>Debt Ratio</h4>
+                    <p id="debt-ratio">0%</p>
+                </div>
+                <div>
+                    <h4>Investment Mix</h4>
+                    <p id="investment-mix">Not Balanced</p>
+                </div>
+            </div>
+            <div style="margin-top: 2rem;">
+                <canvas id="health-score-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Priority Actions -->
+        <div class="card">
+            <h2>Priority Actions</h2>
+            <div id="priority-actions">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Investment Recommendations -->
+        <div class="card">
+            <h2>Investment Recommendations</h2>
+            <div id="investment-recommendations">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Tax Planning -->
+        <div class="card">
+            <h2>Tax Planning</h2>
+            <div id="tax-planning">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Goal Planning -->
+        <div class="card">
+            <h2>Goal Planning</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" onclick="showGoalModal()">Add Financial Goal</button>
+            </div>
+            <div id="financial-goals"></div>
+        </div>
+
+        <!-- Goal Modal -->
+        <div id="goal-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Add Financial Goal</h3>
+                <form id="goal-form" onsubmit="return saveGoal(event)">
+                    <div class="form-group">
+                        <label for="goal-name">Goal Name</label>
+                        <input type="text" id="goal-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goal-type">Goal Type</label>
+                        <select id="goal-type" required>
+                            <option value="">Select Type</option>
+                            <option value="retirement">Retirement</option>
+                            <option value="education">Education</option>
+                            <option value="house">House Purchase</option>
+                            <option value="vehicle">Vehicle Purchase</option>
+                            <option value="travel">Travel</option>
+                            <option value="emergency">Emergency Fund</option>
+                            <option value="custom">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goal-amount">Target Amount</label>
+                        <input type="number" id="goal-amount" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goal-timeline">Timeline (years)</label>
+                        <input type="number" id="goal-timeline" required min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="goal-priority">Priority</label>
+                        <select id="goal-priority" required>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Goal</button>
+                        <button type="button" class="btn btn-danger" onclick="closeGoalModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Monthly Action Plan -->
+        <div class="card">
+            <h2>Monthly Action Plan</h2>
+            <div id="monthly-actions">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container text-center" style="padding: 2rem 0;">
+        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
+    </footer>
+
+    <!-- Load JavaScript files -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/state.js"></script>
+    <script src="../js/advisor.js"></script>
+</body>
+</html> 

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Information - Financial Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Dashboard</a>
+                <a href="personal-info.html" class="nav-link active">Personal Info</a>
+                <a href="networth.html" class="nav-link">Net Worth</a>
+                <a href="income.html" class="nav-link">Income</a>
+                <a href="expenses.html" class="nav-link">Expenses</a>
+                <a href="ff-score.html" class="nav-link">FF Score</a>
+                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
+                <a href="insurance.html" class="nav-link">Insurance</a>
+                <a href="advisor.html" class="nav-link">Financial Advisor</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1>Personal Information</h1>
+        
+        <div class="card">
+            <form id="personal-info-form" onsubmit="return savePersonalInfo(event)">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">Date of Birth *</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="text" id="age" name="age" readonly>
+                </div>
+
+                <div id="message" class="message" style="display: none;"></div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save Information</button>
+                    <button type="button" class="btn btn-danger" onclick="resetForm()">Reset</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container text-center" style="padding: 2rem 0;">
+        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
+    </footer>
+
+    <!-- Load JavaScript files -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/state.js"></script>
+    <script>
+        // Initialize form with existing data
+        document.addEventListener('DOMContentLoaded', function() {
+            const personalInfo = AppState.personalInfo;
+            if (personalInfo) {
+                document.getElementById('fullName').value = personalInfo.fullName || '';
+                document.getElementById('email').value = personalInfo.email || '';
+                document.getElementById('birthdate').value = personalInfo.birthdate || '';
+                if (personalInfo.birthdate) {
+                    document.getElementById('age').value = utils.calculateAge(personalInfo.birthdate);
+                }
+            }
+
+            // Add birthdate change listener
+            document.getElementById('birthdate').addEventListener('change', function(e) {
+                const age = utils.calculateAge(e.target.value);
+                document.getElementById('age').value = age;
+            });
+        });
+
+        function savePersonalInfo(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const fullName = form.fullName.value.trim();
+            const email = form.email.value.trim();
+            const birthdate = form.birthdate.value;
+            const age = utils.calculateAge(birthdate);
+
+            // Validate email
+            if (!utils.validateEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return false;
+            }
+
+            // Validate birthdate
+            if (age < 18) {
+                showMessage('You must be at least 18 years old', 'error');
+                return false;
+            }
+
+            // Update state
+            AppState.update('personalInfo', {
+                fullName,
+                email,
+                birthdate,
+                age,
+                lastUpdated: new Date().toISOString()
+            });
+
+            showMessage('Personal information saved successfully!', 'success');
+            return false;
+        }
+
+        function resetForm() {
+            document.getElementById('personal-info-form').reset();
+            document.getElementById('age').value = '';
+            showMessage('Form has been reset', 'info');
+        }
+
+        function showMessage(text, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message message-${type}`;
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
