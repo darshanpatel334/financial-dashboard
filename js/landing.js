@@ -33,17 +33,6 @@ function checkUserStatus() {
     const userState = AppState.personalInfo;
     const hasCompletedOnboarding = userState && userState.name;
 
-    // Update CTA buttons based on user status
-    const ctaButtons = document.querySelectorAll('.cta-buttons a');
-    ctaButtons.forEach(button => {
-        if (hasCompletedOnboarding) {
-            if (button.classList.contains('btn-primary')) {
-                button.href = '../index.html';
-                button.textContent = 'Go to Dashboard';
-            }
-        }
-    });
-
     // Update navigation based on user status
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach(link => {
