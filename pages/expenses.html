@@ -5,90 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expenses Tracker - Financial Dashboard</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
+            <div class="nav-brand">
+                <img src="../logo.svg" alt="LifeNivesh Logo" class="logo">
+                <span>LifeNivesh</span>
+            </div>
             <div class="nav-links">
                 <a href="../index.html" class="nav-link">Dashboard</a>
-                <a href="personal-info.html" class="nav-link">Personal Info</a>
                 <a href="networth.html" class="nav-link">Net Worth</a>
                 <a href="income.html" class="nav-link">Income</a>
                 <a href="expenses.html" class="nav-link active">Expenses</a>
                 <a href="ff-score.html" class="nav-link">FF Score</a>
-                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
-                <a href="insurance.html" class="nav-link">Insurance</a>
-                <a href="advisor.html" class="nav-link">Financial Advisor</a>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="container">
-        <h1>Expenses Tracker</h1>
+        <div class="page-header">
+            <h1>Expenses Tracker</h1>
+            <p class="text-secondary">Track and manage your expenses</p>
+        </div>
         
         <!-- Expenses Summary -->
-        <div class="card">
-            <h2>Expenses Summary</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div>
-                    <h4>Monthly Expenses</h4>
-                    <p id="monthly-expenses">₹0</p>
-                    <p id="monthly-expenses-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+        <div class="summary-grid">
+            <div class="card summary-card">
+                <div class="summary-icon liabilities-icon">
+                    <i class="fas fa-wallet"></i>
                 </div>
-                <div>
-                    <h4>Annual Expenses</h4>
-                    <p id="annual-expenses">₹0</p>
-                    <p id="annual-expenses-words" class="text-secondary" style="font-size: 0.9rem;"></p>
-                </div>
-                <div>
-                    <h4>Big Expenses</h4>
-                    <p id="big-expenses">₹0</p>
-                    <p id="big-expenses-words" class="text-secondary" style="font-size: 0.9rem;"></p>
-                </div>
-                <div>
-                    <h4>Expected Inflation</h4>
-                    <p id="expected-inflation">0%</p>
+                <div class="summary-content">
+                    <h3>Monthly Expenses</h3>
+                    <p id="monthly-expenses" class="summary-amount">₹0</p>
+                    <p id="monthly-expenses-words" class="text-secondary"></p>
                 </div>
             </div>
-            <div style="margin-top: 2rem;">
+
+            <div class="card summary-card">
+                <div class="summary-icon return-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>Annual Expenses</h3>
+                    <p id="annual-expenses" class="summary-amount">₹0</p>
+                    <p id="annual-expenses-words" class="text-secondary"></p>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="summary-icon assets-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>Big Expenses</h3>
+                    <p id="big-expenses" class="summary-amount">₹0</p>
+                    <p id="big-expenses-words" class="text-secondary"></p>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="summary-icon networth-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>Expected Inflation</h3>
+                    <p id="expected-inflation" class="summary-amount">0%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="card chart-card">
+            <h2>Expenses Composition</h2>
+            <div class="chart-container">
                 <canvas id="expenses-composition-chart"></canvas>
             </div>
         </div>
 
         <!-- Monthly Recurring Expenses -->
         <div class="card">
-            <h2>Monthly Recurring Expenses</h2>
-            <div class="mb-3">
-                <button class="btn btn-primary" onclick="showMonthlyExpenseModal()">Add Monthly Expense</button>
+            <div class="card-header">
+                <h2>Monthly Recurring Expenses</h2>
+                <button class="btn btn-primary" onclick="showMonthlyExpenseModal()">
+                    <i class="fas fa-plus"></i> Add Monthly Expense
+                </button>
             </div>
-            <div id="monthly-expenses-list"></div>
+            <div id="monthly-expenses-list" class="expenses-list"></div>
         </div>
 
         <!-- Annual Recurring Expenses -->
         <div class="card">
-            <h2>Annual Recurring Expenses</h2>
-            <div class="mb-3">
-                <button class="btn btn-primary" onclick="showAnnualExpenseModal()">Add Annual Expense</button>
+            <div class="card-header">
+                <h2>Annual Recurring Expenses</h2>
+                <button class="btn btn-primary" onclick="showAnnualExpenseModal()">
+                    <i class="fas fa-plus"></i> Add Annual Expense
+                </button>
             </div>
-            <div id="annual-expenses-list"></div>
+            <div id="annual-expenses-list" class="expenses-list"></div>
         </div>
 
         <!-- Big Expenses -->
         <div class="card">
-            <h2>Big Expenses</h2>
-            <div class="mb-3">
-                <button class="btn btn-primary" onclick="showBigExpenseModal()">Add Big Expense</button>
+            <div class="card-header">
+                <h2>Big Expenses</h2>
+                <button class="btn btn-primary" onclick="showBigExpenseModal()">
+                    <i class="fas fa-plus"></i> Add Big Expense
+                </button>
             </div>
-            <div id="big-expenses-list"></div>
+            <div id="big-expenses-list" class="expenses-list"></div>
+        </div>
+
+        <!-- Page Navigation -->
+        <div class="page-navigation">
+            <a href="income.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Income
+            </a>
+            <a href="ff-score.html" class="btn btn-primary">
+                Continue to FF Score <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
 
         <!-- Monthly Expense Modal -->
-        <div id="monthly-expense-modal" class="modal" style="display: none;">
+        <div id="monthly-expense-modal" class="modal">
+            <div class="modal-overlay" onclick="closeMonthlyExpenseModal()"></div>
             <div class="modal-content">
-                <h3>Add Monthly Expense</h3>
+                <div class="modal-header">
+                    <h3>Add Monthly Expense</h3>
+                    <button class="modal-close" onclick="closeMonthlyExpenseModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
                 <form id="monthly-expense-form" onsubmit="return saveMonthlyExpense(event)">
                     <div class="form-group">
                         <label for="monthly-expense-type">Type</label>
@@ -109,28 +160,34 @@
                         </select>
                     </div>
 
-                    <div class="form-group" id="monthly-expense-name-group" style="display: none;">
+                    <div class="form-group" id="monthly-expense-name-group">
                         <label for="monthly-expense-name">Name</label>
-                        <input type="text" id="monthly-expense-name">
+                        <input type="text" id="monthly-expense-name" placeholder="Enter expense name">
                     </div>
 
                     <div class="form-group">
-                        <label for="monthly-expense-amount">Amount</label>
-                        <input type="number" id="monthly-expense-amount" required min="0">
+                        <label for="monthly-expense-amount">Amount (₹)</label>
+                        <input type="number" id="monthly-expense-amount" required min="0" placeholder="Enter monthly amount">
                     </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-danger" onclick="closeMonthlyExpenseModal()">Cancel</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeMonthlyExpenseModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Expense</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Annual Expense Modal -->
-        <div id="annual-expense-modal" class="modal" style="display: none;">
+        <div id="annual-expense-modal" class="modal">
+            <div class="modal-overlay" onclick="closeAnnualExpenseModal()"></div>
             <div class="modal-content">
-                <h3>Add Annual Expense</h3>
+                <div class="modal-header">
+                    <h3>Add Annual Expense</h3>
+                    <button class="modal-close" onclick="closeAnnualExpenseModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
                 <form id="annual-expense-form" onsubmit="return saveAnnualExpense(event)">
                     <div class="form-group">
                         <label for="annual-expense-type">Type</label>
@@ -150,28 +207,34 @@
                         </select>
                     </div>
 
-                    <div class="form-group" id="annual-expense-name-group" style="display: none;">
+                    <div class="form-group" id="annual-expense-name-group">
                         <label for="annual-expense-name">Name</label>
-                        <input type="text" id="annual-expense-name">
+                        <input type="text" id="annual-expense-name" placeholder="Enter expense name">
                     </div>
 
                     <div class="form-group">
-                        <label for="annual-expense-amount">Amount</label>
-                        <input type="number" id="annual-expense-amount" required min="0">
+                        <label for="annual-expense-amount">Amount (₹)</label>
+                        <input type="number" id="annual-expense-amount" required min="0" placeholder="Enter annual amount">
                     </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-danger" onclick="closeAnnualExpenseModal()">Cancel</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeAnnualExpenseModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Expense</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Big Expense Modal -->
-        <div id="big-expense-modal" class="modal" style="display: none;">
+        <div id="big-expense-modal" class="modal">
+            <div class="modal-overlay" onclick="closeBigExpenseModal()"></div>
             <div class="modal-content">
-                <h3>Add Big Expense</h3>
+                <div class="modal-header">
+                    <h3>Add Big Expense</h3>
+                    <button class="modal-close" onclick="closeBigExpenseModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
                 <form id="big-expense-form" onsubmit="return saveBigExpense(event)">
                     <div class="form-group">
                         <label for="big-expense-type">Type</label>
@@ -183,54 +246,30 @@
                         </select>
                     </div>
 
-                    <div class="form-group" id="big-expense-name-group" style="display: none;">
+                    <div class="form-group" id="big-expense-name-group">
                         <label for="big-expense-name">Name</label>
-                        <input type="text" id="big-expense-name">
+                        <input type="text" id="big-expense-name" placeholder="Enter expense name">
                     </div>
 
                     <div class="form-group">
-                        <label for="big-expense-amount">Amount</label>
-                        <input type="number" id="big-expense-amount" required min="0">
+                        <label for="big-expense-amount">Amount (₹)</label>
+                        <input type="number" id="big-expense-amount" required min="0" placeholder="Enter amount">
                     </div>
 
-                    <div class="form-group" id="rental-yield-group" style="display: none;">
+                    <div class="form-group" id="rental-yield-group">
                         <label for="rental-yield">Expected Rental Yield (%)</label>
-                        <input type="number" id="rental-yield" min="0" max="100" step="0.01">
+                        <input type="number" id="rental-yield" min="0" max="100" step="0.01" placeholder="Enter expected yield">
                     </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-danger" onclick="closeBigExpenseModal()">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Inflation Settings Modal -->
-        <div id="inflation-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h3>Set Expected Inflation</h3>
-                <form id="inflation-form" onsubmit="return saveInflation(event)">
-                    <div class="form-group">
-                        <label for="inflation-rate">Expected Annual Inflation Rate (%)</label>
-                        <input type="number" id="inflation-rate" required min="0" max="100" step="0.01">
-                    </div>
-
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-danger" onclick="closeInflationModal()">Cancel</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeBigExpenseModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Expense</button>
                     </div>
                 </form>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="container text-center" style="padding: 2rem 0;">
-        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
-    </footer>
-
-    <!-- Load JavaScript files -->
     <script src="../js/utils.js"></script>
     <script src="../js/state.js"></script>
     <script src="../js/expenses.js"></script>

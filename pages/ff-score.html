@@ -5,88 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Freedom Score - Financial Dashboard</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
+            <div class="nav-brand">
+                <img src="../logo.svg" alt="LifeNivesh Logo" class="logo">
+                <span>LifeNivesh</span>
+            </div>
             <div class="nav-links">
                 <a href="../index.html" class="nav-link">Dashboard</a>
-                <a href="personal-info.html" class="nav-link">Personal Info</a>
                 <a href="networth.html" class="nav-link">Net Worth</a>
                 <a href="income.html" class="nav-link">Income</a>
                 <a href="expenses.html" class="nav-link">Expenses</a>
                 <a href="ff-score.html" class="nav-link active">FF Score</a>
-                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
-                <a href="insurance.html" class="nav-link">Insurance</a>
-                <a href="advisor.html" class="nav-link">Financial Advisor</a>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="container">
-        <h1>Financial Freedom Score</h1>
+        <div class="page-header">
+            <h1>Financial Freedom Score</h1>
+            <p class="text-secondary">Track your progress towards financial freedom</p>
+        </div>
         
         <!-- FF Score Summary -->
-        <div class="card">
-            <h2>FF Score Summary</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div>
-                    <h4>Current FF Score</h4>
-                    <p id="current-ff-score">0%</p>
+        <div class="summary-grid">
+            <div class="card summary-card">
+                <div class="summary-icon assets-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>Current FF Score</h3>
+                    <p id="current-ff-score" class="summary-amount">0%</p>
                     <p id="ff-status" class="text-secondary">Not Started</p>
                 </div>
-                <div>
-                    <h4>Years to Freedom</h4>
-                    <p id="years-to-freedom">0</p>
+            </div>
+
+            <div class="card summary-card">
+                <div class="summary-icon return-icon">
+                    <i class="fas fa-clock"></i>
                 </div>
-                <div>
-                    <h4>Required Corpus</h4>
-                    <p id="required-corpus">₹0</p>
-                    <p id="required-corpus-words" class="text-secondary" style="font-size: 0.9rem;"></p>
-                </div>
-                <div>
-                    <h4>Current Corpus</h4>
-                    <p id="current-corpus">₹0</p>
-                    <p id="current-corpus-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                <div class="summary-content">
+                    <h3>Years to Freedom</h3>
+                    <p id="years-to-freedom" class="summary-amount">0</p>
                 </div>
             </div>
-            <div style="margin-top: 2rem;">
+
+            <div class="card summary-card">
+                <div class="summary-icon liabilities-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>Required Corpus</h3>
+                    <p id="required-corpus" class="summary-amount">₹0</p>
+                    <p id="required-corpus-words" class="text-secondary"></p>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="summary-icon networth-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div class="summary-content">
+                    <h3>Current Corpus</h3>
+                    <p id="current-corpus" class="summary-amount">₹0</p>
+                    <p id="current-corpus-words" class="text-secondary"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="card chart-card">
+            <h2>FF Score Progress</h2>
+            <div class="chart-container">
                 <canvas id="ff-progress-chart"></canvas>
             </div>
         </div>
 
         <!-- FF Score Calculation -->
         <div class="card">
-            <h2>FF Score Calculation</h2>
-            <div class="mb-3">
-                <button class="btn btn-primary" onclick="showCalculationModal()">Update Calculation Parameters</button>
+            <div class="card-header">
+                <h2>FF Score Calculation</h2>
+                <button class="btn btn-primary" onclick="showCalculationModal()">
+                    <i class="fas fa-calculator"></i> Update Parameters
+                </button>
             </div>
             <div class="grid-list">
                 <div class="card">
-                    <h4>Monthly Expenses</h4>
+                    <h4><i class="fas fa-wallet"></i> Monthly Expenses</h4>
                     <p id="calc-monthly-expenses">₹0</p>
                 </div>
                 <div class="card">
-                    <h4>Annual Expenses</h4>
+                    <h4><i class="fas fa-calendar"></i> Annual Expenses</h4>
                     <p id="calc-annual-expenses">₹0</p>
                 </div>
                 <div class="card">
-                    <h4>Expected Return</h4>
+                    <h4><i class="fas fa-chart-line"></i> Expected Return</h4>
                     <p id="calc-expected-return">0%</p>
                 </div>
                 <div class="card">
-                    <h4>Expected Inflation</h4>
+                    <h4><i class="fas fa-percentage"></i> Expected Inflation</h4>
                     <p id="calc-expected-inflation">0%</p>
                 </div>
                 <div class="card">
-                    <h4>Life Expectancy</h4>
+                    <h4><i class="fas fa-heart"></i> Life Expectancy</h4>
                     <p id="calc-life-expectancy">0 years</p>
                 </div>
                 <div class="card">
-                    <h4>Current Age</h4>
+                    <h4><i class="fas fa-user"></i> Current Age</h4>
                     <p id="calc-current-age">0 years</p>
                 </div>
             </div>
@@ -94,9 +125,11 @@
 
         <!-- Year-by-Year Projection -->
         <div class="card">
-            <h2>Year-by-Year Projection</h2>
-            <div class="mb-3">
-                <button class="btn btn-primary" onclick="showProjectionModal()">Update Projection Parameters</button>
+            <div class="card-header">
+                <h2>Year-by-Year Projection</h2>
+                <button class="btn btn-primary" onclick="showProjectionModal()">
+                    <i class="fas fa-chart-bar"></i> Update Projection
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table">
@@ -118,59 +151,75 @@
             </div>
         </div>
 
+        <!-- Page Navigation -->
+        <div class="page-navigation">
+            <a href="expenses.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Expenses
+            </a>
+            <a href="../index.html" class="btn btn-primary">
+                Return to Dashboard <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
         <!-- Calculation Modal -->
-        <div id="calculation-modal" class="modal" style="display: none;">
+        <div id="calculation-modal" class="modal">
+            <div class="modal-overlay" onclick="closeCalculationModal()"></div>
             <div class="modal-content">
-                <h3>Update Calculation Parameters</h3>
+                <div class="modal-header">
+                    <h3>Update Calculation Parameters</h3>
+                    <button class="modal-close" onclick="closeCalculationModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
                 <form id="calculation-form" onsubmit="return saveCalculationParams(event)">
                     <div class="form-group">
                         <label for="expected-return">Expected Annual Return (%)</label>
-                        <input type="number" id="expected-return" required min="0" max="100" step="0.01">
+                        <input type="number" id="expected-return" required min="0" max="100" step="0.01" placeholder="Enter expected return">
                     </div>
 
                     <div class="form-group">
                         <label for="life-expectancy">Life Expectancy (years)</label>
-                        <input type="number" id="life-expectancy" required min="0" max="120">
+                        <input type="number" id="life-expectancy" required min="0" max="120" placeholder="Enter life expectancy">
                     </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-danger" onclick="closeCalculationModal()">Cancel</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeCalculationModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Parameters</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- Projection Modal -->
-        <div id="projection-modal" class="modal" style="display: none;">
+        <div id="projection-modal" class="modal">
+            <div class="modal-overlay" onclick="closeProjectionModal()"></div>
             <div class="modal-content">
-                <h3>Update Projection Parameters</h3>
+                <div class="modal-header">
+                    <h3>Update Projection Parameters</h3>
+                    <button class="modal-close" onclick="closeProjectionModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
                 <form id="projection-form" onsubmit="return saveProjectionParams(event)">
                     <div class="form-group">
-                        <label for="monthly-savings">Monthly Savings</label>
-                        <input type="number" id="monthly-savings" required min="0">
+                        <label for="monthly-savings">Monthly Savings (₹)</label>
+                        <input type="number" id="monthly-savings" required min="0" placeholder="Enter monthly savings">
                     </div>
 
                     <div class="form-group">
                         <label for="annual-savings-increase">Annual Savings Increase (%)</label>
-                        <input type="number" id="annual-savings-increase" required min="0" max="100" step="0.01">
+                        <input type="number" id="annual-savings-increase" required min="0" max="100" step="0.01" placeholder="Enter annual increase">
                     </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-danger" onclick="closeProjectionModal()">Cancel</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeProjectionModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Parameters</button>
                     </div>
                 </form>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="container text-center" style="padding: 2rem 0;">
-        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
-    </footer>
-
-    <!-- Load JavaScript files -->
     <script src="../js/utils.js"></script>
     <script src="../js/state.js"></script>
     <script src="../js/ff-score.js"></script>
