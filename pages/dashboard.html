@@ -19,7 +19,6 @@
                 <span>LifeNivesh</span>
             </div>
             <div class="nav-links">
-                <a href="../index.html" class="nav-link">Home</a>
                 <a href="personal-info.html" class="nav-link">Personal Info</a>
                 <a href="networth.html" class="nav-link">Net Worth</a>
                 <a href="income.html" class="nav-link">Income</a>
@@ -37,9 +36,11 @@
     <main class="container dashboard">
         <div class="dashboard-header">
             <h1>Financial Dashboard</h1>
-            <button class="btn btn-secondary" onclick="generatePDF()">
-                <i class="fas fa-download"></i> Download Report
-            </button>
+            <div class="dashboard-actions">
+                <button class="btn btn-secondary" onclick="generatePDF()">
+                    <i class="fas fa-download"></i> Download Report
+                </button>
+            </div>
         </div>
         
         <!-- Personal Info Summary -->
