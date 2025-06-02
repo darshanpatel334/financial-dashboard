@@ -132,40 +132,48 @@
                 <h2 class="section-title"><i class="fas fa-chart-pie"></i> Expense Summary</h2>
                 
                 <div class="summary">
-                    <div class="summary-item">
-                        <span>Monthly Recurring Expenses:</span>
-                        <span class="highlight" id="totalMonthlyRecurring">₹0</span>
-                        <span class="number-in-words" id="totalMonthlyRecurringWords"></span>
-                    </div>
-                    
-                    <div class="summary-item">
-                        <span>Total Annual/Big Expenses:</span>
-                        <span class="highlight" id="totalBigExpenses">₹0</span>
-                        <span class="number-in-words" id="totalBigExpensesWords"></span>
-                    </div>
-
-                    <div class="summary-item">
-                        <span>Monthly Share of Big Expenses:</span>
-                        <span class="highlight" id="monthlyBigExpenses">₹0</span>
-                        <span class="number-in-words" id="monthlyBigExpensesWords"></span>
-                    </div>
-                    
-                    <div class="summary-item">
-                        <span style="font-size: 1.3rem;">Total Monthly Expenses:</span>
-                        <span class="highlight" id="totalMonthlyExpenses" style="font-size: 1.8rem;">₹0</span>
-                        <span class="number-in-words" id="totalMonthlyExpensesWords"></span>
+                    <!-- Monthly Summary -->
+                    <div class="summary-section">
+                        <h3 class="summary-subtitle">Monthly Breakdown</h3>
+                        <div class="summary-item">
+                            <span>Monthly Recurring Expenses:</span>
+                            <span class="highlight" id="totalMonthlyRecurring">₹0</span>
+                            <span class="number-in-words" id="totalMonthlyRecurringWords"></span>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <span>Monthly Share of Big Expenses:</span>
+                            <span class="highlight" id="monthlyBigExpenses">₹0</span>
+                            <span class="number-in-words" id="monthlyBigExpensesWords"></span>
+                        </div>
+                        
+                        <div class="summary-item total-section">
+                            <span>Total Monthly Expenses:</span>
+                            <span class="highlight" id="totalMonthlyExpenses">₹0</span>
+                            <span class="number-in-words" id="totalMonthlyExpensesWords"></span>
+                        </div>
                     </div>
 
-                    <div class="summary-item">
-                        <span>Annual Recurring Expenses:</span>
-                        <span class="highlight" id="annualRecurring">₹0</span>
-                        <span class="number-in-words" id="annualRecurringWords"></span>
-                    </div>
-
-                    <div class="summary-item">
-                        <span style="font-size: 1.3rem;">Total Annual Expenses:</span>
-                        <span class="highlight" id="annualTotal" style="font-size: 1.8rem;">₹0</span>
-                        <span class="number-in-words" id="annualTotalWords"></span>
+                    <!-- Annual Summary -->
+                    <div class="summary-section">
+                        <h3 class="summary-subtitle">Annual Breakdown</h3>
+                        <div class="summary-item">
+                            <span>Annual Recurring Expenses:</span>
+                            <span class="highlight" id="annualRecurring">₹0</span>
+                            <span class="number-in-words" id="annualRecurringWords"></span>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <span>Total Big Expenses:</span>
+                            <span class="highlight" id="totalBigExpenses">₹0</span>
+                            <span class="number-in-words" id="totalBigExpensesWords"></span>
+                        </div>
+                        
+                        <div class="summary-item total-section">
+                            <span>Total Annual Expenses:</span>
+                            <span class="highlight" id="annualTotal">₹0</span>
+                            <span class="number-in-words" id="annualTotalWords"></span>
+                        </div>
                     </div>
                 </div>
                 <button type="button" id="saveDataBtn" class="btn-calculate">
