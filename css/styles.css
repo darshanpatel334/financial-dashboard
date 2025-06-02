@@ -363,6 +363,12 @@ p {
     border: 1px solid var(--border-color);
 }
 
+.pie-chart-container {
+    max-width: 500px;
+    max-height: 500px;
+    margin: 0 auto;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     html {
