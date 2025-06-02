@@ -1,467 +1,352 @@
+// Constants and Configuration
+const ASSET_CATEGORIES = {
+    REAL_ESTATE: ['buildings', 'plots', 'land'],
+    INVESTMENTS: ['directEquity', 'equityMF', 'debtMF'],
+    FIXED_INCOME: ['fixedDeposits', 'otherFixedIncome'],
+    COMMODITIES: ['gold', 'commodity'],
+    CASH: ['cashAtBank', 'cashInHand']
+};
+
+const LIABILITY_CATEGORIES = ['homeLoan', 'carLoan', 'creditCard', 'educationLoan'];
+
+// Main Initialization
 document.addEventListener('DOMContentLoaded', function() {
-    // Add yield instruction tooltips
+    initializeNetWorthPage();
+});
+
+function initializeNetWorthPage() {
+    setupYieldInstructions();
+    setupEventListeners();
+    loadSavedValues();
+    calculateNetWorth();
+}
+
+// Setup Functions
+function setupYieldInstructions() {
     const yieldInputs = document.querySelectorAll('input[id$="Yield"]');
     yieldInputs.forEach(input => {
-        input.title = "Enter the annual income percentage (excluding appreciation) you generate from this asset";
-        // Add instruction text below yield inputs
-        const instructionDiv = document.createElement('div');
-        instructionDiv.className = 'yield-instruction';
-        instructionDiv.textContent = '% yield represents annual income excluding appreciation';
-        instructionDiv.style.fontSize = '0.8em';
-        instructionDiv.style.color = '#666';
+        const instructionDiv = createYieldInstruction();
+        input.title = "Enter the annual income percentage (excluding appreciation)";
         input.parentNode.appendChild(instructionDiv);
     });
+}
 
-    // Load saved values
+function createYieldInstruction() {
+    const div = document.createElement('div');
+    div.className = 'yield-instruction';
+    div.textContent = '% yield represents annual income excluding appreciation';
+    div.style.fontSize = '0.8em';
+    div.style.color = '#666';
+    return div;
+}
+
+function setupEventListeners() {
+    // Input field listeners
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('input', handleInputChange);
+        input.addEventListener('blur', handleInputBlur);
+    });
+
+    // Button listeners
+    document.getElementById('addAsset')?.addEventListener('click', () => addCustomField('customAssetsList', 'asset'));
+    document.getElementById('addLiability')?.addEventListener('click', () => addCustomField('customLiabilitiesList', 'liability'));
+    document.getElementById('saveDataBtn')?.addEventListener('click', handleSaveClick);
+}
+
+// Event Handlers
+function handleInputChange(event) {
+    const input = event.target;
+    validateInput(input);
+    if (!input.id.includes('Yield')) {
+        updateNumberInWords(input.id);
+    }
+    calculateNetWorth();
+}
+
+function handleInputBlur(event) {
+    validateInput(event.target);
+    calculateNetWorth();
+}
+
+function handleSaveClick() {
+    saveNetWorthValues();
+    showSaveConfirmation();
+}
+
+// Validation Functions
+function validateInput(input) {
+    const value = parseFloat(input.value);
+    if (isNaN(value) || value < 0) {
+        input.value = '';
+        input.placeholder = '₹0';
+        return false;
+    }
+    return true;
+}
+
+// Calculation Functions
+function calculateNetWorth() {
+    const totalAssets = calculateTotalAssets();
+    const totalLiabilities = calculateTotalLiabilities();
+    const netWorth = totalAssets - totalLiabilities;
+
+    updateDisplayValues(totalAssets, totalLiabilities, netWorth);
+    calculateCategoryTotals();
+    
+    const incomeData = calculateIncomeData();
+    saveToLocalStorage('incomeData', incomeData);
+    saveNetWorthData(totalAssets, totalLiabilities, netWorth);
+}
+
+function calculateTotalAssets() {
+    let total = 0;
+    
+    // Calculate for each category
+    Object.values(ASSET_CATEGORIES).forEach(category => {
+        category.forEach(id => {
+            total += parseFloat(document.getElementById(id)?.value || 0);
+        });
+    });
+    
+    // Add custom assets
+    document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
+        total += parseFloat(input.value || 0);
+    });
+    
+    return total;
+}
+
+function calculateTotalLiabilities() {
+    let total = 0;
+    
+    // Calculate standard liabilities
+    LIABILITY_CATEGORIES.forEach(id => {
+        total += parseFloat(document.getElementById(id)?.value || 0);
+    });
+    
+    // Add custom liabilities
+    document.querySelectorAll('#customLiabilitiesList .custom-value').forEach(input => {
+        total += parseFloat(input.value || 0);
+    });
+    
+    return total;
+}
+
+function calculateCategoryTotals() {
+    // Real Estate Total
+    const realEstateTotal = calculateRealEstateTotal();
+    const monthlyRentalIncome = calculateMonthlyRentalIncome();
+    
+    // Update category totals
+    updateCategoryDisplay('totalRealEstate', realEstateTotal);
+    updateCategoryDisplay('monthlyRentalIncome', monthlyRentalIncome);
+    updateCategoryDisplay('totalInvestments', calculateCategoryTotal(ASSET_CATEGORIES.INVESTMENTS));
+    updateCategoryDisplay('totalFixedIncome', calculateCategoryTotal(ASSET_CATEGORIES.FIXED_INCOME));
+    updateCategoryDisplay('totalCommodity', calculateCategoryTotal(ASSET_CATEGORIES.COMMODITIES));
+    updateCategoryDisplay('totalCash', calculateCategoryTotal(ASSET_CATEGORIES.CASH));
+    updateCategoryDisplay('totalOtherAssets', calculateCustomAssetsTotal());
+}
+
+function calculateRealEstateTotal() {
+    return ASSET_CATEGORIES.REAL_ESTATE.reduce((total, id) => {
+        return total + (parseFloat(document.getElementById(id)?.value) || 0);
+    }, 0);
+}
+
+function calculateMonthlyRentalIncome() {
+    return ASSET_CATEGORIES.REAL_ESTATE.reduce((total, id) => {
+        const value = parseFloat(document.getElementById(id)?.value) || 0;
+        const yield = parseFloat(document.getElementById(id + 'Yield')?.value) || 0;
+        return total + (value * yield / 12); // Annual yield to monthly
+    }, 0);
+}
+
+function calculateCategoryTotal(categoryIds) {
+    return categoryIds.reduce((total, id) => {
+        return total + (parseFloat(document.getElementById(id)?.value) || 0);
+    }, 0);
+}
+
+function calculateCustomAssetsTotal() {
+    let total = 0;
+    document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
+        total += parseFloat(input.value || 0);
+    });
+    return total;
+}
+
+// Display Update Functions
+function updateDisplayValues(totalAssets, totalLiabilities, netWorth) {
+    updateAmountDisplay('totalAssets', totalAssets);
+    updateAmountDisplay('totalLiabilities', totalLiabilities);
+    updateAmountDisplay('netWorth', netWorth);
+}
+
+function updateAmountDisplay(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = formatCurrency(value);
+        const wordsElement = document.getElementById(elementId + 'Words');
+        if (wordsElement) {
+            wordsElement.textContent = `₹${numberToWords(value)}`;
+        }
+    }
+}
+
+function updateCategoryDisplay(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = formatCurrency(value);
+    }
+}
+
+// Custom Fields Management
+function addCustomField(containerId, type, item = { name: '', value: '' }) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const fieldId = `custom-${type}-${Date.now()}`;
+    const fieldHTML = createCustomFieldHTML(fieldId, type, item);
+    container.insertAdjacentHTML('beforeend', fieldHTML);
+    
+    // Add event listeners to new field
+    const newField = document.getElementById(fieldId);
+    if (newField) {
+        const valueInput = newField.querySelector('.custom-value');
+        if (valueInput) {
+            valueInput.addEventListener('input', handleInputChange);
+            valueInput.addEventListener('blur', handleInputBlur);
+        }
+    }
+}
+
+function createCustomFieldHTML(fieldId, type, item) {
+    return `
+        <div class="custom-item" id="${fieldId}">
+            <input type="text" 
+                   placeholder="${type === 'asset' ? 'Asset Name' : 'Liability Name'}" 
+                   value="${item.name || ''}" 
+                   class="custom-name">
+            <input type="number" 
+                   placeholder="Amount (₹)" 
+                   value="${item.value || ''}" 
+                   class="custom-value">
+            <button class="remove-btn" onclick="removeCustomField('${fieldId}')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+}
+
+function removeCustomField(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (field) {
+        field.remove();
+        calculateNetWorth();
+    }
+}
+
+// Data Management Functions
+function loadSavedValues() {
     const savedValues = getFromLocalStorage('networthValues') || {};
     
-    // Initialize custom assets and liabilities
-    initCustomFields('customAssetsList', 'asset', savedValues.customAssets || []);
-    initCustomFields('customLiabilitiesList', 'liability', savedValues.customLiabilities || []);
-    
-    // Set input values from saved data
-    const inputs = {
-        buildings: savedValues.buildings || '',
-        buildingsYield: savedValues.buildingsYield || '',
-        plots: savedValues.plots || '',
-        plotsYield: savedValues.plotsYield || '',
-        land: savedValues.land || '',
-        landYield: savedValues.landYield || '',
-        directEquity: savedValues.directEquity || '',
-        directEquityYield: savedValues.directEquityYield || '',
-        equityMF: savedValues.equityMF || '',
-        equityMFYield: savedValues.equityMFYield || '',
-        debtMF: savedValues.debtMF || '',
-        debtMFYield: savedValues.debtMFYield || '',
-        fixedDeposits: savedValues.fixedDeposits || '',
-        fixedDepositsYield: savedValues.fixedDepositsYield || '',
-        otherFixedIncome: savedValues.otherFixedIncome || '',
-        otherFixedIncomeYield: savedValues.otherFixedIncomeYield || '',
-        gold: savedValues.gold || '',
-        commodity: savedValues.commodity || '',
-        cashAtBank: savedValues.cashAtBank || '',
-        cashInHand: savedValues.cashInHand || '',
-        homeLoan: savedValues.homeLoan || '',
-        carLoan: savedValues.carLoan || '',
-        creditCard: savedValues.creditCard || '',
-        educationLoan: savedValues.educationLoan || ''
-    };
-    
-    // Set values to input fields and update words
-    Object.keys(inputs).forEach(id => {
+    // Load standard fields
+    Object.entries(savedValues).forEach(([id, value]) => {
         const element = document.getElementById(id);
-        if (element) {
-            element.value = inputs[id];
+        if (element && value !== undefined) {
+            element.value = value;
             if (!id.includes('Yield')) {
                 updateNumberInWords(id);
             }
         }
     });
     
-    // Add event listeners to all input fields for auto-update
-    const updateOnInput = () => {
-        calculateNetWorth();
-        calculateCategoryTotals();
-    };
+    // Load custom fields
+    loadCustomFields('customAssetsList', 'asset', savedValues.customAssets);
+    loadCustomFields('customLiabilitiesList', 'liability', savedValues.customLiabilities);
+}
 
-    // Add event listeners to all inputs, including yield inputs
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-        input.addEventListener('input', () => {
-            if (!input.id.includes('Yield')) {
-                updateNumberInWords(input.id);
-            }
-            updateOnInput();
-        });
-        
-        // Also update on blur to catch manual edits
-        input.addEventListener('blur', updateOnInput);
-    });
-    
-    // Add event listeners for buttons
-    document.getElementById('addAsset').addEventListener('click', () => {
-        addCustomField('customAssetsList', 'asset');
-    });
-    
-    document.getElementById('addLiability').addEventListener('click', () => {
-        addCustomField('customLiabilitiesList', 'liability');
-    });
-
-    // Add save button event listener
-    document.getElementById('saveDataBtn').addEventListener('click', () => {
-        saveNetWorthValues();
-        // Show feedback to user
-        const btn = document.getElementById('saveDataBtn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-        btn.style.background = '#27ae60';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = '';
-        }, 2000);
-    });
-    
-    // Calculate net worth on load
-    calculateNetWorth();
-    calculateCategoryTotals();
-});
-
-function initCustomFields(containerId, type, savedItems = []) {
+function loadCustomFields(containerId, type, items = []) {
     const container = document.getElementById(containerId);
+    if (!container) return;
+    
     container.innerHTML = '';
-    
-    if (savedItems && savedItems.length > 0) {
-        savedItems.forEach(item => {
-            addCustomField(containerId, type, item);
-        });
-    }
+    items.forEach(item => addCustomField(containerId, type, item));
 }
 
-function addCustomField(containerId, type, item = { name: '', value: '' }) {
-    const container = document.getElementById(containerId);
-    const fieldId = `custom-${type}-${Date.now()}`;
+function saveNetWorthData(totalAssets, totalLiabilities, netWorth) {
+    const data = collectFormData();
+    data.totalAssets = totalAssets;
+    data.totalLiabilities = totalLiabilities;
+    data.netWorth = netWorth;
+    data.lastUpdated = new Date().toISOString();
     
-    const fieldHTML = `
-        <div class="custom-item" id="${fieldId}">
-            <input type="text" placeholder="${type === 'asset' ? 'Asset Name' : 'Liability Name'}" 
-                   value="${item.name || ''}" class="custom-name">
-            <input type="number" placeholder="Amount (₹)" 
-                   value="${item.value || ''}" class="custom-value">
-            <button class="remove-btn" onclick="document.getElementById('${fieldId}').remove(); calculateNetWorth();">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    
-    container.insertAdjacentHTML('beforeend', fieldHTML);
+    saveToLocalStorage('networthValues', data);
+    notifyOtherPages();
 }
 
-function calculateNetWorth() {
-    // Calculate totals
-    const totalAssets = calculateTotalAssets();
-    const totalLiabilities = calculateTotalLiabilities();
-    const netWorth = totalAssets - totalLiabilities;
+function collectFormData() {
+    const data = {};
     
-    // Update display
-    document.getElementById('totalAssets').textContent = formatCurrency(totalAssets);
-    document.getElementById('totalLiabilities').textContent = formatCurrency(totalLiabilities);
-    document.getElementById('netWorth').textContent = formatCurrency(netWorth);
-    
-    // Update words display for totals
-    document.getElementById('totalAssetsWords').textContent = `₹${numberToWords(totalAssets)}`;
-    document.getElementById('totalLiabilitiesWords').textContent = `₹${numberToWords(totalLiabilities)}`;
-    document.getElementById('netWorthWords').textContent = `₹${numberToWords(netWorth)}`;
-    
-    // Calculate category totals
-    calculateCategoryTotals();
-    
-    // Calculate and update income data
-    const incomeData = calculateIncomeData();
-    
-    // Save income data
-    saveToLocalStorage('incomeData', incomeData);
-    
-    // Save net worth data with all details
-    const networthData = {
-        // Save all input values
-        buildings: document.getElementById('buildings').value,
-        buildingsYield: document.getElementById('buildingsYield').value,
-        plots: document.getElementById('plots').value,
-        plotsYield: document.getElementById('plotsYield').value,
-        land: document.getElementById('land').value,
-        landYield: document.getElementById('landYield').value,
-        directEquity: document.getElementById('directEquity').value,
-        directEquityYield: document.getElementById('directEquityYield').value,
-        equityMF: document.getElementById('equityMF').value,
-        equityMFYield: document.getElementById('equityMFYield').value,
-        debtMF: document.getElementById('debtMF').value,
-        debtMFYield: document.getElementById('debtMFYield').value,
-        fixedDeposits: document.getElementById('fixedDeposits').value,
-        fixedDepositsYield: document.getElementById('fixedDepositsYield').value,
-        otherFixedIncome: document.getElementById('otherFixedIncome').value,
-        otherFixedIncomeYield: document.getElementById('otherFixedIncomeYield').value,
-        gold: document.getElementById('gold').value,
-        commodity: document.getElementById('commodity').value,
-        cashAtBank: document.getElementById('cashAtBank').value,
-        cashInHand: document.getElementById('cashInHand').value,
-        homeLoan: document.getElementById('homeLoan').value,
-        carLoan: document.getElementById('carLoan').value,
-        creditCard: document.getElementById('creditCard').value,
-        educationLoan: document.getElementById('educationLoan').value,
-        
-        // Save custom fields
-        customAssets: Array.from(document.querySelectorAll('#customAssetsList .custom-item')).map(item => ({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        })),
-        customLiabilities: Array.from(document.querySelectorAll('#customLiabilitiesList .custom-item')).map(item => ({
-            name: item.querySelector('.custom-name').value,
-            value: item.querySelector('.custom-value').value
-        })),
-        
-        // Save calculated totals
-        totalAssets,
-        totalLiabilities,
-        netWorth,
-        lastUpdated: new Date().toISOString()
-    };
-    
-    // Save to localStorage
-    saveToLocalStorage('networthValues', networthData);
-    
-    // Dispatch events to notify other pages
-    window.dispatchEvent(new Event('storage'));
-    window.dispatchEvent(new CustomEvent('localStorageUpdated'));
-    
-    // Log the values for debugging
-    console.log('Net Worth Calculation:', {
-        totalAssets,
-        totalLiabilities,
-        netWorth,
-        incomeData
-    });
-}
-
-function calculateIncomeData() {
-    // Calculate rental income from real estate
-    const rentalIncome = {
-        buildings: (parseFloat(document.getElementById('buildings').value || 0) * parseFloat(document.getElementById('buildingsYield').value || 0) / 100),
-        plots: (parseFloat(document.getElementById('plots').value || 0) * parseFloat(document.getElementById('plotsYield').value || 0) / 100),
-        land: (parseFloat(document.getElementById('land').value || 0) * parseFloat(document.getElementById('landYield').value || 0) / 100)
-    };
-    
-    // Calculate dividend income
-    const dividendIncome = {
-        directEquity: (parseFloat(document.getElementById('directEquity').value || 0) * parseFloat(document.getElementById('directEquityYield').value || 0) / 100),
-        equityMF: (parseFloat(document.getElementById('equityMF').value || 0) * parseFloat(document.getElementById('equityMFYield').value || 0) / 100)
-    };
-    
-    // Calculate interest income
-    const interestIncome = {
-        debtMF: (parseFloat(document.getElementById('debtMF').value || 0) * parseFloat(document.getElementById('debtMFYield').value || 0) / 100),
-        fixedDeposits: (parseFloat(document.getElementById('fixedDeposits').value || 0) * parseFloat(document.getElementById('fixedDepositsYield').value || 0) / 100),
-        otherFixedIncome: (parseFloat(document.getElementById('otherFixedIncome').value || 0) * parseFloat(document.getElementById('otherFixedIncomeYield').value || 0) / 100)
-    };
-    
-    // Calculate totals
-    const totalRental = Object.values(rentalIncome).reduce((sum, val) => sum + val, 0);
-    const totalDividend = Object.values(dividendIncome).reduce((sum, val) => sum + val, 0);
-    const totalInterest = Object.values(interestIncome).reduce((sum, val) => sum + val, 0);
-    
-    return {
-        annual: {
-            rental: totalRental,
-            dividend: totalDividend,
-            interest: totalInterest
-        },
-        monthly: {
-            rental: Math.round(totalRental / 12),
-            dividend: Math.round(totalDividend / 12),
-            interest: Math.round(totalInterest / 12)
-        },
-        breakdown: {
-            rental: {
-                total: totalRental,
-                sources: rentalIncome
-            },
-            dividend: {
-                total: totalDividend,
-                sources: dividendIncome
-            },
-            interest: {
-                total: totalInterest,
-                sources: interestIncome
+    // Collect standard fields
+    [...ASSET_CATEGORIES.REAL_ESTATE, ...ASSET_CATEGORIES.INVESTMENTS, 
+     ...ASSET_CATEGORIES.FIXED_INCOME, ...ASSET_CATEGORIES.COMMODITIES, 
+     ...ASSET_CATEGORIES.CASH, ...LIABILITY_CATEGORIES].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            data[id] = element.value;
+            const yieldElement = document.getElementById(id + 'Yield');
+            if (yieldElement) {
+                data[id + 'Yield'] = yieldElement.value;
             }
         }
-    };
-}
-
-function calculateTotalAssets() {
-    let totalAssets = 0;
-    
-    // Real Estate
-    totalAssets += parseFloat(document.getElementById('buildings').value) || 0;
-    totalAssets += parseFloat(document.getElementById('plots').value) || 0;
-    totalAssets += parseFloat(document.getElementById('land').value) || 0;
-    
-    // Investments
-    totalAssets += parseFloat(document.getElementById('directEquity').value) || 0;
-    totalAssets += parseFloat(document.getElementById('equityMF').value) || 0;
-    totalAssets += parseFloat(document.getElementById('debtMF').value) || 0;
-    
-    // Fixed Income
-    totalAssets += parseFloat(document.getElementById('fixedDeposits').value) || 0;
-    totalAssets += parseFloat(document.getElementById('otherFixedIncome').value) || 0;
-    
-    // Other Assets
-    totalAssets += parseFloat(document.getElementById('gold').value) || 0;
-    totalAssets += parseFloat(document.getElementById('commodity').value) || 0;
-    totalAssets += parseFloat(document.getElementById('cashAtBank').value) || 0;
-    totalAssets += parseFloat(document.getElementById('cashInHand').value) || 0;
-    
-    // Custom assets
-    document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
-        totalAssets += parseFloat(input.value) || 0;
     });
     
-    return totalAssets;
-}
-
-function calculateTotalLiabilities() {
-    let totalLiabilities = 0;
-    
-    // Predefined liabilities
-    totalLiabilities += parseFloat(document.getElementById('homeLoan').value) || 0;
-    totalLiabilities += parseFloat(document.getElementById('carLoan').value) || 0;
-    totalLiabilities += parseFloat(document.getElementById('creditCard').value) || 0;
-    totalLiabilities += parseFloat(document.getElementById('educationLoan').value) || 0;
-    
-    // Custom liabilities
-    document.querySelectorAll('#customLiabilitiesList .custom-value').forEach(input => {
-        totalLiabilities += parseFloat(input.value) || 0;
-    });
-    
-    return totalLiabilities;
-}
-
-function calculateCategoryTotals() {
-    // Real Estate Total
-    const realEstateTotal = 
-        (parseFloat(document.getElementById('buildings').value) || 0) +
-        (parseFloat(document.getElementById('plots').value) || 0) +
-        (parseFloat(document.getElementById('land').value) || 0);
-    document.getElementById('totalRealEstate').textContent = formatCurrency(realEstateTotal);
-    
-    // Monthly Rental Income
-    const monthlyRentalIncome = 
-        ((parseFloat(document.getElementById('buildings').value) || 0) * (parseFloat(document.getElementById('buildingsYield').value) || 0) / 12) +
-        ((parseFloat(document.getElementById('plots').value) || 0) * (parseFloat(document.getElementById('plotsYield').value) || 0) / 12) +
-        ((parseFloat(document.getElementById('land').value) || 0) * (parseFloat(document.getElementById('landYield').value) || 0) / 12);
-    document.getElementById('monthlyRentalIncome').textContent = formatCurrency(monthlyRentalIncome);
-    
-    // Investments Total
-    const investmentsTotal = 
-        (parseFloat(document.getElementById('directEquity').value) || 0) +
-        (parseFloat(document.getElementById('equityMF').value) || 0) +
-        (parseFloat(document.getElementById('debtMF').value) || 0);
-    document.getElementById('totalInvestments').textContent = formatCurrency(investmentsTotal);
-    
-    // Fixed Income Total
-    const fixedIncomeTotal = 
-        (parseFloat(document.getElementById('fixedDeposits').value) || 0) +
-        (parseFloat(document.getElementById('otherFixedIncome').value) || 0);
-    document.getElementById('totalFixedIncome').textContent = formatCurrency(fixedIncomeTotal);
-    
-    // Commodity Total
-    const commodityTotal = 
-        (parseFloat(document.getElementById('gold').value) || 0) +
-        (parseFloat(document.getElementById('commodity').value) || 0);
-    document.getElementById('totalCommodity').textContent = formatCurrency(commodityTotal);
-    
-    // Cash Total
-    const cashTotal = parseFloat(document.getElementById('cashAtBank').value) || 0 + parseFloat(document.getElementById('cashInHand').value) || 0;
-    document.getElementById('totalCash').textContent = formatCurrency(cashTotal);
-    
-    // Other Assets Total
-    let otherAssetsTotal = 0;
-    document.querySelectorAll('#customAssetsList .custom-value').forEach(input => {
-        otherAssetsTotal += parseFloat(input.value) || 0;
-    });
-    document.getElementById('totalOtherAssets').textContent = formatCurrency(otherAssetsTotal);
-}
-
-function saveNetWorthValues() {
-    const networthValues = {
-        // Real Estate
-        buildings: document.getElementById('buildings').value,
-        buildingsYield: document.getElementById('buildingsYield').value,
-        plots: document.getElementById('plots').value,
-        plotsYield: document.getElementById('plotsYield').value,
-        land: document.getElementById('land').value,
-        landYield: document.getElementById('landYield').value,
-        
-        // Investments
-        directEquity: document.getElementById('directEquity').value,
-        directEquityYield: document.getElementById('directEquityYield').value,
-        equityMF: document.getElementById('equityMF').value,
-        equityMFYield: document.getElementById('equityMFYield').value,
-        debtMF: document.getElementById('debtMF').value,
-        debtMFYield: document.getElementById('debtMFYield').value,
-        
-        // Fixed Income
-        fixedDeposits: document.getElementById('fixedDeposits').value,
-        fixedDepositsYield: document.getElementById('fixedDepositsYield').value,
-        otherFixedIncome: document.getElementById('otherFixedIncome').value,
-        otherFixedIncomeYield: document.getElementById('otherFixedIncomeYield').value,
-        
-        // Other Assets
-        gold: document.getElementById('gold').value,
-        commodity: document.getElementById('commodity').value,
-        cashAtBank: document.getElementById('cashAtBank').value,
-        cashInHand: document.getElementById('cashInHand').value,
-        
-        // Liabilities
-        homeLoan: document.getElementById('homeLoan').value,
-        carLoan: document.getElementById('carLoan').value,
-        creditCard: document.getElementById('creditCard').value,
-        educationLoan: document.getElementById('educationLoan').value,
-        
-        // Custom fields
-        customAssets: [],
-        customLiabilities: []
-    };
-    
-    // Save custom assets
-    document.querySelectorAll('#customAssetsList .custom-item').forEach(item => {
-        networthValues.customAssets.push({
+    // Collect custom fields
+    data.customAssets = Array.from(document.querySelectorAll('#customAssetsList .custom-item'))
+        .map(item => ({
             name: item.querySelector('.custom-name').value,
             value: item.querySelector('.custom-value').value
-        });
-    });
-    
-    // Save custom liabilities
-    document.querySelectorAll('#customLiabilitiesList .custom-item').forEach(item => {
-        networthValues.customLiabilities.push({
+        }));
+        
+    data.customLiabilities = Array.from(document.querySelectorAll('#customLiabilitiesList .custom-item'))
+        .map(item => ({
             name: item.querySelector('.custom-name').value,
             value: item.querySelector('.custom-value').value
-        });
-    });
-    
-    // Save to localStorage with timestamp
-    networthValues.lastUpdated = new Date().toISOString();
-    saveToLocalStorage('networthValues', networthValues);
+        }));
+        
+    return data;
 }
 
-function updateNumberInWords(inputId) {
-    const input = document.getElementById(inputId);
-    const wordsSpan = document.getElementById(inputId + 'Words');
-    if (input && wordsSpan) {
-        const value = parseFloat(input.value) || 0;
-        wordsSpan.textContent = `₹${numberToWords(value)}`;
-    }
+// Utility Functions
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0
+    }).format(amount);
 }
 
-function numberToWords(num) {
-    if (num === 0) return 'Zero';
+function showSaveConfirmation() {
+    const btn = document.getElementById('saveDataBtn');
+    if (!btn) return;
     
-    const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
-    const teens = ['Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+    btn.style.background = '#27ae60';
     
-    if (num < 0) return 'Negative ' + numberToWords(Math.abs(num));
-    if (num < 11) return units[num];
-    if (num < 20) return teens[num - 11];
-    if (num < 100) {
-        const ten = Math.floor(num / 10);
-        const one = num % 10;
-        return tens[ten] + (one ? ' ' + units[one] : '');
-    }
-    if (num < 1000) return units[Math.floor(num / 100)] + ' Hundred' + (num % 100 ? ' and ' + numberToWords(num % 100) : '');
-    if (num < 100000) return numberToWords(Math.floor(num / 1000)) + ' Thousand' + (num % 1000 ? ' ' + numberToWords(num % 1000) : '');
-    if (num < 10000000) return numberToWords(Math.floor(num / 100000)) + ' Lakh' + (num % 100000 ? ' ' + numberToWords(num % 100000) : '');
-    return numberToWords(Math.floor(num / 10000000)) + ' Crore' + (num % 10000000 ? ' ' + numberToWords(num % 10000000) : '');
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.style.background = '';
+    }, 2000);
 }
 
-// Remove the updateFFBtn event listener since we're using automatic updates
+function notifyOtherPages() {
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('localStorageUpdated'));
+}
+
+// Remove the updateFFBtn since we're using automatic updates
 const updateFFBtn = document.getElementById('updateFFBtn');
 if (updateFFBtn) {
     updateFFBtn.style.display = 'none';
