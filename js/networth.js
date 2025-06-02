@@ -216,10 +216,20 @@ function saveAsset(event) {
     const asset = { value, yield };
     if (subcategory === 'custom') {
         asset.name = name;
+        // Initialize custom array if it doesn't exist
+        if (!AppState.netWorth.assets[category].custom) {
+            AppState.netWorth.assets[category].custom = [];
+        }
         AppState.netWorth.assets[category].custom.push(asset);
     } else {
+        if (!AppState.netWorth.assets[category][subcategory]) {
+            AppState.netWorth.assets[category][subcategory] = { value: 0, yield: 0 };
+        }
         AppState.netWorth.assets[category][subcategory] = asset;
     }
+    
+    // Save state
+    AppState.save();
     
     // Update summary
     calculateNetWorthSummary();

@@ -171,12 +171,26 @@ const AppState = {
     init() {
         const savedState = utils.getFromLocalStorage('appState');
         if (savedState) {
+            // Ensure custom arrays exist in assets
+            if (savedState.netWorth && savedState.netWorth.assets) {
+                Object.keys(savedState.netWorth.assets).forEach(category => {
+                    if (!savedState.netWorth.assets[category].custom) {
+                        savedState.netWorth.assets[category].custom = [];
+                    }
+                });
+            }
             Object.assign(this, savedState);
         }
     },
 
     // Save state to localStorage
     save() {
+        // Ensure custom arrays exist before saving
+        Object.keys(this.netWorth.assets).forEach(category => {
+            if (!this.netWorth.assets[category].custom) {
+                this.netWorth.assets[category].custom = [];
+            }
+        });
         utils.saveToLocalStorage('appState', this);
     },
 
@@ -185,6 +199,12 @@ const AppState = {
         Object.keys(this).forEach(key => {
             if (typeof this[key] !== 'function') {
                 this[key] = JSON.parse(JSON.stringify(this[key]));
+            }
+        });
+        // Ensure custom arrays exist after reset
+        Object.keys(this.netWorth.assets).forEach(category => {
+            if (!this.netWorth.assets[category].custom) {
+                this.netWorth.assets[category].custom = [];
             }
         });
         this.save();
@@ -201,7 +221,7 @@ const AppState = {
     }
 };
 
-// Initialize state when the script loads
+// Initialize state when the file loads
 AppState.init();
 
 // Make state available globally
