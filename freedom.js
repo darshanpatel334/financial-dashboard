@@ -17,11 +17,10 @@ function setupEventListeners() {
     ['expectedReturn', 'expectedInflation'].forEach(id => {
         const input = document.getElementById(id);
         if (input) {
-            input.addEventListener('input', () => {
+        input.addEventListener('input', () => {
                 if (parseFloat(input.value) < 0) {
                     input.value = '0';
                 }
-                updateCurrentNumbers(); // Update current numbers
                 calculateFFScore();
             });
         }
@@ -38,31 +37,115 @@ function loadFFData() {
         document.getElementById('expectedInflation').value = savedRates.inflation;
     }
     
-    // Update current numbers and calculate score
-    updateCurrentNumbers();
+    // Calculate score
     calculateFFScore();
 }
 
 function updateCurrentNumbers() {
-    // Get current net worth
+    // Get current net worth from Net Worth page
     const netWorthData = getFromLocalStorage('netWorthValues') || {};
-    let totalAssets = calculateTotalAssets(netWorthData);
-    let totalLiabilities = calculateTotalLiabilities(netWorthData);
-    let currentNetWorth = totalAssets - totalLiabilities;
+    const { totalAssets, totalLiabilities, netWorth } = calculateNetWorthFromData(netWorthData);
     
-    // Get current annual expenses
+    // Get annual expenses from Expenses page
     const expenseData = getFromLocalStorage('expenseValues') || {};
-    let annualExpenses = calculateAnnualExpenses(expenseData);
+    let annualExpenses = calculateTotalAnnualExpenses(expenseData);
     
     // Update the display
-    updateDisplay('currentNetWorth', currentNetWorth);
+    updateDisplay('currentNetWorth', netWorth);
     updateDisplay('annualExpenses', annualExpenses);
     
     // Add words display for better readability
-    updateWordsDisplay('currentNetWorthWords', currentNetWorth);
+    updateWordsDisplay('currentNetWorthWords', netWorth);
     updateWordsDisplay('annualExpensesWords', annualExpenses);
     
-    return { currentNetWorth, annualExpenses };
+    return { currentNetWorth: netWorth, annualExpenses };
+}
+
+function calculateNetWorthFromData(data) {
+    // Calculate total assets
+    let totalAssets = 0;
+    
+    // Real Estate
+    ['primaryResidence', 'otherProperties'].forEach(id => {
+        totalAssets += parseFloat(data[id] || 0);
+    });
+    
+    // Investments
+    ['stocks', 'mutualFunds', 'bonds', 'ppf', 'epf', 'nps'].forEach(id => {
+        totalAssets += parseFloat(data[id] || 0);
+    });
+    
+    // Cash & Equivalents
+    ['bankBalance', 'cashInHand'].forEach(id => {
+        totalAssets += parseFloat(data[id] || 0);
+    });
+    
+    // Other Assets
+    ['gold', 'vehicle', 'otherAssets'].forEach(id => {
+        totalAssets += parseFloat(data[id] || 0);
+    });
+    
+    // Custom assets
+    if (data.customAssets) {
+        data.customAssets.forEach(item => {
+            totalAssets += parseFloat(item.value || 0);
+        });
+    }
+    
+    // Calculate total liabilities
+    let totalLiabilities = 0;
+    
+    // Loans
+    ['homeLoan', 'carLoan', 'personalLoan', 'educationLoan'].forEach(id => {
+        totalLiabilities += parseFloat(data[id] || 0);
+    });
+    
+    // Credit Card Debt
+    totalLiabilities += parseFloat(data.creditCardDebt || 0);
+    
+    // Custom liabilities
+    if (data.customLiabilities) {
+        data.customLiabilities.forEach(item => {
+            totalLiabilities += parseFloat(item.value || 0);
+        });
+    }
+    
+    // Calculate net worth
+    const netWorth = totalAssets - totalLiabilities;
+    
+    return { totalAssets, totalLiabilities, netWorth };
+}
+
+function calculateTotalAnnualExpenses(expenseData) {
+    // Calculate monthly recurring total
+    let monthlyRecurringTotal = 0;
+    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
+        monthlyRecurringTotal += parseFloat(expenseData[id] || 0);
+    });
+    
+    // Add custom monthly expenses
+    if (expenseData.monthly) {
+        expenseData.monthly.forEach(item => {
+            monthlyRecurringTotal += parseFloat(item.value || 0);
+        });
+    }
+    
+    // Calculate annual big expenses total
+    let annualBigTotal = 0;
+    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
+        annualBigTotal += parseFloat(expenseData[id] || 0);
+    });
+    
+    // Add custom annual expenses
+    if (expenseData.big) {
+        expenseData.big.forEach(item => {
+            annualBigTotal += parseFloat(item.value || 0);
+        });
+    }
+    
+    // Calculate total annual expenses
+    // Monthly recurring × 12 + Annual big expenses
+    return (monthlyRecurringTotal * 12) + annualBigTotal;
 }
 
 function calculateFFScore() {
@@ -128,95 +211,6 @@ function calculateYearsToDepletion(initialNetWorth, initialAnnualExpenses, retur
     
     console.log(`\nFinal FF Score: ${years} years`);
     return years;
-}
-
-function calculateTotalAssets(data) {
-    let total = 0;
-    
-    // Real Estate
-    ['primaryResidence', 'otherProperties'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Investments
-    ['stocks', 'mutualFunds', 'bonds', 'ppf', 'epf', 'nps'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Cash & Equivalents
-    ['bankBalance', 'cashInHand'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Other Assets
-    ['gold', 'vehicle', 'otherAssets'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Custom assets
-    if (data.customAssets) {
-        data.customAssets.forEach(item => {
-            total += parseFloat(item.value || 0);
-        });
-    }
-    
-    return total;
-}
-
-function calculateTotalLiabilities(data) {
-    let total = 0;
-    
-    // Loans
-    ['homeLoan', 'carLoan', 'personalLoan', 'educationLoan'].forEach(id => {
-        total += parseFloat(data[id] || 0);
-    });
-    
-    // Credit Card Debt
-    total += parseFloat(data.creditCardDebt || 0);
-    
-    // Custom liabilities
-    if (data.customLiabilities) {
-        data.customLiabilities.forEach(item => {
-            total += parseFloat(item.value || 0);
-        });
-    }
-    
-    return total;
-}
-
-function calculateAnnualExpenses(data) {
-    // Calculate monthly recurring expenses
-    let monthlyRecurring = 0;
-    
-    // Regular monthly expenses
-    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
-        monthlyRecurring += parseFloat(data[id] || 0);
-    });
-    
-    // Custom monthly expenses
-    if (data.monthly) {
-        data.monthly.forEach(item => {
-            monthlyRecurring += parseFloat(item.value || 0);
-        });
-    }
-    
-    // Calculate annual big expenses
-    let annualBigExpenses = 0;
-    
-    // Regular big expenses
-    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
-        annualBigExpenses += parseFloat(data[id] || 0);
-    });
-    
-    // Custom big expenses
-    if (data.big) {
-        data.big.forEach(item => {
-            annualBigExpenses += parseFloat(item.value || 0);
-        });
-    }
-    
-    // Total annual expenses = (monthly recurring × 12) + annual big expenses
-    return (monthlyRecurring * 12) + annualBigExpenses;
 }
 
 function updateFFDisplay(ffScore, netWorth, annualExpenses) {

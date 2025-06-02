@@ -12,35 +12,34 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function setupEventListeners() {
-    // Add input event listeners
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-        input.addEventListener('input', () => {
-            if (input.value === '') {
-                input.placeholder = '₹0';
-            }
-                updateNumberInWords(input.id);
-            calculateExpenses();
-        });
-        
-        // Prevent negative values
-        input.addEventListener('change', function() {
-            if (parseFloat(this.value) < 0) {
-                this.value = '';
-                this.placeholder = '₹0';
-                updateNumberInWords(this.id);
+    // Monthly recurring expenses
+    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', () => {
+                if (parseFloat(input.value) < 0) {
+                    input.value = '0';
+                }
                 calculateExpenses();
-            }
-        });
+            });
+        }
     });
-    
-    // Add custom expense buttons
-    document.getElementById('addMonthly').addEventListener('click', () => {
-        addCustomField('customMonthlyList', 'monthly');
+
+    // Annual big expenses
+    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', () => {
+                if (parseFloat(input.value) < 0) {
+                    input.value = '0';
+                }
+                calculateExpenses();
+            });
+        }
     });
-    
-    document.getElementById('addBig').addEventListener('click', () => {
-        addCustomField('customBigList', 'big');
-    });
+
+    // Custom expense handlers
+    setupCustomExpenseHandlers();
 }
 
 function resetAllFields() {
@@ -127,64 +126,93 @@ function setFieldValueIfValid(fieldId, value) {
 }
 
 function calculateExpenses() {
-    console.log('Calculating expenses');
+    console.log('Calculating expenses...');
     
-    // Calculate monthly recurring expenses
-    let totalMonthlyRecurring = 0;
+    // Calculate Monthly Recurring Total
+    let monthlyRecurringTotal = calculateMonthlyRecurring();
+    console.log('Monthly Recurring Total:', monthlyRecurringTotal);
     
-    // Regular monthly expenses including EMIs
-    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
-        totalMonthlyRecurring += getNumericValue(id);
-    });
+    // Calculate Annual Big Expenses
+    let annualBigTotal = calculateAnnualBig();
+    let monthlyEquivalentOfAnnual = annualBigTotal / 12;
+    console.log('Annual Big Total:', annualBigTotal);
+    console.log('Monthly Equivalent of Annual:', monthlyEquivalentOfAnnual);
     
-    // Add custom monthly expenses
-    document.querySelectorAll('#customMonthlyList .custom-value').forEach(input => {
-        totalMonthlyRecurring += getNumericValue(input);
-    });
+    // Calculate Total Monthly Expenses
+    let totalMonthlyExpenses = monthlyRecurringTotal + monthlyEquivalentOfAnnual;
+    console.log('Total Monthly Expenses:', totalMonthlyExpenses);
     
-    // Calculate annual big expenses
-    let totalBigExpenses = 0;
+    // Calculate Total Annual Expenses
+    let totalAnnualExpenses = totalMonthlyExpenses * 12;
+    console.log('Total Annual Expenses:', totalAnnualExpenses);
     
-    // Regular big expenses
-    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
-        totalBigExpenses += getNumericValue(id);
-    });
+    // Update Summary Display
+    updateSummaryDisplay(monthlyRecurringTotal, annualBigTotal, monthlyEquivalentOfAnnual, totalMonthlyExpenses, totalAnnualExpenses);
     
-    // Add custom big expenses
-    document.querySelectorAll('#customBigList .custom-value').forEach(input => {
-        totalBigExpenses += getNumericValue(input);
-    });
+    // Save to localStorage
+    saveExpenseData();
     
-    // Calculate monthly share of big expenses
-    const monthlyBigExpenses = totalBigExpenses / 12;
-    
-    // Calculate total monthly expenses
-    const totalMonthlyExpenses = totalMonthlyRecurring + monthlyBigExpenses;
-    
-    // Calculate annual total
-    const annualTotal = totalMonthlyExpenses * 12;
-    
-    // Update display if we have any values
-    if (totalMonthlyRecurring > 0 || totalBigExpenses > 0) {
-        updateDisplayValues({
-            totalMonthlyRecurring,
-            monthlyBigExpenses,
-            totalMonthlyExpenses,
-            annualTotal
-        });
-        saveExpenseData();
-    } else {
-        updateDisplayValues({
-            totalMonthlyRecurring: 0,
-            monthlyBigExpenses: 0,
-            totalMonthlyExpenses: 0,
-            annualTotal: 0
-        });
-        localStorage.removeItem('expenseValues');
-    }
-    
-    // Notify other pages
+    // Dispatch event for other pages
     notifyUpdate();
+}
+
+function calculateMonthlyRecurring() {
+    let total = 0;
+    
+    // Regular monthly expenses
+    ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
+        total += parseFloat(document.getElementById(id)?.value || 0);
+    });
+    
+    // Custom monthly expenses
+    const customMonthly = document.querySelectorAll('.custom-monthly-expense');
+    customMonthly.forEach(row => {
+        const valueInput = row.querySelector('input[type="number"]');
+        if (valueInput) {
+            total += parseFloat(valueInput.value || 0);
+        }
+    });
+    
+    return total;
+}
+
+function calculateAnnualBig() {
+    let total = 0;
+    
+    // Regular annual expenses
+    ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
+        total += parseFloat(document.getElementById(id)?.value || 0);
+    });
+    
+    // Custom annual expenses
+    const customAnnual = document.querySelectorAll('.custom-big-expense');
+    customAnnual.forEach(row => {
+        const valueInput = row.querySelector('input[type="number"]');
+        if (valueInput) {
+            total += parseFloat(valueInput.value || 0);
+        }
+    });
+    
+    return total;
+}
+
+function updateSummaryDisplay(monthlyRecurringTotal, annualBigTotal, monthlyEquivalentOfAnnual, totalMonthlyExpenses, totalAnnualExpenses) {
+    // Update Monthly Recurring Total
+    document.getElementById('monthlyRecurringTotal').textContent = formatCurrency(monthlyRecurringTotal);
+    document.getElementById('monthlyRecurringTotalWords').textContent = convertToWords(monthlyRecurringTotal);
+    
+    // Update Annual Big Expenses
+    document.getElementById('annualBigTotal').textContent = formatCurrency(annualBigTotal);
+    document.getElementById('annualBigTotalWords').textContent = convertToWords(annualBigTotal);
+    document.getElementById('monthlyEquivalentOfAnnual').textContent = formatCurrency(monthlyEquivalentOfAnnual);
+    
+    // Update Total Monthly Expenses
+    document.getElementById('totalMonthlyExpenses').textContent = formatCurrency(totalMonthlyExpenses);
+    document.getElementById('totalMonthlyExpensesWords').textContent = convertToWords(totalMonthlyExpenses);
+    
+    // Update Total Annual Expenses
+    document.getElementById('totalAnnualExpenses').textContent = formatCurrency(totalAnnualExpenses);
+    document.getElementById('totalAnnualExpensesWords').textContent = convertToWords(totalAnnualExpenses);
 }
 
 function getNumericValue(inputOrId) {

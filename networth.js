@@ -59,13 +59,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Add event listeners to all input fields for auto-update
-    document.querySelectorAll('input').forEach(input => {
+    const updateOnInput = () => {
+        calculateNetWorth();
+        calculateCategoryTotals();
+    };
+
+    // Add event listeners to all inputs, including yield inputs
+    document.querySelectorAll('input[type="number"]').forEach(input => {
         input.addEventListener('input', () => {
             if (!input.id.includes('Yield')) {
                 updateNumberInWords(input.id);
             }
-            calculateNetWorth();
+            updateOnInput();
         });
+        
+        // Also update on blur to catch manual edits
+        input.addEventListener('blur', updateOnInput);
     });
     
     // Add event listeners for buttons
@@ -93,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Calculate net worth on load
     calculateNetWorth();
+    calculateCategoryTotals();
 });
 
 function initCustomFields(containerId, type, savedItems = []) {
@@ -323,9 +333,9 @@ function calculateCategoryTotals() {
     
     // Monthly Rental Income
     const monthlyRentalIncome = 
-        ((parseFloat(document.getElementById('buildings').value) || 0) * (parseFloat(document.getElementById('buildingsYield').value) || 0) / 1200) +
-        ((parseFloat(document.getElementById('plots').value) || 0) * (parseFloat(document.getElementById('plotsYield').value) || 0) / 1200) +
-        ((parseFloat(document.getElementById('land').value) || 0) * (parseFloat(document.getElementById('landYield').value) || 0) / 1200);
+        ((parseFloat(document.getElementById('buildings').value) || 0) * (parseFloat(document.getElementById('buildingsYield').value) || 0) / 12) +
+        ((parseFloat(document.getElementById('plots').value) || 0) * (parseFloat(document.getElementById('plotsYield').value) || 0) / 12) +
+        ((parseFloat(document.getElementById('land').value) || 0) * (parseFloat(document.getElementById('landYield').value) || 0) / 12);
     document.getElementById('monthlyRentalIncome').textContent = formatCurrency(monthlyRentalIncome);
     
     // Investments Total

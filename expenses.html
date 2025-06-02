@@ -88,34 +88,35 @@
             
             <div class="card">
                 <h2 class="section-title"><i class="fas fa-calendar"></i> Annual/Big Expenses</h2>
+                <p class="helper-text">Important: Enter the FULL ANNUAL AMOUNT for each expense (not monthly). For example, if you spend ₹60,000 on vacations per year, enter 60,000.</p>
                 
                 <div class="form-group">
                     <label><i class="fas fa-laptop"></i> Electronics</label>
-                    <input type="number" id="electronics" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <input type="number" id="electronics" placeholder="Enter annual amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="electronicsWords"></span>
                 </div>
                 
                 <div class="form-group">
                     <label><i class="fas fa-plane"></i> Vacations</label>
-                    <input type="number" id="vacations" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <input type="number" id="vacations" placeholder="Enter annual amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="vacationsWords"></span>
                 </div>
 
                 <div class="form-group">
                     <label><i class="fas fa-heartbeat"></i> Medical</label>
-                    <input type="number" id="medical" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <input type="number" id="medical" placeholder="Enter annual amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="medicalWords"></span>
                 </div>
 
                 <div class="form-group">
                     <label><i class="fas fa-graduation-cap"></i> Education</label>
-                    <input type="number" id="education" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <input type="number" id="education" placeholder="Enter annual amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="educationWords"></span>
                 </div>
 
                 <div class="form-group">
                     <label><i class="fas fa-car"></i> Vehicle Maintenance</label>
-                    <input type="number" id="vehicle" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <input type="number" id="vehicle" placeholder="Enter annual amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="vehicleWords"></span>
                 </div>
                 
@@ -124,7 +125,7 @@
                 </div>
                 
                 <button class="btn-calculate" id="addBig">
-                    <i class="fas fa-plus"></i> Add Custom Big Expense
+                    <i class="fas fa-plus"></i> Add Custom Annual Expense
                 </button>
             </div>
             
@@ -132,18 +133,18 @@
                 <h2 class="section-title"><i class="fas fa-chart-pie"></i> Expense Summary</h2>
                 
                 <div class="expense-summary">
-                    <h2>Expense Summary</h2>
                     <div class="summary-grid">
                         <div class="summary-item">
-                            <h3>Monthly Recurring Expenses</h3>
-                            <p class="amount">₹<span id="totalMonthlyRecurring">0</span></p>
-                            <p class="words" id="totalMonthlyRecurringWords">Zero Rupees</p>
+                            <h3>Monthly Recurring Total</h3>
+                            <p class="amount">₹<span id="monthlyRecurringTotal">0</span></p>
+                            <p class="words" id="monthlyRecurringTotalWords">Zero Rupees</p>
                         </div>
                         
                         <div class="summary-item">
-                            <h3>Monthly Share of Big Expenses</h3>
-                            <p class="amount">₹<span id="monthlyBigExpenses">0</span></p>
-                            <p class="words" id="monthlyBigExpensesWords">Zero Rupees</p>
+                            <h3>Annual Big Expenses</h3>
+                            <p class="amount">₹<span id="annualBigTotal">0</span></p>
+                            <p class="words" id="annualBigTotalWords">Zero Rupees</p>
+                            <p class="helper-text">Monthly Share: ₹<span id="monthlyEquivalentOfAnnual">0</span></p>
                         </div>
                         
                         <div class="summary-item highlight">
@@ -153,9 +154,9 @@
                         </div>
                         
                         <div class="summary-item highlight">
-                            <h3>Annual Total Expenses</h3>
-                            <p class="amount">₹<span id="annualTotal">0</span></p>
-                            <p class="words" id="annualTotalWords">Zero Rupees</p>
+                            <h3>Total Annual Expenses</h3>
+                            <p class="amount">₹<span id="totalAnnualExpenses">0</span></p>
+                            <p class="words" id="totalAnnualExpensesWords">Zero Rupees</p>
                         </div>
                     </div>
                 </div>

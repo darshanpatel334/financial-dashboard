@@ -238,12 +238,12 @@ function createPieChart(canvasId, data, options) {
         type: 'pie',
         data: chartData,
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
                         generateLabels: function(chart) {
                             const data = chart.data;
                             if (data.labels.length && data.datasets.length) {
@@ -259,11 +259,11 @@ function createPieChart(canvasId, data, options) {
                             }
                             return [];
                         }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
                             const value = context.raw;
                             const percentage = ((value / total) * 100).toFixed(1);
                             return `${context.label}: ₹${formatCurrency(value)} (${percentage}%)`;
