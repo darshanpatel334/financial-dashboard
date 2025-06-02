@@ -3,143 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Dashboard</title>
+    <title>LifeNivesh - Your Financial Journey</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Chart.js for data visualization -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- jsPDF for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- html2canvas for PDF generation -->
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
+            <div class="nav-brand">
+                <img src="logo.svg" alt="LifeNivesh Logo" class="logo">
+                <span>LifeNivesh</span>
+            </div>
             <div class="nav-links">
-                <a href="pages/personal-info.html" class="nav-link">Personal Info</a>
-                <a href="pages/networth.html" class="nav-link">Net Worth</a>
-                <a href="pages/income.html" class="nav-link">Income</a>
-                <a href="pages/expenses.html" class="nav-link">Expenses</a>
-                <a href="pages/ff-score.html" class="nav-link">FF Score</a>
-                <a href="pages/risk-profile.html" class="nav-link">Risk Profile</a>
-                <a href="pages/insurance.html" class="nav-link">Insurance</a>
-                <a href="index.html" class="nav-link active">Dashboard</a>
-                <a href="pages/advisor.html" class="nav-link">Financial Advisor</a>
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="pages/personal-info.html" class="nav-link">Get Started</a>
+                <a href="pages/dashboard.html" class="nav-link">Dashboard</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container">
-        <h1>Financial Dashboard</h1>
-        
-        <!-- Personal Info Summary -->
-        <div class="card">
-            <h2>Personal Information</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div>
-                    <h4>Name</h4>
-                    <p id="user-name">Not Set</p>
-                </div>
-                <div>
-                    <h4>Age</h4>
-                    <p id="user-age">Not Set</p>
-                </div>
-                <div>
-                    <h4>Risk Profile</h4>
-                    <p id="risk-profile">Not Assessed</p>
-                </div>
-                <div>
-                    <h4>FF Score</h4>
-                    <p id="ff-score">Not Calculated</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Take Control of Your Financial Future</h1>
+                <p>LifeNivesh helps you track, analyze, and improve your financial health with comprehensive tools and personalized insights.</p>
+                <div class="cta-buttons">
+                    <a href="pages/personal-info.html" class="btn btn-primary">Start Your Journey</a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
                 </div>
             </div>
+            <div class="hero-image">
+                <img src="assets/hero-image.svg" alt="Financial Planning Illustration">
+            </div>
         </div>
+    </section>
 
-        <!-- Financial Summary -->
-        <div class="card">
-            <h2>Financial Summary</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div>
-                    <h4>Net Worth</h4>
-                    <p id="total-networth">₹0</p>
-                    <p id="networth-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Comprehensive Financial Tools</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Net Worth Tracking</h3>
+                    <p>Track your assets, liabilities, and overall net worth with detailed categorization and analysis.</p>
                 </div>
-                <div>
-                    <h4>Monthly Income</h4>
-                    <p id="monthly-income">₹0</p>
-                    <p id="income-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                <div class="feature-card">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h3>Income Management</h3>
+                    <p>Monitor multiple income sources and analyze your earning patterns.</p>
                 </div>
-                <div>
-                    <h4>Monthly Expenses</h4>
-                    <p id="monthly-expenses">₹0</p>
-                    <p id="expenses-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                <div class="feature-card">
+                    <i class="fas fa-wallet"></i>
+                    <h3>Expense Analysis</h3>
+                    <p>Categorize and track your expenses with smart insights and budgeting tools.</p>
                 </div>
-                <div>
-                    <h4>Monthly Savings</h4>
-                    <p id="monthly-savings">₹0</p>
-                    <p id="savings-words" class="text-secondary" style="font-size: 0.9rem;"></p>
+                <div class="feature-card">
+                    <i class="fas fa-calculator"></i>
+                    <h3>FF Score</h3>
+                    <p>Calculate your Financial Freedom score and track your progress towards financial independence.</p>
                 </div>
-            </div>
-            <div style="margin-top: 2rem;">
-                <canvas id="monthly-summary-chart"></canvas>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Risk Assessment</h3>
+                    <p>Understand your risk profile and get personalized investment allocation suggestions.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-umbrella"></i>
+                    <h3>Insurance Planning</h3>
+                    <p>Manage your insurance portfolio and ensure adequate coverage for you and your family.</p>
+                </div>
             </div>
         </div>
+    </section>
 
-        <!-- Asset Allocation -->
-        <div class="card">
-            <h2>Asset Allocation</h2>
-            <div class="grid-2">
-                <div>
-                    <canvas id="asset-allocation-chart"></canvas>
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2>Your Financial Journey</h2>
+            <div class="journey-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Personal Profile</h3>
+                    <p>Start by setting up your personal profile and financial goals.</p>
                 </div>
-                <div>
-                    <h4>Current vs Recommended</h4>
-                    <div id="allocation-comparison"></div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Asset Mapping</h3>
+                    <p>Input your assets, income sources, and expenses.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Risk Assessment</h3>
+                    <p>Complete the risk profile questionnaire for personalized recommendations.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Track Progress</h3>
+                    <p>Monitor your financial health and progress through the dashboard.</p>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Insurance Coverage -->
-        <div class="card">
-            <h2>Insurance Coverage</h2>
-            <div class="grid-2">
-                <div>
-                    <canvas id="insurance-coverage-chart"></canvas>
-                </div>
-                <div>
-                    <h4>Coverage Status</h4>
-                    <div id="insurance-status"></div>
-                </div>
-            </div>
+    <!-- Get Started Section -->
+    <section class="get-started">
+        <div class="container">
+            <h2>Ready to Start Your Financial Journey?</h2>
+            <p>Join thousands of users who have taken control of their financial future with LifeNivesh.</p>
+            <a href="pages/personal-info.html" class="btn btn-primary">Get Started Now</a>
         </div>
-
-        <!-- Priority Actions -->
-        <div class="card">
-            <h2>Priority Actions</h2>
-            <div id="priority-actions">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Financial Goals -->
-        <div class="card">
-            <h2>Financial Goals</h2>
-            <div id="financial-goals">
-                <!-- Will be populated by JavaScript -->
-            </div>
-        </div>
-    </main>
+    </section>
 
     <!-- Footer -->
-    <footer class="container text-center" style="padding: 2rem 0;">
-        <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="pages/dashboard.html">Dashboard</a></li>
+                        <li><a href="pages/networth.html">Net Worth</a></li>
+                        <li><a href="pages/income.html">Income</a></li>
+                        <li><a href="pages/expenses.html">Expenses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="pages/ff-score.html">FF Score Calculator</a></li>
+                        <li><a href="pages/risk-profile.html">Risk Profile Assessment</a></li>
+                        <li><a href="pages/insurance.html">Insurance Planning</a></li>
+                        <li><a href="pages/advisor.html">Financial Advisor</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="mailto:support@lifenivesh.com">support@lifenivesh.com</a></li>
+                        <li><a href="#help">Help Center</a></li>
+                        <li><a href="#feedback">Feedback</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 LifeNivesh. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
 
-    <!-- Load JavaScript files -->
     <script src="js/utils.js"></script>
     <script src="js/state.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html> 
