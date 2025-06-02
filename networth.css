@@ -1,52 +1,173 @@
 /* Specific styles for Net Worth Calculator */
-.dashboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
 }
 
-@media (max-width: 900px) {
-    .dashboard {
-        grid-template-columns: 1fr;
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    padding: 1rem 1.25rem;
+}
+
+.card-header h2 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Number in Words Display */
+.number-words {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+/* Yield Input Groups */
+.input-group-text {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    color: #495057;
+}
+
+/* Custom Assets and Liabilities */
+.custom-asset, .custom-liability {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Remove Button */
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Summary Section */
+#netWorth {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* Instructions */
+.alert {
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-info {
+    background-color: #e3f2fd;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+/* Category Totals */
+.category-total {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    margin-top: 1rem;
+}
+
+.category-total .total-amount {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Action Buttons */
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    padding: 0.5rem 1.5rem;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 0.5rem 1.5rem;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .form-group.row {
+        margin-right: -0.5rem;
+        margin-left: -0.5rem;
+    }
+    
+    .col-form-label {
+        padding-bottom: 0.5rem;
     }
 }
 
-.custom-assets, .custom-liabilities {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 15px;
-    border-radius: 12px;
-    margin: 20px 0;
+/* Income Summary Section */
+#totalRentalIncome, #totalDividendIncome, #totalInterestIncome {
+    color: #28a745;
+    font-weight: 500;
 }
 
-.custom-item {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    align-items: center;
+/* Breadcrumb Navigation */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.75rem 0;
+    margin-bottom: 2rem;
 }
 
-.custom-item input:first-child {
-    flex: 2;
+.breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
 }
 
-.custom-item input:last-child {
-    flex: 1;
+.breadcrumb-item.active {
+    color: #6c757d;
 }
 
-.remove-btn {
-    background: var(--danger);
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition);
-}
-
-.remove-btn:hover {
-    background: #d32f2f;
+/* Tooltips */
+[data-toggle="tooltip"] {
+    cursor: help;
 }
