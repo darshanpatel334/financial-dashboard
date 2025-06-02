@@ -33,7 +33,7 @@
         
         <div class="dashboard">
             <div class="card">
-                <h2 class="section-title"><i class="fas fa-sync-alt"></i> Monthly Expenses</h2>
+                <h2 class="section-title"><i class="fas fa-sync-alt"></i> Monthly Recurring Expenses</h2>
                 
                 <div class="form-group">
                     <label><i class="fas fa-shopping-basket"></i> Groceries</label>
@@ -64,19 +64,7 @@
                     <input type="number" id="dining" placeholder="Enter amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="diningWords"></span>
                 </div>
-                
-                <div id="custom-monthly" class="custom-expenses">
-                    <!-- Custom monthly expenses will be added here -->
-                </div>
-                
-                <button class="btn-calculate" id="addMonthlyExpenseBtn">
-                    <i class="fas fa-plus"></i> Add Custom Expense
-                </button>
-            </div>
-            
-            <div class="card">
-                <h2 class="section-title"><i class="fas fa-home"></i> Big Expenses</h2>
-                
+
                 <div class="form-group">
                     <label><i class="fas fa-car"></i> Car EMI</label>
                     <input type="number" id="carEMI" placeholder="Enter amount (₹)" value="0" class="no-spinner">
@@ -84,13 +72,25 @@
                 </div>
                 
                 <div class="form-group">
-                    <label><i class="fas fa-house"></i> Home Loan</label>
+                    <label><i class="fas fa-house"></i> Home Loan EMI</label>
                     <input type="number" id="homeEMI" placeholder="Enter amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="homeEMIWords"></span>
                 </div>
                 
+                <div id="customMonthlyList" class="custom-expenses">
+                    <!-- Custom monthly expenses will be added here -->
+                </div>
+                
+                <button class="btn-calculate" id="addMonthly">
+                    <i class="fas fa-plus"></i> Add Custom Monthly Expense
+                </button>
+            </div>
+            
+            <div class="card">
+                <h2 class="section-title"><i class="fas fa-calendar"></i> Annual/Big Expenses</h2>
+                
                 <div class="form-group">
-                    <label><i class="fas fa-tv"></i> Electronics</label>
+                    <label><i class="fas fa-laptop"></i> Electronics</label>
                     <input type="number" id="electronics" placeholder="Enter amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="electronicsWords"></span>
                 </div>
@@ -100,13 +100,31 @@
                     <input type="number" id="vacations" placeholder="Enter amount (₹)" value="0" class="no-spinner">
                     <span class="number-in-words" id="vacationsWords"></span>
                 </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-heartbeat"></i> Medical</label>
+                    <input type="number" id="medical" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="medicalWords"></span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-graduation-cap"></i> Education</label>
+                    <input type="number" id="education" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="educationWords"></span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-car"></i> Vehicle Maintenance</label>
+                    <input type="number" id="vehicle" placeholder="Enter amount (₹)" value="0" class="no-spinner">
+                    <span class="number-in-words" id="vehicleWords"></span>
+                </div>
                 
-                <div id="custom-big" class="custom-expenses">
+                <div id="customBigList" class="custom-expenses">
                     <!-- Custom big expenses will be added here -->
                 </div>
                 
-                <button class="btn-calculate" id="addBigExpenseBtn">
-                    <i class="fas fa-plus"></i> Add Custom Expense
+                <button class="btn-calculate" id="addBig">
+                    <i class="fas fa-plus"></i> Add Custom Big Expense
                 </button>
             </div>
             
@@ -115,18 +133,39 @@
                 
                 <div class="summary">
                     <div class="summary-item">
-                        <span>Monthly Expenses:</span>
-                        <span class="highlight" id="monthlyExpensesResult">₹78,000</span>
+                        <span>Monthly Recurring Expenses:</span>
+                        <span class="highlight" id="totalMonthlyRecurring">₹0</span>
+                        <span class="number-in-words" id="totalMonthlyRecurringWords"></span>
                     </div>
                     
                     <div class="summary-item">
-                        <span>Big Expenses:</span>
-                        <span class="highlight" id="bigExpensesResult">₹80,000</span>
+                        <span>Total Annual/Big Expenses:</span>
+                        <span class="highlight" id="totalBigExpenses">₹0</span>
+                        <span class="number-in-words" id="totalBigExpensesWords"></span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Monthly Share of Big Expenses:</span>
+                        <span class="highlight" id="monthlyBigExpenses">₹0</span>
+                        <span class="number-in-words" id="monthlyBigExpensesWords"></span>
                     </div>
                     
                     <div class="summary-item">
                         <span style="font-size: 1.3rem;">Total Monthly Expenses:</span>
-                        <span class="highlight" id="totalExpenses" style="font-size: 1.8rem;">₹1,58,000</span>
+                        <span class="highlight" id="totalMonthlyExpenses" style="font-size: 1.8rem;">₹0</span>
+                        <span class="number-in-words" id="totalMonthlyExpensesWords"></span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Annual Recurring Expenses:</span>
+                        <span class="highlight" id="annualRecurring">₹0</span>
+                        <span class="number-in-words" id="annualRecurringWords"></span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span style="font-size: 1.3rem;">Total Annual Expenses:</span>
+                        <span class="highlight" id="annualTotal" style="font-size: 1.8rem;">₹0</span>
+                        <span class="number-in-words" id="annualTotalWords"></span>
                     </div>
                 </div>
                 <button type="button" id="saveDataBtn" class="btn-calculate">

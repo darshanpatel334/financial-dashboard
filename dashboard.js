@@ -595,15 +595,26 @@ function updateChartData(chart, newData) {
 }
 
 function calculateMonthlyExpenses(values) {
-    const regularExpenses = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining'];
-    const total = regularExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
-    return total + calculateCustomExpenses(values.monthly || []);
+    // Monthly recurring expenses
+    const regularExpenses = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'];
+    const monthlyRecurring = regularExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
+    const customMonthly = calculateCustomExpenses(values.monthly || []);
+    
+    // Big expenses converted to monthly
+    const bigExpenses = ['electronics', 'vacations', 'medical', 'education', 'vehicle'];
+    const annualBig = bigExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
+    const customBig = calculateCustomExpenses(values.big || []);
+    
+    // Convert annual expenses to monthly
+    const monthlyBigExpenses = (annualBig + customBig) / 12;
+    
+    return monthlyRecurring + customMonthly + monthlyBigExpenses;
 }
 
 function calculateBigExpenses(values) {
-    const bigExpenses = ['carEMI', 'homeEMI', 'electronics', 'vacations'];
-    const total = bigExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
-    return total + calculateCustomExpenses(values.big || []);
+    const bigExpenses = ['electronics', 'vacations', 'medical', 'education', 'vehicle'];
+    const annualBig = bigExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
+    return annualBig + calculateCustomExpenses(values.big || []);
 }
 
 function calculateCustomExpenses(items) {
@@ -642,9 +653,22 @@ function calculateCustomAssetsTotal(items) {
 }
 
 function calculateTotalMonthlyExpenses(values) {
-    const monthlyExpenses = calculateMonthlyExpenses(values);
-    const bigExpenses = calculateBigExpenses(values);
-    return monthlyExpenses + (bigExpenses / 12);
+    if (!values) return 0;
+    
+    // Calculate monthly recurring expenses
+    const regularExpenses = ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'];
+    const monthlyRecurring = regularExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
+    const customMonthly = calculateCustomExpenses(values.monthly || []);
+    
+    // Calculate big expenses
+    const bigExpenses = ['electronics', 'vacations', 'medical', 'education', 'vehicle'];
+    const annualBig = bigExpenses.reduce((sum, key) => sum + (parseFloat(values[key]) || 0), 0);
+    const customBig = calculateCustomExpenses(values.big || []);
+    
+    // Convert annual expenses to monthly
+    const monthlyBigExpenses = (annualBig + customBig) / 12;
+    
+    return monthlyRecurring + customMonthly + monthlyBigExpenses;
 }
 
 function calculateTotalLiabilities(values) {

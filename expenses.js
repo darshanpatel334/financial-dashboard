@@ -133,6 +133,7 @@ function calculateExpenses() {
     let totalMonthlyRecurring = 0;
     let hasMonthlyValues = false;
     
+    // Regular monthly expenses including EMIs
     ['groceries', 'utilities', 'subscriptions', 'shopping', 'dining', 'carEMI', 'homeEMI'].forEach(id => {
         const value = getNumericValue(id);
         if (value > 0) hasMonthlyValues = true;
@@ -146,10 +147,11 @@ function calculateExpenses() {
         totalMonthlyRecurring += value;
     });
     
-    // Calculate big expenses
+    // Calculate big/annual expenses
     let totalBigExpenses = 0;
     let hasBigValues = false;
     
+    // Regular big expenses
     ['electronics', 'vacations', 'medical', 'education', 'vehicle'].forEach(id => {
         const value = getNumericValue(id);
         if (value > 0) hasBigValues = true;
@@ -169,13 +171,19 @@ function calculateExpenses() {
     // Calculate total monthly expenses
     const totalMonthlyExpenses = totalMonthlyRecurring + monthlyBigExpenses;
     
+    // Calculate annual values
+    const annualRecurring = totalMonthlyRecurring * 12;
+    const annualTotal = annualRecurring + totalBigExpenses;
+    
     // Update display and save data if we have actual values
     if (hasMonthlyValues || hasBigValues) {
         updateDisplayValues({
             totalMonthlyRecurring,
             totalBigExpenses,
             monthlyBigExpenses,
-            totalMonthlyExpenses
+            totalMonthlyExpenses,
+            annualRecurring,
+            annualTotal
         });
         saveExpenseData();
     } else {
@@ -183,7 +191,9 @@ function calculateExpenses() {
             totalMonthlyRecurring: 0,
             totalBigExpenses: 0,
             monthlyBigExpenses: 0,
-            totalMonthlyExpenses: 0
+            totalMonthlyExpenses: 0,
+            annualRecurring: 0,
+            annualTotal: 0
         });
         localStorage.removeItem('expenseValues');
     }
@@ -204,34 +214,29 @@ function updateDisplayValues(values) {
     updateDisplay('totalBigExpenses', values.totalBigExpenses);
     updateDisplay('monthlyBigExpenses', values.monthlyBigExpenses);
     updateDisplay('totalMonthlyExpenses', values.totalMonthlyExpenses);
-    
-    // Update annual values
-    const annualRecurring = values.totalMonthlyRecurring * 12;
-    const annualTotal = values.totalMonthlyExpenses * 12;
-    
-    updateDisplay('annualRecurring', annualRecurring);
-    updateDisplay('annualTotal', annualTotal);
+    updateDisplay('annualRecurring', values.annualRecurring);
+    updateDisplay('annualTotal', values.annualTotal);
     
     // Update words displays
     updateWordsDisplay('totalMonthlyRecurringWords', values.totalMonthlyRecurring);
     updateWordsDisplay('totalBigExpensesWords', values.totalBigExpenses);
     updateWordsDisplay('monthlyBigExpensesWords', values.monthlyBigExpenses);
     updateWordsDisplay('totalMonthlyExpensesWords', values.totalMonthlyExpenses);
-    updateWordsDisplay('annualRecurringWords', annualRecurring);
-    updateWordsDisplay('annualTotalWords', annualTotal);
+    updateWordsDisplay('annualRecurringWords', values.annualRecurring);
+    updateWordsDisplay('annualTotalWords', values.annualTotal);
 }
 
 function updateDisplay(elementId, value) {
     const element = document.getElementById(elementId);
     if (element) {
-        element.textContent = value > 0 ? formatCurrency(value) : '₹0';
+        element.textContent = formatCurrency(value);
     }
 }
 
 function updateWordsDisplay(elementId, value) {
     const element = document.getElementById(elementId);
     if (element) {
-        element.textContent = value > 0 ? `₹${numberToWords(value)}` : '₹Zero';
+        element.textContent = `₹${numberToWords(value)}`;
     }
 }
 
@@ -312,6 +317,9 @@ function saveExpenseData() {
     
     // Save to localStorage
     saveToLocalStorage('expenseValues', expenseData);
+    
+    // Notify other pages
+    notifyUpdate();
 }
 
 function notifyUpdate() {
@@ -324,7 +332,7 @@ function updateNumberInWords(inputId) {
     const wordsSpan = document.getElementById(inputId + 'Words');
     if (input && wordsSpan) {
         const value = parseFloat(input.value) || 0;
-        wordsSpan.textContent = value > 0 ? `₹${numberToWords(value)}` : '₹Zero';
+        wordsSpan.textContent = `₹${numberToWords(value)}`;
     }
 }
 
