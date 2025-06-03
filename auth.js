@@ -30,12 +30,14 @@ function showStatus(message, isError = false) {
 function handleSignUp(event) {
     console.log('handleSignUp called'); // Debug log
     event.preventDefault();
+    const firstName = document.getElementById('signupFirstName').value;
+    const lastName = document.getElementById('signupLastName').value;
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
 
-    console.log('Email:', email, 'Password length:', password.length); // Debug log
+    console.log('Signup data:', { firstName, lastName, email, passwordLength: password.length }); // Debug log
 
-    if (!email || !password) {
+    if (!firstName || !lastName || !email || !password) {
         showStatus('Please fill in all fields', true);
         return;
     }
@@ -48,10 +50,32 @@ function handleSignUp(event) {
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             console.log('Sign up successful:', userCredential.user.email); // Debug log
+            
+            // Store user's name information
+            const userData = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                signupDate: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            // Also save as personal info to kickstart the journey
+            const personalInfo = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email
+            };
+            localStorage.setItem('personalInfo', JSON.stringify(personalInfo));
+            
             showStatus('Account created successfully! Redirecting...');
-            // Redirect to personal info page
+            
+            // Use smart redirect to determine where to go
             setTimeout(() => {
-                window.location.href = 'personal-info.html';
+                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info.html';
+                window.location.href = nextPage;
             }, 1500);
         })
         .catch((error) => {
@@ -78,9 +102,11 @@ function handleLogin(event) {
         .then((userCredential) => {
             console.log('Login successful:', userCredential.user.email); // Debug log
             showStatus('Login successful! Redirecting...');
-            // Redirect to personal info page
+            
+            // Use smart redirect to determine where to go
             setTimeout(() => {
-                window.location.href = 'personal-info.html';
+                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info.html';
+                window.location.href = nextPage;
             }, 1500);
         })
         .catch((error) => {

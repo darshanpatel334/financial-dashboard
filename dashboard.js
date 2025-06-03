@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load all data from previous pages
 function loadAllData() {
     dashboardData = {
-        personal: Storage.get('personalData', {}),
+        personal: Storage.get('personalInfo', {}),
         netWorth: Storage.get('netWorthData', {}),
         income: Storage.get('incomeData', {}),
         expenses: Storage.get('expenseData', {}),
@@ -23,6 +23,8 @@ function loadAllData() {
         insurance: Storage.get('insuranceData', {}),
         riskProfile: Storage.get('riskProfileData', {})
     };
+    
+    console.log('Dashboard data loaded:', dashboardData); // Debug log
 }
 
 // Initialize dashboard
@@ -36,7 +38,7 @@ function initDashboard() {
 // Update summary cards
 function updateSummaryCards() {
     // Net Worth
-    const netWorth = dashboardData.netWorth.totals?.totalNetWorth || 0;
+    const netWorth = dashboardData.netWorth.totals?.netWorth || 0;
     document.getElementById('dashboardNetWorth').textContent = formatCurrency(netWorth);
     
     // Annual Income
@@ -48,7 +50,7 @@ function updateSummaryCards() {
     document.getElementById('dashboardExpenses').textContent = formatCurrency(annualExpenses);
     
     // FF Score
-    const ffScore = dashboardData.ffScore.currentScore || 0;
+    const ffScore = dashboardData.ffScore.currentScore || dashboardData.ffScore.score || 0;
     document.getElementById('dashboardFFScore').textContent = ffScore;
     
     // Update FF Score color
@@ -117,19 +119,34 @@ function createAssetChart() {
     const ctx = document.getElementById('assetChart').getContext('2d');
     const netWorthData = dashboardData.netWorth;
     
-    if (!netWorthData.assets) return;
+    if (!netWorthData.assets) {
+        console.log('No asset data available');
+        return;
+    }
     
     const labels = [];
     const data = [];
     const colors = [chartColors.primary, chartColors.success, chartColors.warning, chartColors.info, chartColors.purple];
     
+    // Calculate totals for each category from the assets data
     Object.keys(netWorthData.assets).forEach((category, index) => {
-        const categoryTotal = netWorthData.categoryTotals?.[category] || 0;
+        let categoryTotal = 0;
+        if (Array.isArray(netWorthData.assets[category])) {
+            categoryTotal = netWorthData.assets[category].reduce((sum, asset) => {
+                return sum + (asset.value || 0);
+            }, 0);
+        }
+        
         if (categoryTotal > 0) {
             labels.push(formatCategoryName(category));
             data.push(categoryTotal);
         }
     });
+    
+    if (labels.length === 0) {
+        console.log('No asset data to display');
+        return;
+    }
     
     charts.assetChart = new Chart(ctx, {
         type: 'doughnut',
@@ -148,6 +165,15 @@ function createAssetChart() {
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = formatCurrency(context.raw);
+                            const percentage = ((context.raw / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
@@ -204,36 +230,81 @@ function createIncomeExpenseChart() {
     });
 }
 
-// Create income sources chart
+// Create income composition chart
 function createIncomeChart() {
     const ctx = document.getElementById('incomeChart').getContext('2d');
     const incomeData = dashboardData.income;
     
-    if (!incomeData.breakdown) return;
+    if (!incomeData.income) {
+        console.log('No income data available');
+        return;
+    }
     
-    const breakdown = incomeData.breakdown;
-    const labels = ['Salary', 'Rental', 'Dividend', 'Interest', 'Other'];
-    const data = [
-        breakdown.salary || 0,
-        breakdown.rental || 0,
-        breakdown.dividend || 0,
-        breakdown.interest || 0,
-        breakdown.other || 0
-    ];
+    const labels = [];
+    const data = [];
+    const colors = [chartColors.primary, chartColors.success, chartColors.warning, chartColors.info, chartColors.purple];
+    
+    // Calculate totals for each income category
+    Object.keys(incomeData.income).forEach((category, index) => {
+        let categoryTotal = 0;
+        if (Array.isArray(incomeData.income[category])) {
+            categoryTotal = incomeData.income[category].reduce((sum, income) => {
+                let annualAmount = 0;
+                if (income.amount && income.frequency) {
+                    switch (income.frequency) {
+                        case 'monthly':
+                            annualAmount = income.amount * 12;
+                            break;
+                        case 'quarterly':
+                            annualAmount = income.amount * 4;
+                            break;
+                        case 'annual':
+                            annualAmount = income.amount;
+                            break;
+                    }
+                }
+                return sum + annualAmount;
+            }, 0);
+        }
+        
+        if (categoryTotal > 0) {
+            labels.push(formatCategoryName(category));
+            data.push(categoryTotal);
+        }
+    });
+    
+    // Add auto-calculated income from assets
+    const netWorthData = dashboardData.netWorth;
+    if (netWorthData.assets) {
+        let assetYieldIncome = 0;
+        Object.keys(netWorthData.assets).forEach(category => {
+            if (Array.isArray(netWorthData.assets[category])) {
+                netWorthData.assets[category].forEach(asset => {
+                    if (asset.value && asset.yield) {
+                        assetYieldIncome += (asset.value * asset.yield) / 100;
+                    }
+                });
+            }
+        });
+        
+        if (assetYieldIncome > 0) {
+            labels.push('Asset Yields');
+            data.push(assetYieldIncome);
+        }
+    }
+    
+    if (labels.length === 0) {
+        console.log('No income data to display');
+        return;
+    }
     
     charts.incomeChart = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: [
-                    chartColors.primary,
-                    chartColors.success,
-                    chartColors.warning,
-                    chartColors.info,
-                    chartColors.purple
-                ],
+                backgroundColor: colors.slice(0, labels.length),
                 borderWidth: 2,
                 borderColor: '#ffffff'
             }]
@@ -244,6 +315,15 @@ function createIncomeChart() {
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = formatCurrency(context.raw);
+                            const percentage = ((context.raw / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
@@ -255,15 +335,56 @@ function createExpenseChart() {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     const expenseData = dashboardData.expenses;
     
-    if (!expenseData.breakdown) return;
+    if (!expenseData.expenses) {
+        console.log('No expense data available');
+        return;
+    }
     
-    const breakdown = expenseData.breakdown;
-    const labels = ['Monthly Recurring', 'Annual Recurring', 'Big Expenses'];
-    const data = [
-        breakdown.monthlyRecurring || 0,
-        breakdown.annualRecurring || 0,
-        breakdown.bigExpenses || 0
-    ];
+    const labels = [];
+    const data = [];
+    const colors = [chartColors.danger, chartColors.warning, chartColors.orange];
+    
+    // Monthly recurring expenses
+    if (expenseData.expenses.monthlyRecurring && expenseData.expenses.monthlyRecurring.length > 0) {
+        const monthlyTotal = expenseData.expenses.monthlyRecurring.reduce((sum, expense) => {
+            return sum + (expense.amount || 0);
+        }, 0) * 12;
+        
+        if (monthlyTotal > 0) {
+            labels.push('Monthly Recurring');
+            data.push(monthlyTotal);
+        }
+    }
+    
+    // Annual recurring expenses
+    if (expenseData.expenses.annualRecurring && expenseData.expenses.annualRecurring.length > 0) {
+        const annualTotal = expenseData.expenses.annualRecurring.reduce((sum, expense) => {
+            return sum + (expense.amount || 0);
+        }, 0);
+        
+        if (annualTotal > 0) {
+            labels.push('Annual Recurring');
+            data.push(annualTotal);
+        }
+    }
+    
+    // Big expenses (amortized)
+    if (expenseData.expenses.bigExpenses && expenseData.expenses.bigExpenses.length > 0) {
+        const bigExpensesTotal = expenseData.expenses.bigExpenses.reduce((sum, expense) => {
+            const years = expense.replacementYears || 1;
+            return sum + (expense.amount / years);
+        }, 0);
+        
+        if (bigExpensesTotal > 0) {
+            labels.push('Big Expenses (Amortized)');
+            data.push(bigExpensesTotal);
+        }
+    }
+    
+    if (labels.length === 0) {
+        console.log('No expense data to display');
+        return;
+    }
     
     charts.expenseChart = new Chart(ctx, {
         type: 'doughnut',
@@ -271,11 +392,7 @@ function createExpenseChart() {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: [
-                    chartColors.danger,
-                    chartColors.warning,
-                    chartColors.orange
-                ],
+                backgroundColor: colors.slice(0, labels.length),
                 borderWidth: 2,
                 borderColor: '#ffffff'
             }]
@@ -286,6 +403,15 @@ function createExpenseChart() {
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = formatCurrency(context.raw);
+                            const percentage = ((context.raw / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
@@ -318,14 +444,45 @@ function createAllocationCharts() {
 // Calculate current allocation from net worth data
 function calculateCurrentAllocation() {
     const netWorthData = dashboardData.netWorth;
-    const totalAssets = netWorthData.totals?.totalAssets || 1;
+    let totalAssets = 0;
+    let categoryTotals = {
+        equity: 0,
+        fixedIncome: 0,
+        realEstate: 0,
+        otherAssets: 0
+    };
+    
+    // Calculate category totals from assets data
+    if (netWorthData.assets) {
+        Object.keys(netWorthData.assets).forEach(category => {
+            if (Array.isArray(netWorthData.assets[category])) {
+                const categoryTotal = netWorthData.assets[category].reduce((sum, asset) => {
+                    return sum + (asset.value || 0);
+                }, 0);
+                
+                categoryTotals[category] = categoryTotal;
+                totalAssets += categoryTotal;
+            }
+        });
+    }
+    
+    // Prevent division by zero
+    if (totalAssets === 0) {
+        return {
+            equity: 0,
+            debt: 0,
+            gold: 0,
+            reits: 0,
+            cash: 0
+        };
+    }
     
     return {
-        equity: ((netWorthData.categoryTotals?.equity || 0) / totalAssets) * 100,
-        debt: ((netWorthData.categoryTotals?.fixedIncome || 0) / totalAssets) * 100,
-        gold: ((netWorthData.categoryTotals?.gold || 0) / totalAssets) * 100,
-        reits: ((netWorthData.categoryTotals?.realEstate || 0) / totalAssets) * 100,
-        cash: ((netWorthData.categoryTotals?.cash || 0) / totalAssets) * 100
+        equity: ((categoryTotals.equity || 0) / totalAssets) * 100,
+        debt: ((categoryTotals.fixedIncome || 0) / totalAssets) * 100,
+        gold: 0, // Not tracked separately in our model
+        reits: ((categoryTotals.realEstate || 0) / totalAssets) * 100,
+        cash: ((categoryTotals.otherAssets || 0) / totalAssets) * 100
     };
 }
 

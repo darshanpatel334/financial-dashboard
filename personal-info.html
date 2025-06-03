@@ -359,6 +359,13 @@
             if (user) {
                 document.getElementById('userEmail').textContent = user.email;
                 loadPersonalInfo();
+                
+                // Initialize progress tracking
+                if (typeof initProgressTracking === 'function') {
+                    console.log('Initializing progress tracking on personal-info page');
+                    const progress = initProgressTracking();
+                    console.log('Current progress:', progress);
+                }
             } else {
                 window.location.href = 'index.html';
             }

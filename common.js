@@ -887,4 +887,179 @@ function validateFinancialData(data, type) {
 }
 
 // ===== EXPORT VALIDATION FUNCTION =====
-window.validateAllCalculations = validateAllCalculations; 
+window.validateAllCalculations = validateAllCalculations;
+
+// ===== USER JOURNEY PROGRESS TRACKING =====
+
+// Define the journey steps in order
+const JOURNEY_STEPS = [
+    { key: 'personalInfo', page: 'personal-info.html', name: 'Personal Information' },
+    { key: 'netWorthData', page: 'networth.html', name: 'Net Worth' },
+    { key: 'incomeData', page: 'income.html', name: 'Income Analysis' },
+    { key: 'expenseData', page: 'expenses.html', name: 'Expense Analysis' },
+    { key: 'ffScoreData', page: 'ff-score.html', name: 'FF Score' },
+    { key: 'insuranceData', page: 'insurance.html', name: 'Insurance' },
+    { key: 'riskProfileData', page: 'risk-profile.html', name: 'Risk Profile' },
+    { key: 'completed', page: 'dashboard.html', name: 'Dashboard' }
+];
+
+// Check user progress and determine where they should be redirected
+function checkUserProgress() {
+    const progress = getUserProgress();
+    return progress;
+}
+
+// Get detailed user progress
+function getUserProgress() {
+    const progress = {
+        completed: [],
+        current: null,
+        next: null,
+        percentage: 0,
+        isComplete: false
+    };
+    
+    for (let i = 0; i < JOURNEY_STEPS.length; i++) {
+        const step = JOURNEY_STEPS[i];
+        
+        if (step.key === 'completed') {
+            // Check if all previous steps are completed
+            if (progress.completed.length === JOURNEY_STEPS.length - 1) {
+                progress.isComplete = true;
+                progress.current = step;
+                progress.percentage = 100;
+            }
+            break;
+        }
+        
+        const data = Storage.get(step.key, {});
+        const isStepComplete = validateStepCompletion(step.key, data);
+        
+        if (isStepComplete) {
+            progress.completed.push(step);
+        } else {
+            progress.current = step;
+            progress.next = JOURNEY_STEPS[i + 1];
+            break;
+        }
+    }
+    
+    progress.percentage = Math.round((progress.completed.length / (JOURNEY_STEPS.length - 1)) * 100);
+    
+    return progress;
+}
+
+// Validate if a step is completed
+function validateStepCompletion(stepKey, data) {
+    switch (stepKey) {
+        case 'personalInfo':
+            return data.firstName && data.lastName && data.dateOfBirth && data.maritalStatus;
+            
+        case 'netWorthData':
+            return data.totals && (data.totals.totalAssets > 0 || data.totals.totalLiabilities > 0);
+            
+        case 'incomeData':
+            return data.totals && data.totals.annualTotal > 0;
+            
+        case 'expenseData':
+            return data.totals && data.totals.annualTotal > 0;
+            
+        case 'ffScoreData':
+            return data.currentScore !== undefined || data.score !== undefined;
+            
+        case 'insuranceData':
+            return Object.keys(data).length > 0; // Basic check for any insurance data
+            
+        case 'riskProfileData':
+            return data.riskProfile && data.riskScore;
+            
+        default:
+            return false;
+    }
+}
+
+// Smart redirect based on user progress
+function smartRedirect() {
+    const progress = checkUserProgress();
+    
+    if (progress.isComplete) {
+        // All steps completed, go to dashboard
+        return 'dashboard.html';
+    } else if (progress.current) {
+        // Go to current incomplete step
+        return progress.current.page;
+    } else {
+        // Start from beginning
+        return 'personal-info.html';
+    }
+}
+
+// Initialize progress tracking on any page
+function initProgressTracking() {
+    const currentPage = getCurrentPageName();
+    const progress = checkUserProgress();
+    
+    // Only redirect if we're on landing page or personal info page
+    if (currentPage === 'index.html' || currentPage === 'personal-info.html') {
+        // If user has completed everything, show option to go to dashboard
+        if (progress.isComplete && currentPage === 'index.html') {
+            showDashboardOption();
+        }
+        // If user is on personal-info but should be elsewhere, redirect
+        else if (currentPage === 'personal-info.html' && progress.current && progress.current.key !== 'personalInfo') {
+            window.location.href = progress.current.page;
+        }
+    }
+    
+    return progress;
+}
+
+// Get current page name
+function getCurrentPageName() {
+    return window.location.pathname.split('/').pop() || 'index.html';
+}
+
+// Show dashboard option on landing page
+function showDashboardOption() {
+    const heroSection = document.querySelector('.hero-section');
+    if (heroSection) {
+        const dashboardButton = document.createElement('div');
+        dashboardButton.style.marginTop = '2rem';
+        dashboardButton.innerHTML = `
+            <div class="instruction-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);">
+                <h3 style="color: #0369a1; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle"></i> Welcome Back!
+                </h3>
+                <p style="margin-bottom: 1.5rem;">You've completed your financial assessment. View your personalized dashboard or update your information.</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">
+                        <i class="fas fa-chart-line"></i> View Dashboard
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='personal-info.html'">
+                        <i class="fas fa-edit"></i> Update Information
+                    </button>
+                </div>
+            </div>
+        `;
+        heroSection.appendChild(dashboardButton);
+    }
+}
+
+// Update progress bar display (if exists on page)
+function updateProgressDisplay(progress) {
+    const progressBar = document.getElementById('journeyProgress');
+    const progressText = document.getElementById('progressText');
+    
+    if (progressBar) {
+        progressBar.style.width = progress.percentage + '%';
+    }
+    
+    if (progressText) {
+        progressText.textContent = `${progress.completed.length} of ${JOURNEY_STEPS.length - 1} steps completed (${progress.percentage}%)`;
+    }
+}
+
+// Export progress functions
+window.checkUserProgress = checkUserProgress;
+window.smartRedirect = smartRedirect;
+window.initProgressTracking = initProgressTracking; 
