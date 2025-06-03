@@ -3,277 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Net Worth - Financial Dashboard</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Net Worth - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <img src="../logo.svg" alt="LifeNivesh Logo" class="logo">
-                <span>LifeNivesh</span>
-            </div>
-            <div class="nav-links">
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
-                <a href="networth.html" class="nav-link active">Net Worth</a>
-                <a href="income.html" class="nav-link">Income</a>
-                <a href="expenses.html" class="nav-link">Expenses</a>
-                <a href="ff-score.html" class="nav-link">FF Score</a>
-            </div>
+        <div class="logo">
+            <img src="../logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="../personal-info.html" class="nav-link"><i class="fas fa-user"></i> Information</a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container">
-        <div class="page-header">
-            <h1>Net Worth Tracker</h1>
-            <p class="text-secondary">Track and manage your assets and liabilities</p>
-        </div>
+    <div class="container">
+        <section class="section-header">
+            <h2>Net Worth Calculator</h2>
+            <p>Let's calculate your total net worth</p>
+        </section>
         
-        <!-- Summary Cards -->
-        <div class="summary-grid">
-            <div class="card summary-card">
-                <div class="summary-icon assets-icon">
-                    <i class="fas fa-arrow-trend-up"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Total Assets</h3>
-                    <p id="total-assets" class="summary-amount">₹0</p>
-                    <p id="total-assets-words" class="text-secondary"></p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon liabilities-icon">
-                    <i class="fas fa-arrow-trend-down"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Total Liabilities</h3>
-                    <p id="total-liabilities" class="summary-amount">₹0</p>
-                    <p id="total-liabilities-words" class="text-secondary"></p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon networth-icon">
-                    <i class="fas fa-scale-balanced"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Net Worth</h3>
-                    <p id="net-worth" class="summary-amount">₹0</p>
-                    <p id="net-worth-words" class="text-secondary"></p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon return-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Expected Annual Return</h3>
-                    <p id="expected-return" class="summary-amount">₹0</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="charts-grid">
-            <div class="card chart-card">
-                <h2>Net Worth Trend</h2>
-                <div class="chart-container">
-                    <canvas id="networth-chart"></canvas>
-                </div>
-            </div>
-
-            <div class="card chart-card">
-                <h2>Asset Allocation</h2>
-                <div class="chart-container">
-                    <canvas id="asset-allocation-chart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Assets Section -->
         <div class="card">
-            <div class="card-header">
-                <h2>Assets</h2>
-                <button class="btn btn-primary" onclick="showAssetModal()">
-                    <i class="fas fa-plus"></i> Add Asset
+            <h2 class="section-title"><i class="fas fa-wallet"></i> Assets and Liabilities</h2>
+            
+            <form id="netWorthForm" class="form">
+                <div class="form-section">
+                    <h3>Assets</h3>
+                    <div class="form-group">
+                        <label for="cashAndSavings">Cash and Savings</label>
+                        <input type="number" id="cashAndSavings" name="cashAndSavings" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="investments">Investments</label>
+                        <input type="number" id="investments" name="investments" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="realEstate">Real Estate</label>
+                        <input type="number" id="realEstate" name="realEstate" placeholder="Enter amount" min="0">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Liabilities</h3>
+                    <div class="form-group">
+                        <label for="loans">Loans</label>
+                        <input type="number" id="loans" name="loans" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="creditCardDebt">Credit Card Debt</label>
+                        <input type="number" id="creditCardDebt" name="creditCardDebt" placeholder="Enter amount" min="0">
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <h3>Your Net Worth: <span id="netWorthResult">₹0</span></h3>
+                </div>
+
+                <button type="submit" class="btn-calculate">
+                    <i class="fas fa-calculator"></i> Calculate Net Worth
                 </button>
-            </div>
-
-            <!-- Asset Categories -->
-            <div id="asset-categories" class="asset-categories">
-                <div class="category-section">
-                    <div class="category-header">
-                        <h3><i class="fas fa-building"></i> Real Estate</h3>
-                        <span class="category-total" id="real-estate-total">₹0</span>
-                    </div>
-                    <div id="real-estate-assets" class="asset-list"></div>
-                </div>
-
-                <div class="category-section">
-                    <div class="category-header">
-                        <h3><i class="fas fa-chart-simple"></i> Equity</h3>
-                        <span class="category-total" id="equity-total">₹0</span>
-                    </div>
-                    <div id="equity-assets" class="asset-list"></div>
-                </div>
-
-                <div class="category-section">
-                    <div class="category-header">
-                        <h3><i class="fas fa-vault"></i> Fixed Income</h3>
-                        <span class="category-total" id="fixed-income-total">₹0</span>
-                    </div>
-                    <div id="fixed-income-assets" class="asset-list"></div>
-                </div>
-
-                <div class="category-section">
-                    <div class="category-header">
-                        <h3><i class="fas fa-coins"></i> Commodities</h3>
-                        <span class="category-total" id="commodities-total">₹0</span>
-                    </div>
-                    <div id="commodities-assets" class="asset-list"></div>
-                </div>
-
-                <div class="category-section">
-                    <div class="category-header">
-                        <h3><i class="fas fa-box"></i> Others</h3>
-                        <span class="category-total" id="others-total">₹0</span>
-                    </div>
-                    <div id="other-assets" class="asset-list"></div>
-                </div>
-            </div>
+            </form>
         </div>
 
-        <!-- Liabilities Section -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Liabilities</h2>
-                <button class="btn btn-primary" onclick="showLiabilityModal()">
-                    <i class="fas fa-plus"></i> Add Liability
-                </button>
-            </div>
-            <div id="liabilities-list" class="liabilities-list"></div>
-        </div>
-
-        <!-- Page Navigation -->
-        <div class="page-navigation">
-            <a href="dashboard.html" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+        <div class="navigation-buttons">
+            <a href="../personal-info.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Personal Info
             </a>
-            <a href="income.html" class="btn btn-primary">
-                Continue to Income <i class="fas fa-arrow-right"></i>
+            <a href="income.html" class="btn-next">
+                Next: Income <i class="fas fa-arrow-right"></i>
             </a>
         </div>
+    </div>
 
-        <!-- Asset Modal -->
-        <div id="asset-modal" class="modal">
-            <div class="modal-overlay" onclick="closeAssetModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add New Asset</h3>
-                    <button class="modal-close" onclick="closeAssetModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="asset-form" onsubmit="return saveAsset(event)">
-                    <div class="form-group">
-                        <label for="asset-category">Category</label>
-                        <select id="asset-category" required onchange="updateAssetSubcategories()">
-                            <option value="">Select Category</option>
-                            <option value="realEstate">Real Estate</option>
-                            <option value="equity">Equity</option>
-                            <option value="fixedIncome">Fixed Income</option>
-                            <option value="commodities">Commodities</option>
-                            <option value="others">Others</option>
-                        </select>
-                    </div>
+    <footer>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
+    </footer>
 
-                    <div class="form-group">
-                        <label for="asset-subcategory">Type</label>
-                        <select id="asset-subcategory" required>
-                            <option value="">Select Type</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="asset-name">Name</label>
-                        <input type="text" id="asset-name" required placeholder="Enter asset name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="asset-value">Value (₹)</label>
-                        <input type="number" id="asset-value" required min="0" placeholder="Enter asset value">
-                    </div>
-
-                    <div class="form-group" id="yield-group">
-                        <label for="asset-yield">Expected Annual Yield (%)</label>
-                        <input type="number" id="asset-yield" min="0" max="100" step="0.01" placeholder="Enter expected yield">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeAssetModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Asset</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Liability Modal -->
-        <div id="liability-modal" class="modal">
-            <div class="modal-overlay" onclick="closeLiabilityModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add New Liability</h3>
-                    <button class="modal-close" onclick="closeLiabilityModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="liability-form" onsubmit="return saveLiability(event)">
-                    <div class="form-group">
-                        <label for="liability-type">Type</label>
-                        <select id="liability-type" required onchange="toggleLiabilityName()">
-                            <option value="">Select Type</option>
-                            <option value="homeLoan">Home Loan</option>
-                            <option value="carLoan">Car Loan</option>
-                            <option value="educationLoan">Education Loan</option>
-                            <option value="personalLoan">Personal Loan</option>
-                            <option value="creditCards">Credit Cards</option>
-                            <option value="businessLoan">Business Loan</option>
-                            <option value="custom">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="liability-name-group">
-                        <label for="liability-name">Name</label>
-                        <input type="text" id="liability-name" placeholder="Enter liability name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="liability-amount">Amount (₹)</label>
-                        <input type="number" id="liability-amount" required min="0" placeholder="Enter liability amount">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="liability-tenure">Remaining Tenure (months)</label>
-                        <input type="number" id="liability-tenure" required min="0" placeholder="Enter remaining months">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeLiabilityModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Liability</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </main>
-
-    <script src="../js/utils.js"></script>
-    <script src="../js/state.js"></script>
-    <script src="../js/networth.js"></script>
+    <script src="../main.js"></script>
+    <script src="networth.js"></script>
 </body>
 </html> 
