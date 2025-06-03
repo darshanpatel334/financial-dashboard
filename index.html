@@ -514,22 +514,31 @@
             function setupSmartNavigation() {
                 const startJourneyBtn = document.getElementById('startJourneyBtn');
                 
-                // Check if user is logged in
+                // Add click handler that checks auth state immediately
+                startJourneyBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Immediate auth check
+                    const currentUser = firebase.auth().currentUser;
+                    if (currentUser) {
+                        // User is signed in - go to personal info
+                        console.log('User signed in, redirecting to personal-info page');
+                        window.location.href = 'pages/personal-info.html';
+                    } else {
+                        // User not signed in - show signup modal
+                        console.log('User not signed in, showing signup modal');
+                        document.getElementById('signupModal').style.display = 'block';
+                    }
+                });
+                
+                // Update button text based on auth state (for visual feedback)
                 firebase.auth().onAuthStateChanged((user) => {
                     if (user) {
-                        // User is logged in - modify button behavior
                         startJourneyBtn.innerHTML = '<i class="fas fa-play"></i> Continue Your Journey';
                         startJourneyBtn.removeAttribute('data-modal');
-                        startJourneyBtn.onclick = (e) => {
-                            e.preventDefault();
-                            // Always take user to personal info page
-                            window.location.href = 'pages/personal-info.html';
-                        };
                     } else {
-                        // User not logged in - keep original behavior
                         startJourneyBtn.innerHTML = '<i class="fas fa-rocket"></i> Start Your Financial Journey';
                         startJourneyBtn.setAttribute('data-modal', 'signupModal');
-                        startJourneyBtn.onclick = null;
                     }
                 });
             }
