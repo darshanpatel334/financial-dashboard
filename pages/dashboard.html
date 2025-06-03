@@ -3,197 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - LifeNivesh</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <title>Dashboard - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <img src="../logo.svg" alt="LifeNivesh Logo" class="logo">
-                <span>LifeNivesh</span>
-            </div>
-            <div class="nav-links">
-                <a href="personal-info.html" class="nav-link">Personal Info</a>
-                <a href="networth.html" class="nav-link">Net Worth</a>
-                <a href="income.html" class="nav-link">Income</a>
-                <a href="expenses.html" class="nav-link">Expenses</a>
-                <a href="ff-score.html" class="nav-link">FF Score</a>
-                <a href="risk-profile.html" class="nav-link">Risk Profile</a>
-                <a href="insurance.html" class="nav-link">Insurance</a>
-                <a href="dashboard.html" class="nav-link active">Dashboard</a>
-                <a href="advisor.html" class="nav-link">Financial Advisor</a>
-            </div>
+        <div class="logo">
+            <img src="../logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="../personal-info.html" class="nav-link"><i class="fas fa-user"></i> Information</a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container dashboard">
-        <div class="dashboard-header">
-            <h1>Financial Dashboard</h1>
-            <div class="dashboard-actions">
-                <button class="btn btn-secondary" onclick="generatePDF()">
-                    <i class="fas fa-download"></i> Download Report
-                </button>
-            </div>
-        </div>
+    <div class="container">
+        <section class="section-header">
+            <h2>Financial Dashboard</h2>
+            <p>Your complete financial overview</p>
+        </section>
         
-        <!-- Personal Info Summary -->
         <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-user"></i> Personal Information</h2>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <h4>Name</h4>
-                    <p id="user-name">Not Set</p>
-                </div>
-                <div class="info-item">
-                    <h4>Age</h4>
-                    <p id="user-age">Not Set</p>
-                </div>
-                <div class="info-item">
-                    <h4>Risk Profile</h4>
-                    <p id="risk-profile">Not Assessed</p>
-                </div>
-                <div class="info-item">
-                    <h4>FF Score</h4>
-                    <p id="ff-score">Not Calculated</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Financial Summary -->
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-chart-pie"></i> Financial Summary</h2>
-            </div>
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <h4>Net Worth</h4>
-                    <p id="total-networth">₹0</p>
-                    <p id="networth-words" class="text-secondary"></p>
-                </div>
-                <div class="summary-item">
-                    <h4>Monthly Income</h4>
-                    <p id="monthly-income">₹0</p>
-                    <p id="income-words" class="text-secondary"></p>
-                </div>
-                <div class="summary-item">
-                    <h4>Monthly Expenses</h4>
-                    <p id="monthly-expenses">₹0</p>
-                    <p id="expenses-words" class="text-secondary"></p>
-                </div>
-                <div class="summary-item">
-                    <h4>Monthly Savings</h4>
-                    <p id="monthly-savings">₹0</p>
-                    <p id="savings-words" class="text-secondary"></p>
-                </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="monthly-summary-chart"></canvas>
-            </div>
-        </div>
-
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- Asset Allocation -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-balance-scale"></i> Asset Allocation</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="chart-container">
-                        <canvas id="asset-allocation-chart"></canvas>
-                    </div>
-                    <div class="allocation-comparison">
-                        <h4>Current vs Recommended</h4>
-                        <div id="allocation-comparison"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Insurance Coverage -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-shield-alt"></i> Insurance Coverage</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="chart-container">
-                        <canvas id="insurance-coverage-chart"></canvas>
-                    </div>
-                    <div class="coverage-status">
-                        <h4>Coverage Status</h4>
-                        <div id="insurance-status"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Priority Actions -->
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-tasks"></i> Priority Actions</h2>
-            </div>
-            <div id="priority-actions" class="priority-actions-grid">
+            <h2 class="section-title"><i class="fas fa-user-circle"></i> Personal Overview</h2>
+            <div id="personalInfo" class="dashboard-section">
                 <!-- Will be populated by JavaScript -->
             </div>
         </div>
 
-        <!-- Financial Goals -->
         <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-bullseye"></i> Financial Goals</h2>
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Financial Health</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <h3>Net Worth</h3>
+                    <div id="netWorthSummary">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="dashboard-item">
+                    <h3>Monthly Cash Flow</h3>
+                    <div id="cashFlowSummary">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="dashboard-item">
+                    <h3>FF Score</h3>
+                    <div id="ffScoreSummary">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="dashboard-item">
+                    <h3>Risk Profile</h3>
+                    <div id="riskProfileSummary">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
             </div>
-            <div id="financial-goals" class="goals-grid">
+        </div>
+
+        <div class="card">
+            <h2 class="section-title"><i class="fas fa-shield-alt"></i> Protection Status</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-item">
+                    <h3>Life Insurance</h3>
+                    <div id="lifeInsuranceSummary">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="dashboard-item">
+                    <h3>Health Insurance</h3>
+                    <div id="healthInsuranceSummary">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title"><i class="fas fa-tasks"></i> Action Items</h2>
+            <div id="actionItems" class="dashboard-section">
                 <!-- Will be populated by JavaScript -->
             </div>
         </div>
-    </main>
 
-    <!-- Footer -->
+        <div class="navigation-buttons">
+            <a href="risk-profile.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Risk Profile
+            </a>
+            <a href="advisor.html" class="btn-next">
+                Next: Financial Advisor <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="networth.html">Net Worth</a></li>
-                        <li><a href="income.html">Income</a></li>
-                        <li><a href="expenses.html">Expenses</a></li>
-                        <li><a href="ff-score.html">FF Score</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Tools</h4>
-                    <ul>
-                        <li><a href="risk-profile.html">Risk Profile</a></li>
-                        <li><a href="insurance.html">Insurance</a></li>
-                        <li><a href="advisor.html">Financial Advisor</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Help</h4>
-                    <ul>
-                        <li><a href="#help">Help Center</a></li>
-                        <li><a href="#feedback">Feedback</a></li>
-                        <li><a href="mailto:support@lifenivesh.com">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 LifeNivesh. All rights reserved.</p>
-            </div>
-        </div>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
     </footer>
 
-    <script src="../js/utils.js"></script>
-    <script src="../js/state.js"></script>
-    <script src="../js/dashboard.js"></script>
+    <script src="../main.js"></script>
+    <script src="dashboard.js"></script>
 </body>
 </html> 

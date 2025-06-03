@@ -3,275 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expenses Tracker - Financial Dashboard</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Expenses - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <img src="../logo.svg" alt="LifeNivesh Logo" class="logo">
-                <span>LifeNivesh</span>
-            </div>
-            <div class="nav-links">
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
-                <a href="networth.html" class="nav-link">Net Worth</a>
-                <a href="income.html" class="nav-link">Income</a>
-                <a href="expenses.html" class="nav-link active">Expenses</a>
-                <a href="ff-score.html" class="nav-link">FF Score</a>
-            </div>
+        <div class="logo">
+            <img src="../logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="../personal-info.html" class="nav-link"><i class="fas fa-user"></i> Information</a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container">
-        <div class="page-header">
-            <h1>Expenses Tracker</h1>
-            <p class="text-secondary">Track and manage your expenses</p>
-        </div>
+    <div class="container">
+        <section class="section-header">
+            <h2>Expense Tracker</h2>
+            <p>Track and categorize your monthly expenses</p>
+        </section>
         
-        <!-- Expenses Summary -->
-        <div class="summary-grid">
-            <div class="card summary-card">
-                <div class="summary-icon liabilities-icon">
-                    <i class="fas fa-wallet"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Monthly Expenses</h3>
-                    <p id="monthly-expenses" class="summary-amount">₹0</p>
-                    <p id="monthly-expenses-words" class="text-secondary"></p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon return-icon">
-                    <i class="fas fa-calendar"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Annual Expenses</h3>
-                    <p id="annual-expenses" class="summary-amount">₹0</p>
-                    <p id="annual-expenses-words" class="text-secondary"></p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon assets-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Big Expenses</h3>
-                    <p id="big-expenses" class="summary-amount">₹0</p>
-                    <p id="big-expenses-words" class="text-secondary"></p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon networth-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Expected Inflation</h3>
-                    <p id="expected-inflation" class="summary-amount">0%</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="card chart-card">
-            <h2>Expenses Composition</h2>
-            <div class="chart-container">
-                <canvas id="expenses-composition-chart"></canvas>
-            </div>
-        </div>
-
-        <!-- Monthly Recurring Expenses -->
         <div class="card">
-            <div class="card-header">
-                <h2>Monthly Recurring Expenses</h2>
-                <button class="btn btn-primary" onclick="showMonthlyExpenseModal()">
-                    <i class="fas fa-plus"></i> Add Monthly Expense
+            <h2 class="section-title"><i class="fas fa-receipt"></i> Monthly Expenses</h2>
+            
+            <form id="expenseForm" class="form">
+                <div class="form-section">
+                    <h3>Essential Expenses</h3>
+                    <div class="form-group">
+                        <label for="housing">Housing (Rent/EMI)</label>
+                        <input type="number" id="housing" name="housing" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="utilities">Utilities</label>
+                        <input type="number" id="utilities" name="utilities" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="groceries">Groceries</label>
+                        <input type="number" id="groceries" name="groceries" placeholder="Enter amount" min="0">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Lifestyle Expenses</h3>
+                    <div class="form-group">
+                        <label for="entertainment">Entertainment</label>
+                        <input type="number" id="entertainment" name="entertainment" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="dining">Dining Out</label>
+                        <input type="number" id="dining" name="dining" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="shopping">Shopping</label>
+                        <input type="number" id="shopping" name="shopping" placeholder="Enter amount" min="0">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Other Expenses</h3>
+                    <div class="form-group">
+                        <label for="transport">Transportation</label>
+                        <input type="number" id="transport" name="transport" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="healthcare">Healthcare</label>
+                        <input type="number" id="healthcare" name="healthcare" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="miscellaneous">Miscellaneous</label>
+                        <input type="number" id="miscellaneous" name="miscellaneous" placeholder="Enter amount" min="0">
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <h3>Total Monthly Expenses: <span id="totalExpensesResult">₹0</span></h3>
+                    <h3>Essential Expenses: <span id="essentialExpensesResult">₹0</span></h3>
+                    <h3>Lifestyle Expenses: <span id="lifestyleExpensesResult">₹0</span></h3>
+                </div>
+
+                <button type="submit" class="btn-calculate">
+                    <i class="fas fa-calculator"></i> Calculate Expenses
                 </button>
-            </div>
-            <div id="monthly-expenses-list" class="expenses-list"></div>
+            </form>
         </div>
 
-        <!-- Annual Recurring Expenses -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Annual Recurring Expenses</h2>
-                <button class="btn btn-primary" onclick="showAnnualExpenseModal()">
-                    <i class="fas fa-plus"></i> Add Annual Expense
-                </button>
-            </div>
-            <div id="annual-expenses-list" class="expenses-list"></div>
-        </div>
-
-        <!-- Big Expenses -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Big Expenses</h2>
-                <button class="btn btn-primary" onclick="showBigExpenseModal()">
-                    <i class="fas fa-plus"></i> Add Big Expense
-                </button>
-            </div>
-            <div id="big-expenses-list" class="expenses-list"></div>
-        </div>
-
-        <!-- Page Navigation -->
-        <div class="page-navigation">
-            <a href="income.html" class="btn btn-secondary">
+        <div class="navigation-buttons">
+            <a href="income.html" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Back to Income
             </a>
-            <a href="ff-score.html" class="btn btn-primary">
-                Continue to FF Score <i class="fas fa-arrow-right"></i>
+            <a href="ff-score.html" class="btn-next">
+                Next: FF Score <i class="fas fa-arrow-right"></i>
             </a>
         </div>
+    </div>
 
-        <!-- Monthly Expense Modal -->
-        <div id="monthly-expense-modal" class="modal">
-            <div class="modal-overlay" onclick="closeMonthlyExpenseModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add Monthly Expense</h3>
-                    <button class="modal-close" onclick="closeMonthlyExpenseModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="monthly-expense-form" onsubmit="return saveMonthlyExpense(event)">
-                    <div class="form-group">
-                        <label for="monthly-expense-type">Type</label>
-                        <select id="monthly-expense-type" required>
-                            <option value="">Select Type</option>
-                            <option value="houseRent">House Rent</option>
-                            <option value="officeRent">Office Rent</option>
-                            <option value="carFuel">Car Fuel</option>
-                            <option value="clothing">Clothing</option>
-                            <option value="groceries">Groceries</option>
-                            <option value="outing">Outing</option>
-                            <option value="food">Food</option>
-                            <option value="subscriptions">Subscriptions</option>
-                            <option value="gas">Gas</option>
-                            <option value="electricity">Electricity</option>
-                            <option value="mobileRecharge">Mobile Recharge</option>
-                            <option value="custom">Other</option>
-                        </select>
-                    </div>
+    <footer>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
+    </footer>
 
-                    <div class="form-group" id="monthly-expense-name-group">
-                        <label for="monthly-expense-name">Name</label>
-                        <input type="text" id="monthly-expense-name" placeholder="Enter expense name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="monthly-expense-amount">Amount (₹)</label>
-                        <input type="number" id="monthly-expense-amount" required min="0" placeholder="Enter monthly amount">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeMonthlyExpenseModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Expense</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Annual Expense Modal -->
-        <div id="annual-expense-modal" class="modal">
-            <div class="modal-overlay" onclick="closeAnnualExpenseModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add Annual Expense</h3>
-                    <button class="modal-close" onclick="closeAnnualExpenseModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="annual-expense-form" onsubmit="return saveAnnualExpense(event)">
-                    <div class="form-group">
-                        <label for="annual-expense-type">Type</label>
-                        <select id="annual-expense-type" required>
-                            <option value="">Select Type</option>
-                            <option value="lifeInsurance">Life Insurance</option>
-                            <option value="medicalInsurance">Medical Insurance</option>
-                            <option value="gymFee">Gym Fee</option>
-                            <option value="annualSubscriptions">Annual Subscriptions</option>
-                            <option value="carMaintenance">Car Maintenance</option>
-                            <option value="traveling">Traveling</option>
-                            <option value="societyMaintenance">Society Maintenance</option>
-                            <option value="taxes">Taxes</option>
-                            <option value="otherAnnualMaintenance">Other Annual Maintenance</option>
-                            <option value="membershipFees">Membership Fees</option>
-                            <option value="custom">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="annual-expense-name-group">
-                        <label for="annual-expense-name">Name</label>
-                        <input type="text" id="annual-expense-name" placeholder="Enter expense name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="annual-expense-amount">Amount (₹)</label>
-                        <input type="number" id="annual-expense-amount" required min="0" placeholder="Enter annual amount">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeAnnualExpenseModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Expense</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Big Expense Modal -->
-        <div id="big-expense-modal" class="modal">
-            <div class="modal-overlay" onclick="closeBigExpenseModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add Big Expense</h3>
-                    <button class="modal-close" onclick="closeBigExpenseModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="big-expense-form" onsubmit="return saveBigExpense(event)">
-                    <div class="form-group">
-                        <label for="big-expense-type">Type</label>
-                        <select id="big-expense-type" required>
-                            <option value="">Select Type</option>
-                            <option value="appliances">Appliances</option>
-                            <option value="house">House</option>
-                            <option value="custom">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="big-expense-name-group">
-                        <label for="big-expense-name">Name</label>
-                        <input type="text" id="big-expense-name" placeholder="Enter expense name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="big-expense-amount">Amount (₹)</label>
-                        <input type="number" id="big-expense-amount" required min="0" placeholder="Enter amount">
-                    </div>
-
-                    <div class="form-group" id="rental-yield-group">
-                        <label for="rental-yield">Expected Rental Yield (%)</label>
-                        <input type="number" id="rental-yield" min="0" max="100" step="0.01" placeholder="Enter expected yield">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeBigExpenseModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Expense</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </main>
-
-    <script src="../js/utils.js"></script>
-    <script src="../js/state.js"></script>
-    <script src="../js/expenses.js"></script>
+    <script src="../main.js"></script>
+    <script src="expenses.js"></script>
 </body>
 </html> 

@@ -3,12 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeNivesh - Redirecting...</title>
-    <script>
-        window.location.href = 'pages/landing.html';
-    </script>
+    <title>NiveshMatrix - Your Financial Journey</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
 </head>
 <body>
-    <p>Redirecting to LifeNivesh...</p>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-link" id="loginBtn" data-modal="loginModal">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a href="#" class="nav-link" id="signupBtn" data-modal="signupModal">
+                <i class="fas fa-user-plus"></i> Sign Up
+            </a>
+            <a href="#" class="nav-link" id="logoutBtn" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <span id="userEmail" class="nav-link" style="display: none;"></span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Welcome to NiveshMatrix</h1>
+        <p>Your comprehensive financial planning and wealth management platform. Track your net worth, analyze investments, and plan your financial future with confidence.</p>
+        <a href="#" class="cta-btn" id="getStartedBtn" data-modal="signupModal">
+            <i class="fas fa-rocket"></i> Get Started
+        </a>
+    </div>
+
+    <!-- Features Section -->
+    <div class="features">
+        <div class="container">
+            <h2>Why Choose NiveshMatrix?</h2>
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <h3><i class="fas fa-chart-line"></i> Net Worth Tracking</h3>
+                    <p>Track your assets and liabilities in one place. Get a clear picture of your financial standing.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-shield-alt"></i> Insurance Analysis</h3>
+                    <p>Evaluate your insurance coverage and get personalized recommendations.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-chart-pie"></i> Risk Assessment</h3>
+                    <p>Understand your risk tolerance and get tailored investment strategies.</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-graduation-cap"></i> Financial Education</h3>
+                    <p>Access educational resources to make informed financial decisions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            <p class="form-footer">Don't have an account? <a href="#" class="switch-modal" data-target="signupModal">Sign up</a></p>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Sign Up</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">Sign Up</button>
+            </form>
+            <p class="form-footer">Already have an account? <a href="#" class="switch-modal" data-target="loginModal">Login</a></p>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <p><i class="fas fa-shield-alt"></i> Your data is processed locally and never leaves your browser</p>
+                <p><i class="fas fa-lock"></i> Secure authentication powered by Firebase</p>
+            </div>
+            <p class="copyright">© 2024 NiveshMatrix</p>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    
+    <!-- Your Scripts -->
+    <script src="main.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        // Modal functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const modals = document.querySelectorAll('.modal');
+            const modalTriggers = document.querySelectorAll('[data-modal]');
+            const closeButtons = document.querySelectorAll('.close');
+            const switchModals = document.querySelectorAll('.switch-modal');
+
+            modalTriggers.forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const modalId = trigger.getAttribute('data-modal');
+                    modals.forEach(modal => modal.style.display = 'none');
+                    document.getElementById(modalId).style.display = 'block';
+                });
+            });
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.closest('.modal').style.display = 'none';
+                });
+            });
+
+            switchModals.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetModal = link.getAttribute('data-target');
+                    modals.forEach(modal => modal.style.display = 'none');
+                    document.getElementById(targetModal).style.display = 'block';
+                });
+            });
+
+            window.addEventListener('click', (e) => {
+                modals.forEach(modal => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html> 

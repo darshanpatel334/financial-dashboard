@@ -3,225 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Freedom Score - Financial Dashboard</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>FF Score - NiveshMatrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <img src="../logo.svg" alt="LifeNivesh Logo" class="logo">
-                <span>LifeNivesh</span>
-            </div>
-            <div class="nav-links">
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
-                <a href="networth.html" class="nav-link">Net Worth</a>
-                <a href="income.html" class="nav-link">Income</a>
-                <a href="expenses.html" class="nav-link">Expenses</a>
-                <a href="ff-score.html" class="nav-link active">FF Score</a>
-            </div>
+        <div class="logo">
+            <img src="../logo.svg" alt="NiveshMatrix Logo">
+            <span>NiveshMatrix</span>
+        </div>
+        <div class="nav-links">
+            <a href="../index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="../personal-info.html" class="nav-link"><i class="fas fa-user"></i> Information</a>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="container">
-        <div class="page-header">
-            <h1>Financial Freedom Score</h1>
-            <p class="text-secondary">Track your progress towards financial freedom</p>
-        </div>
+    <div class="container">
+        <section class="section-header">
+            <h2>Financial Freedom Score</h2>
+            <p>Calculate your path to financial freedom</p>
+        </section>
         
-        <!-- FF Score Summary -->
-        <div class="summary-grid">
-            <div class="card summary-card">
-                <div class="summary-icon assets-icon">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Current FF Score</h3>
-                    <p id="current-ff-score" class="summary-amount">0%</p>
-                    <p id="ff-status" class="text-secondary">Not Started</p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon return-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Years to Freedom</h3>
-                    <p id="years-to-freedom" class="summary-amount">0</p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon liabilities-icon">
-                    <i class="fas fa-bullseye"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Required Corpus</h3>
-                    <p id="required-corpus" class="summary-amount">₹0</p>
-                    <p id="required-corpus-words" class="text-secondary"></p>
-                </div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="summary-icon networth-icon">
-                    <i class="fas fa-piggy-bank"></i>
-                </div>
-                <div class="summary-content">
-                    <h3>Current Corpus</h3>
-                    <p id="current-corpus" class="summary-amount">₹0</p>
-                    <p id="current-corpus-words" class="text-secondary"></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="card chart-card">
-            <h2>FF Score Progress</h2>
-            <div class="chart-container">
-                <canvas id="ff-progress-chart"></canvas>
-            </div>
-        </div>
-
-        <!-- FF Score Calculation -->
         <div class="card">
-            <div class="card-header">
-                <h2>FF Score Calculation</h2>
-                <button class="btn btn-primary" onclick="showCalculationModal()">
-                    <i class="fas fa-calculator"></i> Update Parameters
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> FF Score Calculator</h2>
+            
+            <form id="ffScoreForm" class="form">
+                <div class="form-section">
+                    <h3>Income & Savings</h3>
+                    <div class="form-group">
+                        <label for="monthlyIncome">Monthly Income</label>
+                        <input type="number" id="monthlyIncome" name="monthlyIncome" placeholder="Enter amount" min="0" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="monthlySavings">Monthly Savings</label>
+                        <input type="number" id="monthlySavings" name="monthlySavings" placeholder="Enter amount" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="savingsRate">Savings Rate (%)</label>
+                        <input type="number" id="savingsRate" name="savingsRate" readonly>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Assets & Investments</h3>
+                    <div class="form-group">
+                        <label for="totalAssets">Total Assets</label>
+                        <input type="number" id="totalAssets" name="totalAssets" placeholder="Enter amount" min="0" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="investmentReturns">Expected Annual Investment Returns (%)</label>
+                        <input type="number" id="investmentReturns" name="investmentReturns" placeholder="Enter percentage" min="0" max="100" value="8">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Financial Goals</h3>
+                    <div class="form-group">
+                        <label for="retirementAge">Desired Retirement Age</label>
+                        <input type="number" id="retirementAge" name="retirementAge" placeholder="Enter age" min="35" max="100" value="60">
+                    </div>
+                    <div class="form-group">
+                        <label for="monthlyExpenseGoal">Monthly Expense Goal in Retirement</label>
+                        <input type="number" id="monthlyExpenseGoal" name="monthlyExpenseGoal" placeholder="Enter amount" min="0">
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <h3>Your FF Score: <span id="ffScoreResult">0</span>/100</h3>
+                    <div id="ffScoreMessage" class="score-message"></div>
+                    <div class="score-breakdown">
+                        <h4>Score Breakdown:</h4>
+                        <ul id="scoreBreakdown">
+                            <li>Savings Rate: <span id="savingsScore">0</span>/40</li>
+                            <li>Asset Coverage: <span id="assetScore">0</span>/30</li>
+                            <li>Investment Strategy: <span id="investmentScore">0</span>/30</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-calculate">
+                    <i class="fas fa-calculator"></i> Calculate FF Score
                 </button>
-            </div>
-            <div class="grid-list">
-                <div class="card">
-                    <h4><i class="fas fa-wallet"></i> Monthly Expenses</h4>
-                    <p id="calc-monthly-expenses">₹0</p>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-calendar"></i> Annual Expenses</h4>
-                    <p id="calc-annual-expenses">₹0</p>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-chart-line"></i> Expected Return</h4>
-                    <p id="calc-expected-return">0%</p>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-percentage"></i> Expected Inflation</h4>
-                    <p id="calc-expected-inflation">0%</p>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-heart"></i> Life Expectancy</h4>
-                    <p id="calc-life-expectancy">0 years</p>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-user"></i> Current Age</h4>
-                    <p id="calc-current-age">0 years</p>
-                </div>
-            </div>
+            </form>
         </div>
 
-        <!-- Year-by-Year Projection -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Year-by-Year Projection</h2>
-                <button class="btn btn-primary" onclick="showProjectionModal()">
-                    <i class="fas fa-chart-bar"></i> Update Projection
-                </button>
-            </div>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Year</th>
-                            <th>Age</th>
-                            <th>Annual Expenses</th>
-                            <th>Required Corpus</th>
-                            <th>Expected Corpus</th>
-                            <th>FF Score</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="projection-table-body">
-                        <!-- Projection rows will be added here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Page Navigation -->
-        <div class="page-navigation">
-            <a href="expenses.html" class="btn btn-secondary">
+        <div class="navigation-buttons">
+            <a href="expenses.html" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Back to Expenses
             </a>
-            <a href="dashboard.html" class="btn btn-primary">
-                Return to Dashboard <i class="fas fa-arrow-right"></i>
+            <a href="insurance.html" class="btn-next">
+                Next: Insurance <i class="fas fa-arrow-right"></i>
             </a>
         </div>
+    </div>
 
-        <!-- Calculation Modal -->
-        <div id="calculation-modal" class="modal">
-            <div class="modal-overlay" onclick="closeCalculationModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Update Calculation Parameters</h3>
-                    <button class="modal-close" onclick="closeCalculationModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="calculation-form" onsubmit="return saveCalculationParams(event)">
-                    <div class="form-group">
-                        <label for="expected-return">Expected Annual Return (%)</label>
-                        <input type="number" id="expected-return" required min="0" max="100" step="0.01" placeholder="Enter expected return">
-                    </div>
+    <footer>
+        <p>© 2024 NiveshMatrix | Your data is processed locally and never leaves your browser</p>
+    </footer>
 
-                    <div class="form-group">
-                        <label for="life-expectancy">Life Expectancy (years)</label>
-                        <input type="number" id="life-expectancy" required min="0" max="120" placeholder="Enter life expectancy">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeCalculationModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Parameters</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Projection Modal -->
-        <div id="projection-modal" class="modal">
-            <div class="modal-overlay" onclick="closeProjectionModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Update Projection Parameters</h3>
-                    <button class="modal-close" onclick="closeProjectionModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="projection-form" onsubmit="return saveProjectionParams(event)">
-                    <div class="form-group">
-                        <label for="monthly-savings">Monthly Savings (₹)</label>
-                        <input type="number" id="monthly-savings" required min="0" placeholder="Enter monthly savings">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="annual-savings-increase">Annual Savings Increase (%)</label>
-                        <input type="number" id="annual-savings-increase" required min="0" max="100" step="0.01" placeholder="Enter annual increase">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeProjectionModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Parameters</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </main>
-
-    <script src="../js/utils.js"></script>
-    <script src="../js/state.js"></script>
-    <script src="../js/ff-score.js"></script>
+    <script src="../main.js"></script>
+    <script src="ff-score.js"></script>
 </body>
 </html> 
