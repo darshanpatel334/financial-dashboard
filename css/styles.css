@@ -71,7 +71,7 @@ body {
     background-color: var(--bg-secondary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding-top: 4.5rem; /* Add padding to account for fixed navbar */
+    padding-top: 0; /* Remove the top padding */
 }
 
 /* Typography */
@@ -126,9 +126,12 @@ p {
     background-color: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(8px);
     position: fixed;
+    top: 0; /* Ensure it's at the very top */
+    left: 0; /* Ensure full width alignment */
+    right: 0;
     width: 100%;
     z-index: 1000;
-    padding: var(--space-4) 0;
+    padding: 0.75rem 0; /* Reduced padding */
     border-bottom: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
 }
@@ -264,11 +267,11 @@ p {
 
 /* Hero Section */
 .hero {
-    position: relative;
-    padding: var(--space-16) 0;
+    padding-top: calc(var(--space-16) + 3.5rem); /* Add navbar height to existing padding */
+    padding-bottom: var(--space-16);
     background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-accent) 100%);
     overflow: hidden;
-    min-height: calc(100vh - 4.5rem);
+    min-height: 100vh;
     display: flex;
     align-items: center;
 }
@@ -489,8 +492,16 @@ p {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    body {
+        padding-top: 0; /* Remove padding on mobile */
+    }
+    
     .navbar {
-        padding: var(--space-3) 0;
+        padding: 0.5rem 0; /* Slightly reduced padding on mobile */
+    }
+    
+    .hero {
+        padding-top: calc(var(--space-12) + 3rem); /* Adjusted for mobile */
     }
 
     .nav-links {
@@ -499,16 +510,6 @@ p {
 
     .nav-brand span {
         font-size: 1.25rem;
-    }
-
-    .hero {
-        min-height: auto;
-        padding: var(--space-12) 0;
-    }
-
-    .hero .container {
-        flex-direction: column;
-        text-align: center;
     }
 
     .hero h1 {
@@ -544,10 +545,6 @@ p {
     
     .dashboard-grid {
         grid-template-columns: 1fr;
-    }
-
-    body {
-        padding-top: 4rem; /* Slightly smaller padding for mobile */
     }
 }
 
