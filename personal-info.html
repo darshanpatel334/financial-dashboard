@@ -252,6 +252,94 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        /* Progress Navigation Styles */
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .progress-step:hover {
+            transform: translateY(-2px);
+        }
+
+        .progress-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-step.completed .progress-dot {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .progress-step.completed .progress-dot::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .progress-step.current .progress-dot {
+            background: #2196F3;
+            border-color: #2196F3;
+            animation: pulse 2s infinite;
+        }
+
+        .progress-step span {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .progress-step.completed span {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .progress-step.current span {
+            color: #2196F3;
+            font-weight: 600;
+        }
+
+        .progress-line {
+            width: 30px;
+            height: 2px;
+            background: #e0e0e0;
+            margin: 0 0.5rem;
+            margin-top: 10px;
+        }
+
+        @keyframes pulse {
+            0% { 
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+                transform: scale(1.05);
+            }
+            100% { 
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+                transform: scale(1);
+            }
+        }
+
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -264,6 +352,17 @@
             
             .nav-btn {
                 width: 100%;
+            }
+
+            .progress-dots {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .progress-line {
+                width: 2px;
+                height: 20px;
+                margin: 0;
             }
         }
     </style>
@@ -286,6 +385,53 @@
         <div class="page-header">
             <h1><i class="fas fa-user-circle"></i> Personal Information</h1>
             <p>Let's start by gathering some basic information about you and your family</p>
+        </div>
+
+        <!-- Progress Navigation -->
+        <div id="progressNavigation" style="margin-bottom: 2rem; text-align: center;">
+            <div class="progress-container" style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+                <div class="progress-dots" style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <div class="progress-step current" data-step="1">
+                        <div class="progress-dot"></div>
+                        <span>Personal Info</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="2" data-page="networth.html">
+                        <div class="progress-dot"></div>
+                        <span>Net Worth</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="3" data-page="income.html">
+                        <div class="progress-dot"></div>
+                        <span>Income</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="4" data-page="expenses.html">
+                        <div class="progress-dot"></div>
+                        <span>Expenses</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="5" data-page="ff-score.html">
+                        <div class="progress-dot"></div>
+                        <span>FF Score</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="6" data-page="insurance.html">
+                        <div class="progress-dot"></div>
+                        <span>Insurance</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="7" data-page="risk-profile.html">
+                        <div class="progress-dot"></div>
+                        <span>Risk Profile</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="8" data-page="dashboard.html">
+                        <div class="progress-dot"></div>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Form Card -->
@@ -366,10 +512,41 @@
                     const progress = initProgressTracking();
                     console.log('Current progress:', progress);
                 }
+                
+                // Setup progress navigation
+                setupProgressNavigation();
             } else {
                 window.location.href = 'index.html';
             }
         });
+
+        // Setup progress navigation functionality
+        function setupProgressNavigation() {
+            const progress = getUserProgress();
+            const progressSteps = document.querySelectorAll('.progress-step');
+            
+            // Update progress status
+            progressSteps.forEach((step) => {
+                const stepNumber = parseInt(step.getAttribute('data-step'));
+                step.classList.remove('completed', 'current');
+                
+                if (stepNumber < 1) {
+                    step.classList.add('completed');
+                } else if (stepNumber === 1) {
+                    step.classList.add('current');
+                }
+                
+                // Add click handler for completed steps
+                if (stepNumber <= progress.currentStep || stepNumber === 1) {
+                    step.addEventListener('click', () => {
+                        const page = step.getAttribute('data-page');
+                        if (page && stepNumber !== 1) {
+                            window.location.href = page;
+                        }
+                    });
+                }
+            });
+        }
 
         function showStatus(message, isError = false) {
             const statusElement = document.getElementById('status');
