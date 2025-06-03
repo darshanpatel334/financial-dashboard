@@ -40,10 +40,6 @@
                         <i class="fas fa-rocket"></i>
                         Get Started Free
                     </a>
-                    <a href="../dashboard/personal-info.html" class="btn btn-secondary">
-                        <i class="fas fa-forward"></i>
-                        Skip Sign Up
-                    </a>
                 </div>
                 <div class="hero-stats">
                     <div class="stat-item">
@@ -149,7 +145,6 @@
             <p>Join thousands of users who have taken control of their financial future with NiveshMatrix.</p>
             <div class="cta-buttons">
                 <a href="signup.html" class="btn btn-primary">Get Started Now</a>
-                <a href="../dashboard/personal-info.html" class="btn btn-outline-light">Skip Sign Up</a>
             </div>
         </div>
     </section>
@@ -190,8 +185,14 @@
         </div>
     </footer>
 
-    <script src="../js/utils.js"></script>
-    <script src="../js/state.js"></script>
-    <script src="../js/landing.js"></script>
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    
+    <!-- Your Scripts -->
+    <script src="../js/auth.js"></script>
 </body>
 </html> 
