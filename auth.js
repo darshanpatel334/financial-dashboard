@@ -28,12 +28,26 @@ function showStatus(message, isError = false) {
 
 // Sign Up functionality
 function handleSignUp(event) {
+    console.log('handleSignUp called'); // Debug log
     event.preventDefault();
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
 
+    console.log('Email:', email, 'Password length:', password.length); // Debug log
+
+    if (!email || !password) {
+        showStatus('Please fill in all fields', true);
+        return;
+    }
+
+    if (password.length < 6) {
+        showStatus('Password must be at least 6 characters long', true);
+        return;
+    }
+
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
+            console.log('Sign up successful:', userCredential.user.email); // Debug log
             showStatus('Account created successfully! Redirecting...');
             // Redirect to personal info page
             setTimeout(() => {
@@ -41,18 +55,28 @@ function handleSignUp(event) {
             }, 1500);
         })
         .catch((error) => {
+            console.error('Sign up error:', error); // Debug log
             showStatus(error.message, true);
         });
 }
 
 // Login functionality
 function handleLogin(event) {
+    console.log('handleLogin called'); // Debug log
     event.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
+    console.log('Login attempt for:', email); // Debug log
+
+    if (!email || !password) {
+        showStatus('Please fill in all fields', true);
+        return;
+    }
+
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
+            console.log('Login successful:', userCredential.user.email); // Debug log
             showStatus('Login successful! Redirecting...');
             // Redirect to personal info page
             setTimeout(() => {
@@ -60,6 +84,7 @@ function handleLogin(event) {
             }, 1500);
         })
         .catch((error) => {
+            console.error('Login error:', error); // Debug log
             showStatus(error.message, true);
         });
 }
