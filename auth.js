@@ -37,7 +37,7 @@ function handleSignUp(event) {
             showStatus('Account created successfully! Redirecting...');
             // Redirect to personal info page
             setTimeout(() => {
-                window.location.href = 'pages/personal-info.html';
+                window.location.href = 'personal-info.html';
             }, 1500);
         })
         .catch((error) => {
@@ -56,7 +56,7 @@ function handleLogin(event) {
             showStatus('Login successful! Redirecting...');
             // Redirect to personal info page
             setTimeout(() => {
-                window.location.href = 'pages/personal-info.html';
+                window.location.href = 'personal-info.html';
             }, 1500);
         })
         .catch((error) => {
@@ -70,7 +70,7 @@ function handleLogout() {
         .then(() => {
             showStatus('Logged out successfully!');
             // Redirect to landing page
-            window.location.href = '../pages/landing.html';
+            window.location.href = 'index.html';
         })
         .catch((error) => {
             showStatus(error.message, true);

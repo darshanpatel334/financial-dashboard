@@ -4,69 +4,445 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NiveshMatrix - Your Financial Journey</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    <style>
+        /* Core styles */
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-primary: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --bg-secondary: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--bg-primary);
+            padding: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 400px;
+            margin: 4rem auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 4rem;
+            text-align: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            margin-top: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 0;
+            background: var(--bg-primary);
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--text-primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-primary);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 4rem 0;
+            background: var(--bg-secondary);
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .cta p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Status Message */
+        .status-message {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status-message.success {
+            background-color: var(--success-color);
+        }
+
+        .status-message.error {
+            background-color: #ef4444;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .user-email {
+            color: var(--text-primary);
+            margin-right: 1rem;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
-        <div class="logo">
-            <img src="logo.svg" alt="NiveshMatrix Logo">
-            <span>NiveshMatrix</span>
-        </div>
-        <div class="nav-links">
-            <a href="#" class="nav-link" id="loginBtn" data-modal="loginModal">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
-            <a href="#" class="nav-link" id="signupBtn" data-modal="signupModal">
-                <i class="fas fa-user-plus"></i> Sign Up
-            </a>
-            <a href="#" class="nav-link" id="logoutBtn" style="display: none;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
-            <span id="userEmail" class="nav-link" style="display: none;"></span>
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="nav-links">
+                <div class="auth-buttons">
+                    <button class="btn btn-secondary btn-login" data-modal="loginModal">Login</button>
+                    <button class="btn btn-primary btn-signup" data-modal="signupModal">Sign Up</button>
+                    <span class="user-email" style="display: none;"></span>
+                    <button class="btn btn-secondary btn-logout" style="display: none;">Logout</button>
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <div class="hero">
-        <h1>Welcome to NiveshMatrix</h1>
-        <p>Your comprehensive financial planning and wealth management platform. Track your net worth, analyze investments, and plan your financial future with confidence.</p>
-        <a href="#" class="cta-btn" id="getStartedBtn" data-modal="signupModal">
-            <i class="fas fa-rocket"></i> Get Started
-        </a>
-    </div>
-
-    <!-- Features Section -->
-    <div class="features">
+    <section class="hero">
         <div class="container">
-            <h2>Why Choose NiveshMatrix?</h2>
-            <div class="feature-cards">
-                <div class="feature-card">
-                    <h3><i class="fas fa-chart-line"></i> Net Worth Tracking</h3>
-                    <p>Track your assets and liabilities in one place. Get a clear picture of your financial standing.</p>
+            <h1>Transform Your Financial Future</h1>
+            <p>Take control of your wealth with NiveshMatrix's comprehensive financial planning tools. Track your net worth, analyze expenses, and discover your path to financial freedom.</p>
+            <button class="btn btn-primary btn-signup" data-modal="signupModal">
+                <i class="fas fa-rocket"></i> Start Your Financial Journey
+            </button>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Active Users</span>
                 </div>
-                <div class="feature-card">
-                    <h3><i class="fas fa-shield-alt"></i> Insurance Analysis</h3>
-                    <p>Evaluate your insurance coverage and get personalized recommendations.</p>
+                <div class="stat-item">
+                    <span class="stat-number">₹50Cr+</span>
+                    <span class="stat-label">Assets Tracked</span>
                 </div>
-                <div class="feature-card">
-                    <h3><i class="fas fa-chart-pie"></i> Risk Assessment</h3>
-                    <p>Understand your risk tolerance and get tailored investment strategies.</p>
-                </div>
-                <div class="feature-card">
-                    <h3><i class="fas fa-graduation-cap"></i> Financial Education</h3>
-                    <p>Access educational resources to make informed financial decisions.</p>
+                <div class="stat-item">
+                    <span class="stat-number">4.8/5</span>
+                    <span class="stat-label">User Rating</span>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2>Comprehensive Financial Tools</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Net Worth Tracking</h3>
+                    <p>Track your assets, liabilities, and overall net worth with detailed categorization and yield analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>Income & Expense Analysis</h3>
+                    <p>Monitor multiple income sources and categorize expenses to understand your cash flow patterns.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Financial Freedom Score</h3>
+                    <p>Calculate your FF score and discover how many years you can sustain your lifestyle without active income.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Risk Assessment</h3>
+                    <p>Understand your risk profile and get personalized investment allocation suggestions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-umbrella"></i>
+                    </div>
+                    <h3>Insurance Planning</h3>
+                    <p>Manage your life and health insurance portfolio to ensure adequate coverage.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3>Personal Financial Advisor</h3>
+                    <p>Get AI-powered personalized financial advice based on your complete financial profile.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Take Control of Your Finances?</h2>
+            <p>Join thousands of users who have transformed their financial future with NiveshMatrix.</p>
+            <button class="btn btn-primary btn-signup" data-modal="signupModal">Get Started Free</button>
+        </div>
+    </section>
 
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Login</h2>
+            <h2>Welcome Back!</h2>
             <form id="loginForm">
                 <div class="form-group">
                     <label for="loginEmail">Email</label>
@@ -76,9 +452,8 @@
                     <label for="loginPassword">Password</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button type="submit" class="btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
             </form>
-            <p class="form-footer">Don't have an account? <a href="#" class="switch-modal" data-target="signupModal">Sign up</a></p>
         </div>
     </div>
 
@@ -86,7 +461,7 @@
     <div id="signupModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Sign Up</h2>
+            <h2>Start Your Journey</h2>
             <form id="signupForm">
                 <div class="form-group">
                     <label for="signupEmail">Email</label>
@@ -96,40 +471,30 @@
                     <label for="signupPassword">Password</label>
                     <input type="password" id="signupPassword" required>
                 </div>
-                <button type="submit" class="btn-primary">Sign Up</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up</button>
             </form>
-            <p class="form-footer">Already have an account? <a href="#" class="switch-modal" data-target="loginModal">Login</a></p>
         </div>
     </div>
 
     <!-- Status Message -->
     <div id="status" class="status-message" style="display: none;"></div>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <p><i class="fas fa-shield-alt"></i> Your data is processed locally and never leaves your browser</p>
-                <p><i class="fas fa-lock"></i> Secure authentication powered by Firebase</p>
-            </div>
-            <p class="copyright">© 2024 NiveshMatrix</p>
-        </div>
-    </footer>
-
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
     
     <!-- Your Scripts -->
-    <script src="main.js"></script>
     <script src="auth.js"></script>
-
     <script>
         // Modal functionality
         document.addEventListener('DOMContentLoaded', () => {
             const modals = document.querySelectorAll('.modal');
             const modalTriggers = document.querySelectorAll('[data-modal]');
             const closeButtons = document.querySelectorAll('.close');
-            const switchModals = document.querySelectorAll('.switch-modal');
+
+            // Setup form handlers
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('signupForm').addEventListener('submit', handleSignUp);
 
             modalTriggers.forEach(trigger => {
                 trigger.addEventListener('click', (e) => {
@@ -143,15 +508,6 @@
             closeButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     button.closest('.modal').style.display = 'none';
-                });
-            });
-
-            switchModals.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetModal = link.getAttribute('data-target');
-                    modals.forEach(modal => modal.style.display = 'none');
-                    document.getElementById(targetModal).style.display = 'block';
                 });
             });
 

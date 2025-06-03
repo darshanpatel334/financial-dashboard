@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Worth - NiveshMatrix</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-primary: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --bg-secondary: #f8fafc;
+            --border-color: #e2e8f0;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .navbar {
+            background-color: var(--bg-primary);
+            padding: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .instruction-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            border: 1px solid #0ea5e9;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .instruction-box h3 {
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card {
+            background: var(--bg-primary);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .summary-card.assets {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .summary-card.liabilities {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .summary-card.networth {
+            border-left: 4px solid var(--primary-color);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+
+        .summary-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-amount.positive {
+            color: var(--success-color);
+        }
+
+        .summary-amount.negative {
+            color: var(--danger-color);
+        }
+
+        .summary-amount.networth {
+            color: var(--primary-color);
+        }
+
+        .section-card {
+            background: var(--bg-primary);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-item-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-item-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .category-group {
+            margin-bottom: 2rem;
+        }
+
+        .category-header {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-total {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .asset-item {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .amount-display {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.375rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .status-message {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status-message.success {
+            background-color: var(--success-color);
+        }
+
+        .status-message.error {
+            background-color: var(--danger-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .asset-item {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-chart-line"></i> Net Worth Analysis</h1>
+            <p>Track your assets and liabilities to calculate your true net worth</p>
+        </div>
+
+        <!-- Instruction Box -->
+        <div class="instruction-box">
+            <h3><i class="fas fa-info-circle"></i> Important Note</h3>
+            <p>% Yield represents the annual income you generate or expect to generate from each asset, excluding asset appreciation. For example, rental income from real estate, dividends from equity, or interest from fixed deposits.</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card assets">
+                <h3>Total Assets</h3>
+                <div class="summary-amount positive" id="totalAssets">₹0</div>
+                <small>Excluding occupied house & ornaments</small>
+            </div>
+            <div class="summary-card liabilities">
+                <h3>Total Liabilities</h3>
+                <div class="summary-amount negative" id="totalLiabilities">₹0</div>
+                <small>Remaining principal amounts</small>
+            </div>
+            <div class="summary-card networth">
+                <h3>Net Worth</h3>
+                <div class="summary-amount networth" id="netWorth">₹0</div>
+                <small>Assets - Liabilities</small>
+            </div>
+        </div>
+
+        <!-- Assets Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-building"></i> Assets
+                </h2>
+            </div>
+
+            <!-- Real Estate -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">🏠 Real Estate</span>
+                    <span class="category-total" id="realEstateTotal">₹0</span>
+                </div>
+                <div id="realEstateItems">
+                    <!-- Real estate items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addAssetItem('realEstate', 'Real Estate')">
+                    <i class="fas fa-plus"></i> Add Real Estate
+                </button>
+            </div>
+
+            <!-- Equity Investments -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">📈 Equity Investments</span>
+                    <span class="category-total" id="equityTotal">₹0</span>
+                </div>
+                <div id="equityItems">
+                    <!-- Equity items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addAssetItem('equity', 'Equity')">
+                    <i class="fas fa-plus"></i> Add Equity Investment
+                </button>
+            </div>
+
+            <!-- Fixed Income -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">🏦 Fixed Income</span>
+                    <span class="category-total" id="fixedIncomeTotal">₹0</span>
+                </div>
+                <div id="fixedIncomeItems">
+                    <!-- Fixed income items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addAssetItem('fixedIncome', 'Fixed Income')">
+                    <i class="fas fa-plus"></i> Add Fixed Income
+                </button>
+            </div>
+
+            <!-- Other Assets -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">💎 Other Assets</span>
+                    <span class="category-total" id="otherAssetsTotal">₹0</span>
+                </div>
+                <div id="otherAssetsItems">
+                    <!-- Other assets items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addAssetItem('otherAssets', 'Other Asset')">
+                    <i class="fas fa-plus"></i> Add Other Asset
+                </button>
+            </div>
+        </div>
+
+        <!-- Liabilities Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i> Liabilities
+                </h2>
+            </div>
+
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">💳 Loans & Debts</span>
+                    <span class="category-total" id="liabilitiesTotal">₹0</span>
+                </div>
+                <div id="liabilityItems">
+                    <!-- Liability items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addLiabilityItem()">
+                    <i class="fas fa-plus"></i> Add Liability
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: Personal Info
+            </button>
+            <button type="button" class="nav-btn btn-primary" onclick="goNext()">
+                Next: Income Analysis <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        let assetCount = 0;
+        let liabilityCount = 0;
+
+        // Check authentication
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('userEmail').textContent = user.email;
+                loadNetWorthData();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        function showStatus(message, isError = false) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status-message ${isError ? 'error' : 'success'}`;
+            statusElement.style.display = 'block';
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+        }
+
+        function numberToWords(num) {
+            if (num === 0) return "Zero";
+            
+            const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+            const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+            const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+            
+            function convertHundreds(n) {
+                let result = "";
+                if (n >= 100) {
+                    result += ones[Math.floor(n / 100)] + " Hundred ";
+                    n %= 100;
+                }
+                if (n >= 20) {
+                    result += tens[Math.floor(n / 10)] + " ";
+                    n %= 10;
+                }
+                if (n >= 10) {
+                    result += teens[n - 10] + " ";
+                } else if (n > 0) {
+                    result += ones[n] + " ";
+                }
+                return result;
+            }
+            
+            if (num >= 10000000) { // Crores
+                return convertHundreds(Math.floor(num / 10000000)) + "Crore " + numberToWords(num % 10000000);
+            } else if (num >= 100000) { // Lakhs
+                return convertHundreds(Math.floor(num / 100000)) + "Lakh " + numberToWords(num % 100000);
+            } else if (num >= 1000) { // Thousands
+                return convertHundreds(Math.floor(num / 1000)) + "Thousand " + numberToWords(num % 1000);
+            } else {
+                return convertHundreds(num);
+            }
+        }
+
+        function addAssetItem(category, type) {
+            assetCount++;
+            const container = document.getElementById(category + 'Items');
+            const assetItem = document.createElement('div');
+            assetItem.className = 'asset-item';
+            assetItem.innerHTML = `
+                <div class="form-group">
+                    <label>${type} Name</label>
+                    <input type="text" placeholder="Enter name" onchange="calculateTotals()">
+                    <div class="amount-display"></div>
+                </div>
+                <div class="form-group">
+                    <label>Value (₹)</label>
+                    <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)">
+                    <div class="amount-display"></div>
+                </div>
+                <div class="form-group">
+                    <label>Yield (%)</label>
+                    <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
+                    <div class="amount-display"></div>
+                </div>
+                <button class="delete-btn" onclick="removeItem(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(assetItem);
+            saveNetWorthData();
+        }
+
+        function addLiabilityItem() {
+            liabilityCount++;
+            const container = document.getElementById('liabilityItems');
+            const liabilityItem = document.createElement('div');
+            liabilityItem.className = 'asset-item';
+            liabilityItem.innerHTML = `
+                <div class="form-group">
+                    <label>Loan Type</label>
+                    <select onchange="calculateTotals()">
+                        <option value="">Select Type</option>
+                        <option value="home">Home Loan</option>
+                        <option value="car">Car Loan</option>
+                        <option value="education">Education Loan</option>
+                        <option value="personal">Personal Loan</option>
+                        <option value="credit">Credit Card</option>
+                        <option value="business">Business Loan</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Remaining Amount (₹)</label>
+                    <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)">
+                    <div class="amount-display"></div>
+                </div>
+                <div class="form-group">
+                    <label>Remaining Tenure (Months)</label>
+                    <input type="number" placeholder="0" onchange="calculateTotals()">
+                </div>
+                <button class="delete-btn" onclick="removeItem(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(liabilityItem);
+            saveNetWorthData();
+        }
+
+        function removeItem(button) {
+            button.closest('.asset-item').remove();
+            calculateTotals();
+            saveNetWorthData();
+        }
+
+        function updateWords(input) {
+            const value = parseFloat(input.value) || 0;
+            const wordsDiv = input.nextElementSibling;
+            if (wordsDiv && wordsDiv.classList.contains('amount-display')) {
+                wordsDiv.textContent = value > 0 ? numberToWords(value) : '';
+            }
+        }
+
+        function calculateTotals() {
+            let totalAssets = 0;
+            let totalLiabilities = 0;
+            
+            // Calculate category totals
+            const categories = ['realEstate', 'equity', 'fixedIncome', 'otherAssets'];
+            categories.forEach(category => {
+                let categoryTotal = 0;
+                const items = document.querySelectorAll(`#${category}Items .asset-item`);
+                items.forEach(item => {
+                    const value = parseFloat(item.querySelector('input[type="number"]').value) || 0;
+                    categoryTotal += value;
+                    if (category !== 'otherAssets') { // Don't include occupied house and ornaments in total assets
+                        totalAssets += value;
+                    }
+                });
+                document.getElementById(category + 'Total').textContent = `₹${categoryTotal.toLocaleString('en-IN')}`;
+            });
+
+            // Calculate liabilities
+            const liabilityItems = document.querySelectorAll('#liabilityItems .asset-item');
+            liabilityItems.forEach(item => {
+                const value = parseFloat(item.querySelector('input[type="number"]').value) || 0;
+                totalLiabilities += value;
+            });
+
+            // Update totals
+            document.getElementById('totalAssets').textContent = `₹${totalAssets.toLocaleString('en-IN')}`;
+            document.getElementById('totalLiabilities').textContent = `₹${totalLiabilities.toLocaleString('en-IN')}`;
+            document.getElementById('liabilitiesTotal').textContent = `₹${totalLiabilities.toLocaleString('en-IN')}`;
+            
+            const netWorth = totalAssets - totalLiabilities;
+            document.getElementById('netWorth').textContent = `₹${netWorth.toLocaleString('en-IN')}`;
+
+            // Auto-save
+            setTimeout(() => {
+                saveNetWorthData();
+            }, 1000);
+        }
+
+        function saveNetWorthData() {
+            const data = {
+                assets: {},
+                liabilities: [],
+                totals: {
+                    totalAssets: parseFloat(document.getElementById('totalAssets').textContent.replace(/[₹,]/g, '')) || 0,
+                    totalLiabilities: parseFloat(document.getElementById('totalLiabilities').textContent.replace(/[₹,]/g, '')) || 0,
+                    netWorth: parseFloat(document.getElementById('netWorth').textContent.replace(/[₹,]/g, '')) || 0
+                }
+            };
+
+            // Save assets by category
+            const categories = ['realEstate', 'equity', 'fixedIncome', 'otherAssets'];
+            categories.forEach(category => {
+                data.assets[category] = [];
+                const items = document.querySelectorAll(`#${category}Items .asset-item`);
+                items.forEach(item => {
+                    const inputs = item.querySelectorAll('input');
+                    if (inputs.length >= 3) {
+                        data.assets[category].push({
+                            name: inputs[0].value,
+                            value: parseFloat(inputs[1].value) || 0,
+                            yield: parseFloat(inputs[2].value) || 0
+                        });
+                    }
+                });
+            });
+
+            // Save liabilities
+            const liabilityItems = document.querySelectorAll('#liabilityItems .asset-item');
+            liabilityItems.forEach(item => {
+                const select = item.querySelector('select');
+                const inputs = item.querySelectorAll('input');
+                if (inputs.length >= 2) {
+                    data.liabilities.push({
+                        type: select.value,
+                        amount: parseFloat(inputs[0].value) || 0,
+                        tenure: parseFloat(inputs[1].value) || 0
+                    });
+                }
+            });
+
+            localStorage.setItem('netWorthData', JSON.stringify(data));
+        }
+
+        function loadNetWorthData() {
+            const savedData = localStorage.getItem('netWorthData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                // Load assets
+                Object.keys(data.assets || {}).forEach(category => {
+                    data.assets[category].forEach(asset => {
+                        addAssetItem(category, category === 'realEstate' ? 'Real Estate' : 
+                                   category === 'equity' ? 'Equity' : 
+                                   category === 'fixedIncome' ? 'Fixed Income' : 'Other Asset');
+                        
+                        const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
+                        const inputs = lastItem.querySelectorAll('input');
+                        inputs[0].value = asset.name;
+                        inputs[1].value = asset.value;
+                        inputs[2].value = asset.yield;
+                        updateWords(inputs[1]);
+                    });
+                });
+
+                // Load liabilities
+                (data.liabilities || []).forEach(liability => {
+                    addLiabilityItem();
+                    const lastItem = document.querySelector('#liabilityItems .asset-item:last-child');
+                    const select = lastItem.querySelector('select');
+                    const inputs = lastItem.querySelectorAll('input');
+                    select.value = liability.type;
+                    inputs[0].value = liability.amount;
+                    inputs[1].value = liability.tenure;
+                    updateWords(inputs[0]);
+                });
+
+                calculateTotals();
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'personal-info.html';
+        }
+
+        function goNext() {
+            saveNetWorthData();
+            showStatus('Net worth data saved successfully!');
+            setTimeout(() => {
+                window.location.href = 'income.html';
+            }, 1500);
+        }
+    </script>
+</body>
+</html> 

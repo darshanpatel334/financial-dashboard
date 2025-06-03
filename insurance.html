@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Analysis - NiveshMatrix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-shield-alt"></i> Insurance Analysis</h1>
+            <p>Ensure adequate protection for you and your family with comprehensive insurance planning</p>
+        </div>
+
+        <!-- Instruction Box -->
+        <div class="instruction-box">
+            <h3><i class="fas fa-info-circle"></i> Insurance Planning Guidelines</h3>
+            <p>Life insurance should be 10-15x your annual income. Health insurance should cover major medical expenses. Term insurance is generally more cost-effective than endowment policies.</p>
+        </div>
+
+        <!-- Insurance Summary -->
+        <div class="summary-grid">
+            <div class="summary-card assets">
+                <h3>Life Insurance Coverage</h3>
+                <div class="summary-amount positive" id="totalLifeCoverage">₹0</div>
+                <small>Total protection amount</small>
+            </div>
+            <div class="summary-card networth">
+                <h3>Health Insurance Coverage</h3>
+                <div class="summary-amount networth" id="totalHealthCoverage">₹0</div>
+                <small>Medical protection amount</small>
+            </div>
+            <div class="summary-card liabilities">
+                <h3>Annual Premiums</h3>
+                <div class="summary-amount negative" id="totalPremiums">₹0</div>
+                <small>Total yearly cost</small>
+            </div>
+        </div>
+
+        <!-- Coverage Adequacy Analysis -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-pie"></i> Coverage Adequacy
+                </h2>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Life Insurance Ratio</h4>
+                        <div class="score-number" id="lifeInsuranceRatio">0x</div>
+                        <p class="text-secondary">Of annual income</p>
+                        <small id="lifeInsuranceStatus">Calculating...</small>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Health Coverage Score</h4>
+                        <div class="score-number" id="healthCoverageScore">0/10</div>
+                        <p class="text-secondary">Adequacy rating</p>
+                        <small id="healthCoverageStatus">Calculating...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Life Insurance Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heart"></i> Life Insurance
+                </h2>
+            </div>
+
+            <!-- Term Insurance -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">🛡️ Term Insurance</span>
+                    <span class="category-total" id="termInsuranceTotal">₹0</span>
+                </div>
+                <div class="instruction-box">
+                    <p><strong>Recommended:</strong> Pure protection, cost-effective, ideal for income replacement</p>
+                </div>
+                <div id="termInsuranceItems">
+                    <!-- Term insurance items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addInsuranceItem('termInsurance', 'Term Insurance')">
+                    <i class="fas fa-plus"></i> Add Term Insurance
+                </button>
+            </div>
+
+            <!-- Endowment Insurance -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">💰 Endowment/ULIP</span>
+                    <span class="category-total" id="endowmentInsuranceTotal">₹0</span>
+                </div>
+                <div class="instruction-box">
+                    <p><strong>Note:</strong> Combines insurance + investment, generally lower returns than separate term + mutual funds</p>
+                </div>
+                <div id="endowmentInsuranceItems">
+                    <!-- Endowment insurance items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addInsuranceItem('endowmentInsurance', 'Endowment/ULIP')">
+                    <i class="fas fa-plus"></i> Add Endowment/ULIP
+                </button>
+            </div>
+        </div>
+
+        <!-- Health Insurance Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heartbeat"></i> Health Insurance
+                </h2>
+            </div>
+
+            <!-- Individual Health Insurance -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">👤 Individual Health Insurance</span>
+                    <span class="category-total" id="individualHealthTotal">₹0</span>
+                </div>
+                <div id="individualHealthItems">
+                    <!-- Individual health insurance items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addInsuranceItem('individualHealth', 'Individual Health Insurance')">
+                    <i class="fas fa-plus"></i> Add Individual Policy
+                </button>
+            </div>
+
+            <!-- Family Health Insurance -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">👨‍👩‍👧‍👦 Family Health Insurance</span>
+                    <span class="category-total" id="familyHealthTotal">₹0</span>
+                </div>
+                <div id="familyHealthItems">
+                    <!-- Family health insurance items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addInsuranceItem('familyHealth', 'Family Health Insurance')">
+                    <i class="fas fa-plus"></i> Add Family Policy
+                </button>
+            </div>
+
+            <!-- Group Health Insurance -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">🏢 Group/Corporate Health Insurance</span>
+                    <span class="category-total" id="groupHealthTotal">₹0</span>
+                </div>
+                <div id="groupHealthItems">
+                    <!-- Group health insurance items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addInsuranceItem('groupHealth', 'Group Health Insurance')">
+                    <i class="fas fa-plus"></i> Add Group Policy
+                </button>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i> Insurance Recommendations
+                </h2>
+            </div>
+            
+            <div id="insuranceRecommendations">
+                <!-- Recommendations will be populated here -->
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: FF Score
+            </button>
+            <button type="button" class="nav-btn btn-primary" onclick="goNext()">
+                Next: Risk Profile <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+    <script src="insurance.js"></script>
+</body>
+</html> 

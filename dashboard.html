@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard - NiveshMatrix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container container-wide">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-chart-line"></i> Financial Dashboard</h1>
+            <p>Comprehensive overview of your financial health and investment portfolio</p>
+            <button class="btn btn-success" onclick="downloadReport()">
+                <i class="fas fa-download"></i> Download Report
+            </button>
+        </div>
+
+        <!-- Key Metrics Summary -->
+        <div class="summary-grid">
+            <div class="summary-card networth">
+                <h3>Net Worth</h3>
+                <div class="summary-amount networth" id="dashboardNetWorth">₹0</div>
+                <small id="netWorthStatus">Total Assets - Liabilities</small>
+            </div>
+            <div class="summary-card assets">
+                <h3>Annual Income</h3>
+                <div class="summary-amount positive" id="dashboardIncome">₹0</div>
+                <small id="incomeStatus">Total yearly income</small>
+            </div>
+            <div class="summary-card liabilities">
+                <h3>Annual Expenses</h3>
+                <div class="summary-amount negative" id="dashboardExpenses">₹0</div>
+                <small id="expensesStatus">Total yearly spending</small>
+            </div>
+            <div class="summary-card">
+                <h3>FF Score</h3>
+                <div class="summary-amount" id="dashboardFFScore">0</div>
+                <small id="ffScoreStatus">Years of financial freedom</small>
+            </div>
+        </div>
+
+        <!-- Financial Health Indicators -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heartbeat"></i> Financial Health Indicators
+                </h2>
+            </div>
+            
+            <div class="grid-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Savings Rate</h4>
+                        <div class="score-number" id="savingsRateIndicator">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="savingsRateProgress"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Life Insurance Ratio</h4>
+                        <div class="score-number" id="lifeInsuranceIndicator">0x</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="lifeInsuranceProgress"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Risk Profile</h4>
+                        <div class="score-number" id="riskProfileIndicator">-</div>
+                        <small id="riskProfileSubtext">Investment approach</small>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Asset Growth Rate</h4>
+                        <div class="score-number" id="assetGrowthIndicator">0%</div>
+                        <small>Expected annual returns</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid-2">
+            <!-- Net Worth Breakdown -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-pie"></i> Asset Allocation</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="assetChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Income vs Expenses -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-bar"></i> Income vs Expenses</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Income Composition -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-money-bill-wave"></i> Income Sources</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="incomeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Expense Breakdown -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-receipt"></i> Expense Categories</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommended Asset Allocation vs Current -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-balance-scale"></i> Asset Allocation Analysis
+                </h2>
+            </div>
+            
+            <div class="grid-2">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h4>Current Allocation</h4>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="currentAllocationChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h4>Recommended Allocation</h4>
+                        <small>Based on your risk profile</small>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="recommendedAllocationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Items & Recommendations -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-tasks"></i> Priority Action Items
+                </h2>
+            </div>
+            
+            <div id="actionItems">
+                <!-- Action items will be populated here -->
+            </div>
+        </div>
+
+        <!-- Financial Timeline -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-calendar-alt"></i> Financial Timeline
+                </h2>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: Risk Profile
+            </button>
+            <button type="button" class="nav-btn btn-primary" onclick="goNext()">
+                Next: Financial Advisor <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html> 

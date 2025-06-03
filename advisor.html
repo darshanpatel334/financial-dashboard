@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Financial Advisor - NiveshMatrix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-robot"></i> AI Financial Advisor</h1>
+            <p>Get personalized financial recommendations powered by advanced algorithms</p>
+        </div>
+
+        <!-- Advisor Summary -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user-tie"></i> Your Personal Financial Profile
+                </h2>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h4><i class="fas fa-chart-line"></i> Financial Health Score</h4>
+                        <div class="score-display" style="padding: 1rem; margin: 1rem 0;">
+                            <div class="score-number" id="healthScore">0</div>
+                            <div class="score-label">Out of 100</div>
+                        </div>
+                        <div id="healthScoreBreakdown">
+                            <!-- Health score breakdown will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h4><i class="fas fa-target"></i> Priority Focus Areas</h4>
+                        <div id="priorityAreas">
+                            <!-- Priority areas will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personalized Recommendations -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i> Personalized Recommendations
+                </h2>
+                <small class="text-secondary">Based on your complete financial profile</small>
+            </div>
+            
+            <div id="personalizedRecommendations">
+                <!-- Recommendations will be populated here -->
+            </div>
+        </div>
+
+        <!-- Investment Strategy -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-pie"></i> Recommended Investment Strategy
+                </h2>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Asset Allocation Strategy</h4>
+                        <div id="allocationStrategy">
+                            <!-- Allocation strategy will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Specific Investment Recommendations</h4>
+                        <div id="investmentRecommendations">
+                            <!-- Investment recommendations will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goal-Based Planning -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-bullseye"></i> Goal-Based Planning
+                </h2>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                        <h4>Short-term Goals</h4>
+                        <p class="text-secondary">(1-3 years)</p>
+                        <div id="shortTermGoals">
+                            <!-- Short-term goals will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚀</div>
+                        <h4>Medium-term Goals</h4>
+                        <p class="text-secondary">(3-10 years)</p>
+                        <div id="mediumTermGoals">
+                            <!-- Medium-term goals will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏝️</div>
+                        <h4>Long-term Goals</h4>
+                        <p class="text-secondary">(10+ years)</p>
+                        <div id="longTermGoals">
+                            <!-- Long-term goals will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Management -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-shield-alt"></i> Risk Management Strategy
+                </h2>
+            </div>
+            
+            <div id="riskManagement">
+                <!-- Risk management recommendations will be populated here -->
+            </div>
+        </div>
+
+        <!-- Tax Optimization -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-calculator"></i> Tax Optimization
+                </h2>
+            </div>
+            
+            <div id="taxOptimization">
+                <!-- Tax optimization recommendations will be populated here -->
+            </div>
+        </div>
+
+        <!-- Action Plan -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-tasks"></i> 90-Day Action Plan
+                </h2>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Next 30 Days</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="thirtyDayPlan">
+                            <!-- 30-day plan will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Next 60 Days</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="sixtyDayPlan">
+                            <!-- 60-day plan will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Next 90 Days</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="ninetyDayPlan">
+                            <!-- 90-day plan will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources & Tools -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-tools"></i> Recommended Resources & Tools
+                </h2>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h4><i class="fas fa-mobile-alt"></i> Recommended Apps</h4>
+                        <div id="recommendedApps">
+                            <!-- Recommended apps will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h4><i class="fas fa-book"></i> Educational Resources</h4>
+                        <div id="educationalResources">
+                            <!-- Educational resources will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-phone"></i> Need Human Assistance?
+                </h2>
+            </div>
+            
+            <div class="instruction-box">
+                <h3><i class="fas fa-info-circle"></i> When to Consult a Professional</h3>
+                <p>While our AI provides comprehensive guidance, consider consulting a certified financial planner for complex situations, major life changes, or investments above ₹50 lakhs.</p>
+                
+                <div class="grid-3" style="margin-top: 1rem;">
+                    <div class="text-center">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📞</div>
+                        <strong>Fee-Only Planners</strong>
+                        <p class="text-secondary">SEBI registered advisors</p>
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🏦</div>
+                        <strong>Bank Advisors</strong>
+                        <p class="text-secondary">For banking products</p>
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💼</div>
+                        <strong>Tax Consultants</strong>
+                        <p class="text-secondary">For complex tax planning</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: Dashboard
+            </button>
+            <button type="button" class="nav-btn btn-success" onclick="completeJourney()">
+                Complete Financial Assessment <i class="fas fa-check"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+    <script src="advisor.js"></script>
+</body>
+</html> 

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Profile Assessment - NiveshMatrix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-balance-scale"></i> Investment Risk Profile</h1>
+            <p>Assess your risk tolerance to determine the optimal investment strategy</p>
+        </div>
+
+        <!-- Instruction Box -->
+        <div class="instruction-box">
+            <h3><i class="fas fa-info-circle"></i> Risk Assessment</h3>
+            <p>Answer these 8 questions honestly to determine your investment risk profile. This will help create a personalized asset allocation strategy.</p>
+        </div>
+
+        <!-- Risk Score Display -->
+        <div class="score-display" id="riskScoreDisplay" style="display: none;">
+            <div class="score-number" id="riskScore">0</div>
+            <div class="score-label">Risk Score</div>
+            <div style="margin-top: 1rem;">
+                <span id="riskProfileEmoji" style="font-size: 2rem;">📊</span>
+                <div id="riskProfileLevel" style="font-size: 1.1rem; margin-top: 0.5rem; font-weight: 600;">Conservative</div>
+                <div id="riskProfileDescription" style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-secondary);">Risk profile description</div>
+            </div>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-question-circle"></i> Risk Assessment Questions
+                </h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="questionProgress" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Question 1: Age -->
+            <div class="question-card" data-question="1">
+                <h3>1. What is your age?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="age" value="1">
+                        <span>Above 60 years</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="age" value="2">
+                        <span>50-60 years</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="age" value="3">
+                        <span>35-50 years</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="age" value="4">
+                        <span>Below 35 years</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 2: Investment Horizon -->
+            <div class="question-card" data-question="2">
+                <h3>2. What is your investment time horizon?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="horizon" value="1">
+                        <span>Less than 2 years</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="horizon" value="2">
+                        <span>2-5 years</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="horizon" value="3">
+                        <span>5-10 years</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="horizon" value="4">
+                        <span>More than 10 years</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 3: Investment Goal -->
+            <div class="question-card" data-question="3">
+                <h3>3. What is your primary investment goal?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="goal" value="1">
+                        <span>Capital preservation</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="goal" value="2">
+                        <span>Regular income</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="goal" value="3">
+                        <span>Moderate growth</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="goal" value="4">
+                        <span>High growth</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 4: Market Volatility -->
+            <div class="question-card" data-question="4">
+                <h3>4. How would you react if your investment portfolio lost 20% in a year?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="volatility" value="1">
+                        <span>Sell everything immediately</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="volatility" value="2">
+                        <span>Reduce risky investments</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="volatility" value="3">
+                        <span>Wait for recovery</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="volatility" value="4">
+                        <span>Buy more at lower prices</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 5: Income Stability -->
+            <div class="question-card" data-question="5">
+                <h3>5. How stable is your current income?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="income" value="1">
+                        <span>Irregular/Variable income</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="income" value="2">
+                        <span>Moderately stable</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="income" value="3">
+                        <span>Very stable</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="income" value="4">
+                        <span>Multiple income sources</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 6: Financial Knowledge -->
+            <div class="question-card" data-question="6">
+                <h3>6. How would you rate your investment knowledge?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="knowledge" value="1">
+                        <span>Beginner - Limited knowledge</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="knowledge" value="2">
+                        <span>Basic - Some understanding</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="knowledge" value="3">
+                        <span>Good - Well informed</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="knowledge" value="4">
+                        <span>Expert - Extensive knowledge</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 7: Emergency Fund -->
+            <div class="question-card" data-question="7">
+                <h3>7. Do you have an emergency fund covering 6+ months of expenses?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="emergency" value="1">
+                        <span>No emergency fund</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="emergency" value="2">
+                        <span>1-3 months coverage</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="emergency" value="3">
+                        <span>3-6 months coverage</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="emergency" value="4">
+                        <span>6+ months coverage</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 8: Risk Appetite -->
+            <div class="question-card" data-question="8">
+                <h3>8. Which statement best describes your attitude towards risk?</h3>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="appetite" value="1">
+                        <span>I avoid risk at all costs</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="appetite" value="2">
+                        <span>I prefer safe investments</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="appetite" value="3">
+                        <span>I accept moderate risk for better returns</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="appetite" value="4">
+                        <span>I embrace risk for maximum returns</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="calculateRiskProfile()" style="width: 100%; margin-top: 2rem;">
+                <i class="fas fa-calculator"></i> Calculate Risk Profile
+            </button>
+        </div>
+
+        <!-- Asset Allocation Recommendation -->
+        <div class="section-card" id="allocationSection" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-pie"></i> Recommended Asset Allocation
+                </h2>
+            </div>
+            
+            <div class="grid-4" id="assetAllocation">
+                <!-- Asset allocation will be populated here -->
+            </div>
+        </div>
+
+        <!-- Risk Profile Insights -->
+        <div class="section-card" id="insightsSection" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i> Investment Insights
+                </h2>
+            </div>
+            
+            <div id="riskInsights">
+                <!-- Insights will be populated here -->
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: Insurance
+            </button>
+            <button type="button" class="nav-btn btn-primary" onclick="goNext()">
+                Next: Dashboard <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+    <script src="risk-profile.js"></script>
+</body>
+</html> 

@@ -1,4 +1,185 @@
-<!-- Income Composition Chart -->
-<div class="chart-container pie-chart-container">
-    <canvas id="income-composition-chart"></canvas>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Analysis - NiveshMatrix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-money-bill-wave"></i> Income Analysis</h1>
+            <p>Track all your income sources and understand your cash flow patterns</p>
+        </div>
+
+        <!-- Instruction Box -->
+        <div class="instruction-box">
+            <h3><i class="fas fa-info-circle"></i> Income Categories</h3>
+            <p>Record all regular and recurring income sources. Some income from investments will be automatically calculated based on your net worth data.</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card assets">
+                <h3>Monthly Income</h3>
+                <div class="summary-amount positive" id="monthlyTotal">₹0</div>
+                <small>Total monthly recurring</small>
+            </div>
+            <div class="summary-card networth">
+                <h3>Annual Income</h3>
+                <div class="summary-amount networth" id="annualTotal">₹0</div>
+                <small>Total yearly income</small>
+            </div>
+            <div class="summary-card liabilities">
+                <h3>Asset Yield Income</h3>
+                <div class="summary-amount positive" id="assetYieldTotal">₹0</div>
+                <small>From investments annually</small>
+            </div>
+        </div>
+
+        <!-- Salary/Pension Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-briefcase"></i> Salary & Pension
+                </h2>
+            </div>
+
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">💼 Primary Income</span>
+                    <span class="category-total" id="salaryTotal">₹0</span>
+                </div>
+                <div id="salaryItems">
+                    <!-- Salary items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addIncomeItem('salary', 'Salary/Pension')">
+                    <i class="fas fa-plus"></i> Add Salary/Pension
+                </button>
+            </div>
+        </div>
+
+        <!-- Rental Income Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-home"></i> Rental Income
+                </h2>
+            </div>
+
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">🏠 Property Rental</span>
+                    <span class="category-total" id="rentalTotal">₹0</span>
+                </div>
+                <div id="rentalItems">
+                    <!-- Rental items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addIncomeItem('rental', 'Rental Income')">
+                    <i class="fas fa-plus"></i> Add Rental Income
+                </button>
+            </div>
+        </div>
+
+        <!-- Investment Income Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i> Investment Income
+                </h2>
+                <small class="text-secondary">Some values calculated from Net Worth data</small>
+            </div>
+
+            <!-- Dividend Income -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">📈 Dividend Income</span>
+                    <span class="category-total" id="dividendTotal">₹0</span>
+                </div>
+                <div class="instruction-box">
+                    <p><strong>Auto-calculated:</strong> ₹<span id="autoEquityYield">0</span> from equity investments</p>
+                </div>
+                <div id="dividendItems">
+                    <!-- Dividend items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addIncomeItem('dividend', 'Dividend Income')">
+                    <i class="fas fa-plus"></i> Add Additional Dividend
+                </button>
+            </div>
+
+            <!-- Interest Income -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">🏦 Interest Income</span>
+                    <span class="category-total" id="interestTotal">₹0</span>
+                </div>
+                <div class="instruction-box">
+                    <p><strong>Auto-calculated:</strong> ₹<span id="autoFixedIncomeYield">0</span> from fixed income investments</p>
+                </div>
+                <div id="interestItems">
+                    <!-- Interest items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addIncomeItem('interest', 'Interest Income')">
+                    <i class="fas fa-plus"></i> Add Additional Interest
+                </button>
+            </div>
+        </div>
+
+        <!-- Other Income Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-coins"></i> Other Income
+                </h2>
+            </div>
+
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">💰 Other Sources</span>
+                    <span class="category-total" id="otherIncomeTotal">₹0</span>
+                </div>
+                <div id="otherIncomeItems">
+                    <!-- Other income items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addIncomeItem('otherIncome', 'Other Income')">
+                    <i class="fas fa-plus"></i> Add Other Income
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: Net Worth
+            </button>
+            <button type="button" class="nav-btn btn-primary" onclick="goNext()">
+                Next: Expense Analysis <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
     </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+    <script src="income.js"></script>
+</body>
+</html> 

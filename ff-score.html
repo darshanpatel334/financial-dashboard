@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Freedom Score - NiveshMatrix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">NiveshMatrix</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-trophy"></i> Financial Freedom Score</h1>
+            <p>Calculate how many years your current wealth can sustain your lifestyle</p>
+        </div>
+
+        <!-- Instruction Box -->
+        <div class="instruction-box">
+            <h3><i class="fas fa-info-circle"></i> How FF Score Works</h3>
+            <p>Your FF Score shows how many years your current net worth can sustain your expenses, considering asset growth and inflation. A score of 25+ years indicates strong financial independence.</p>
+        </div>
+
+        <!-- Current Data Summary -->
+        <div class="summary-grid">
+            <div class="summary-card networth">
+                <h3>Net Worth</h3>
+                <div class="summary-amount networth" id="currentNetWorth">₹0</div>
+                <small>Current liquid assets</small>
+            </div>
+            <div class="summary-card liabilities">
+                <h3>Annual Expenses</h3>
+                <div class="summary-amount negative" id="currentExpenses">₹0</div>
+                <small>Total yearly spending</small>
+            </div>
+            <div class="summary-card assets">
+                <h3>Asset Growth Rate</h3>
+                <div class="summary-amount positive" id="currentGrowthRate">8%</div>
+                <small>Expected annual returns</small>
+            </div>
+        </div>
+
+        <!-- FF Score Display -->
+        <div class="score-display">
+            <div class="score-number" id="ffScore">0</div>
+            <div class="score-label" id="ffScoreLabel">Years of Financial Freedom</div>
+            <div style="margin-top: 1rem;">
+                <span id="ffScoreEmoji" style="font-size: 2rem;">🔴</span>
+                <div id="ffScoreLevel" style="font-size: 1.1rem; margin-top: 0.5rem; font-weight: 600;">Calculating...</div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-sliders-h"></i> Calculation Settings
+                </h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="assetGrowthRate">Expected Asset Growth Rate (% annually)</label>
+                    <input type="number" id="assetGrowthRate" value="8" step="0.1" min="0" max="30" onchange="calculateFFScore()">
+                    <small class="text-secondary">Conservative: 6-8%, Moderate: 8-12%, Aggressive: 12-15%</small>
+                </div>
+                <div class="form-group">
+                    <label for="inflationRate">Inflation Rate (% annually)</label>
+                    <input type="number" id="inflationRate" value="6" step="0.1" min="0" max="20" onchange="calculateFFScore()">
+                    <small class="text-secondary">Historical average in India: 4-6%</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario Analysis -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i> Scenario Analysis
+                </h2>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Conservative</h4>
+                        <div class="score-number" id="conservativeScore">0</div>
+                        <p class="text-secondary">6% growth, 6% inflation</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Moderate</h4>
+                        <div class="score-number" id="moderateScore">0</div>
+                        <p class="text-secondary">10% growth, 6% inflation</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Aggressive</h4>
+                        <div class="score-number" id="aggressiveScore">0</div>
+                        <p class="text-secondary">15% growth, 6% inflation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Improvement Suggestions -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i> Improvement Suggestions
+                </h2>
+            </div>
+            
+            <div id="suggestions">
+                <!-- Suggestions will be populated here -->
+            </div>
+        </div>
+
+        <!-- Progress Visualization -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i> Financial Independence Journey
+                </h2>
+            </div>
+            
+            <div class="progress-visualization">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="ffProgress" style="width: 0%"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.9rem;">
+                    <span>Financially Insecure</span>
+                    <span>Getting There</span>
+                    <span>Financial Freedom</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- What-If Calculator -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-calculator"></i> What-If Calculator
+                </h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="additionalSavings">Additional Monthly Savings (₹)</label>
+                    <input type="number" id="additionalSavings" value="0" onchange="calculateWhatIf()">
+                </div>
+                <div class="form-group">
+                    <label for="expenseReduction">Monthly Expense Reduction (₹)</label>
+                    <input type="number" id="expenseReduction" value="0" onchange="calculateWhatIf()">
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 1rem;">
+                <div class="card-body text-center">
+                    <h4>Improved FF Score</h4>
+                    <div class="score-number" id="improvedScore">0</div>
+                    <p class="text-secondary">With your changes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: Expenses
+            </button>
+            <button type="button" class="nav-btn btn-primary" onclick="goNext()">
+                Next: Insurance <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+    <script src="ff-score.js"></script>
+</body>
+</html> 
