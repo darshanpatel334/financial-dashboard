@@ -71,6 +71,7 @@ body {
     background-color: var(--bg-secondary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    padding-top: 4.5rem; /* Add padding to account for fixed navbar */
 }
 
 /* Typography */
@@ -251,10 +252,22 @@ p {
 
 /* Hero Section */
 .hero {
-    padding: var(--space-16) 0;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-accent) 100%);
     position: relative;
-    margin-top: 4rem;
+    padding: var(--space-16) 0;
+    background-color: var(--bg-primary);
+    overflow: hidden;
+    min-height: calc(100vh - 4.5rem); /* Adjust for navbar height */
+    display: flex;
+    align-items: center;
+}
+
+.hero .container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
 }
 
 .hero-badge {
@@ -442,6 +455,20 @@ p {
         display: none;
     }
     
+    .hero {
+        min-height: auto;
+        padding: var(--space-8) 0;
+    }
+    
+    .hero .container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .hero-image {
+        margin-top: var(--space-8);
+    }
+    
     .hero h1 {
         font-size: 2.5rem;
     }
@@ -467,6 +494,10 @@ p {
     
     .dashboard-grid {
         grid-template-columns: 1fr;
+    }
+
+    body {
+        padding-top: 4rem; /* Slightly smaller padding for mobile */
     }
 }
 
