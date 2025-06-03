@@ -361,7 +361,7 @@
         <div class="container">
             <h1>Transform Your Financial Future</h1>
             <p>Take control of your wealth with NiveshMatrix's comprehensive financial planning tools. Track your net worth, analyze expenses, and discover your path to financial freedom.</p>
-            <button class="btn btn-primary btn-signup" data-modal="signupModal">
+            <button class="btn btn-primary btn-signup" data-modal="signupModal" id="startJourneyBtn">
                 <i class="fas fa-rocket"></i> Start Your Financial Journey
             </button>
             <div class="hero-stats">
@@ -509,6 +509,272 @@
                 console.log('Initializing progress tracking');
                 initProgressTracking();
             }
+            
+            // Add smart journey navigation
+            function setupSmartNavigation() {
+                const startJourneyBtn = document.getElementById('startJourneyBtn');
+                
+                // Check if user is logged in
+                firebase.auth().onAuthStateChanged((user) => {
+                    if (user) {
+                        // User is logged in - modify button behavior
+                        startJourneyBtn.innerHTML = '<i class="fas fa-play"></i> Continue Your Journey';
+                        startJourneyBtn.removeAttribute('data-modal');
+                        startJourneyBtn.onclick = (e) => {
+                            e.preventDefault();
+                            // Check progress and redirect accordingly
+                            const progress = getUserProgress();
+                            if (progress.currentStep > 0) {
+                                // Show navigation modal
+                                showNavigationModal(progress);
+                            } else {
+                                // Start from personal info
+                                window.location.href = 'pages/personal-info.html';
+                            }
+                        };
+                        
+                        // Add navigation system
+                        addNavigationSystem();
+                    } else {
+                        // User not logged in - keep original behavior
+                        startJourneyBtn.innerHTML = '<i class="fas fa-rocket"></i> Start Your Financial Journey';
+                        startJourneyBtn.setAttribute('data-modal', 'signupModal');
+                        startJourneyBtn.onclick = null;
+                    }
+                });
+            }
+            
+            // Add page navigation system
+            function addNavigationSystem() {
+                const heroSection = document.querySelector('.hero .container');
+                const navHtml = `
+                    <div id="pageNavigation" style="margin-top: 2rem; text-align: center;">
+                        <h3 style="color: #333; margin-bottom: 1rem;">Your Financial Journey</h3>
+                        <div class="nav-dots" style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
+                            <div class="nav-step" data-step="1" data-page="personal-info.html">
+                                <div class="nav-dot"></div>
+                                <span>Personal Info</span>
+                            </div>
+                            <div class="nav-line"></div>
+                            <div class="nav-step" data-step="2" data-page="networth.html">
+                                <div class="nav-dot"></div>
+                                <span>Net Worth</span>
+                            </div>
+                            <div class="nav-line"></div>
+                            <div class="nav-step" data-step="3" data-page="income.html">
+                                <div class="nav-dot"></div>
+                                <span>Income</span>
+                            </div>
+                            <div class="nav-line"></div>
+                            <div class="nav-step" data-step="4" data-page="expenses.html">
+                                <div class="nav-dot"></div>
+                                <span>Expenses</span>
+                            </div>
+                            <div class="nav-line"></div>
+                            <div class="nav-step" data-step="5" data-page="ff-score.html">
+                                <div class="nav-dot"></div>
+                                <span>FF Score</span>
+                            </div>
+                            <div class="nav-line"></div>
+                            <div class="nav-step" data-step="6" data-page="insurance.html">
+                                <div class="nav-dot"></div>
+                                <span>Insurance</span>
+                            </div>
+                            <div class="nav-line"></div>
+                            <div class="nav-step" data-step="7" data-page="risk-profile.html">
+                                <div class="nav-dot"></div>
+                                <span>Risk Profile</span>
+                            </div>
+                            <div class="nav-line"></div>
+                            <div class="nav-step" data-step="8" data-page="dashboard.html">
+                                <div class="nav-dot"></div>
+                                <span>Dashboard</span>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        .nav-dots {
+                            padding: 1.5rem;
+                            background: rgba(255, 255, 255, 0.9);
+                            border-radius: 15px;
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                            margin: 1rem 0;
+                        }
+                        .nav-step {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            position: relative;
+                        }
+                        .nav-step:hover {
+                            transform: translateY(-2px);
+                        }
+                        .nav-dot {
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background: #e0e0e0;
+                            margin-bottom: 0.5rem;
+                            transition: all 0.3s ease;
+                            position: relative;
+                        }
+                        .nav-step.completed .nav-dot {
+                            background: #4CAF50;
+                        }
+                        .nav-step.completed .nav-dot::after {
+                            content: '✓';
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            color: white;
+                            font-size: 12px;
+                            font-weight: bold;
+                        }
+                        .nav-step.current .nav-dot {
+                            background: #2196F3;
+                            animation: pulse 1.5s infinite;
+                        }
+                        .nav-step span {
+                            font-size: 0.8rem;
+                            color: #666;
+                            text-align: center;
+                            max-width: 80px;
+                        }
+                        .nav-step.completed span {
+                            color: #4CAF50;
+                            font-weight: 600;
+                        }
+                        .nav-step.current span {
+                            color: #2196F3;
+                            font-weight: 600;
+                        }
+                        .nav-line {
+                            width: 30px;
+                            height: 2px;
+                            background: #e0e0e0;
+                            margin: 0 0.5rem;
+                            margin-top: 10px;
+                        }
+                        @keyframes pulse {
+                            0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7); }
+                            70% { box-shadow: 0 0 0 10px rgba(33, 150, 243, 0); }
+                            100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
+                        }
+                        @media (max-width: 768px) {
+                            .nav-dots {
+                                flex-direction: column;
+                                gap: 1rem;
+                            }
+                            .nav-line {
+                                width: 2px;
+                                height: 20px;
+                                margin: 0;
+                            }
+                        }
+                    </style>
+                `;
+                
+                heroSection.insertAdjacentHTML('beforeend', navHtml);
+                
+                // Update navigation status
+                updateNavigationStatus();
+                
+                // Add click handlers
+                document.querySelectorAll('.nav-step').forEach(step => {
+                    step.addEventListener('click', () => {
+                        const page = step.getAttribute('data-page');
+                        window.location.href = `pages/${page}`;
+                    });
+                });
+            }
+            
+            // Update navigation status based on progress
+            function updateNavigationStatus() {
+                const progress = getUserProgress();
+                const navSteps = document.querySelectorAll('.nav-step');
+                
+                navSteps.forEach((step, index) => {
+                    const stepNumber = parseInt(step.getAttribute('data-step'));
+                    step.classList.remove('completed', 'current');
+                    
+                    if (stepNumber <= progress.currentStep) {
+                        step.classList.add('completed');
+                    } else if (stepNumber === progress.currentStep + 1) {
+                        step.classList.add('current');
+                    }
+                });
+            }
+            
+            // Show navigation modal with options
+            function showNavigationModal(progress) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-content" style="text-align: center;">
+                        <span class="close">&times;</span>
+                        <h2>Welcome Back!</h2>
+                        <p>You've completed ${progress.currentStep} out of 7 steps in your financial journey.</p>
+                        <div style="margin: 2rem 0;">
+                            <button class="btn btn-primary" id="continueJourney" style="margin: 0.5rem;">
+                                <i class="fas fa-play"></i> Continue Where You Left Off
+                            </button>
+                            <button class="btn btn-secondary" id="viewDashboard" style="margin: 0.5rem;">
+                                <i class="fas fa-chart-bar"></i> View Dashboard
+                            </button>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #666;">
+                            You can also use the navigation above to jump to any completed section.
+                        </p>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Close modal functionality
+                const closeBtn = modal.querySelector('.close');
+                closeBtn.onclick = () => {
+                    modal.remove();
+                };
+                
+                modal.onclick = (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                };
+                
+                // Button handlers
+                document.getElementById('continueJourney').onclick = () => {
+                    const nextPage = getNextPage(progress.currentStep);
+                    window.location.href = nextPage;
+                };
+                
+                document.getElementById('viewDashboard').onclick = () => {
+                    window.location.href = 'pages/dashboard.html';
+                };
+            }
+            
+            // Get next page based on current step
+            function getNextPage(currentStep) {
+                const pages = [
+                    'pages/personal-info.html',
+                    'pages/networth.html', 
+                    'pages/income.html',
+                    'pages/expenses.html',
+                    'pages/ff-score.html',
+                    'pages/insurance.html',
+                    'pages/risk-profile.html',
+                    'pages/dashboard.html'
+                ];
+                
+                return pages[currentStep] || 'pages/personal-info.html';
+            }
+            
+            // Setup smart navigation
+            setupSmartNavigation();
             
             const modals = document.querySelectorAll('.modal');
             const modalTriggers = document.querySelectorAll('[data-modal]');
