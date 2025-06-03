@@ -23,7 +23,8 @@ function loadDataFromPreviousPages() {
     // Load net worth data
     const netWorthData = Storage.get('netWorthData', {});
     if (netWorthData.totals) {
-        ffData.netWorth = netWorthData.totals.liquidNetWorth || 0;
+        // Use liquid net worth for FF Score calculation (more accurate for financial freedom)
+        ffData.netWorth = netWorthData.totals.liquidNetWorth || netWorthData.totals.netWorth || 0;
         document.getElementById('currentNetWorth').textContent = formatCurrency(ffData.netWorth);
     }
     
@@ -75,32 +76,37 @@ function calculateFFScore() {
     saveFFData();
 }
 
-// Calculate FF Score value
+// Enhanced FF Score calculation using corrected algorithm
 function calculateFFScoreValue(netWorth, annualExpenses, growthRate, inflationRate) {
-    if (netWorth <= 0 || annualExpenses <= 0) return 0;
+    if (netWorth <= 0 || annualExpenses <= 0) {
+        return 0;
+    }
     
     let currentNetWorth = netWorth;
     let currentExpenses = annualExpenses;
     let years = 0;
+    const maxYears = 100;
     
-    // Simulate year by year
-    while (currentNetWorth > 0 && years < 100) {
-        // Subtract expenses for the year
+    // Simulation with compound growth and inflation
+    while (currentNetWorth > currentExpenses && years < maxYears) {
+        // Deduct annual expenses first
         currentNetWorth -= currentExpenses;
         
-        // If net worth goes negative, we're done
-        if (currentNetWorth <= 0) break;
+        // If net worth becomes negative or zero, break
+        if (currentNetWorth <= 0) {
+            break;
+        }
         
-        // Apply growth to remaining net worth
+        // Apply asset growth to remaining net worth
         currentNetWorth *= (1 + growthRate / 100);
         
-        // Apply inflation to expenses
+        // Apply inflation to expenses for next year
         currentExpenses *= (1 + inflationRate / 100);
         
         years++;
     }
     
-    return years;
+    return Math.min(years, maxYears);
 }
 
 // Calculate scenario analysis

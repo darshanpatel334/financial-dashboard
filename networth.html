@@ -500,9 +500,10 @@
     <div id="status" class="status-message" style="display: none;"></div>
 
     <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
     <script src="auth.js"></script>
+    <script src="common.js"></script>
 
     <script>
         let assetCount = 0;
@@ -646,6 +647,7 @@
         function calculateTotals() {
             let totalAssets = 0;
             let totalLiabilities = 0;
+            let liquidAssets = 0;
             
             // Calculate category totals
             const categories = ['realEstate', 'equity', 'fixedIncome', 'otherAssets'];
@@ -655,8 +657,13 @@
                 items.forEach(item => {
                     const value = parseFloat(item.querySelector('input[type="number"]').value) || 0;
                     categoryTotal += value;
-                    if (category !== 'otherAssets') { // Don't include occupied house and ornaments in total assets
-                        totalAssets += value;
+                    
+                    // All assets contribute to total assets
+                    totalAssets += value;
+                    
+                    // Real estate and other assets (like occupied house) are illiquid
+                    if (category !== 'realEstate' && category !== 'otherAssets') {
+                        liquidAssets += value;
                     }
                 });
                 document.getElementById(category + 'Total').textContent = `₹${categoryTotal.toLocaleString('en-IN')}`;
@@ -669,13 +676,21 @@
                 totalLiabilities += value;
             });
 
-            // Update totals
+            // Update totals display
             document.getElementById('totalAssets').textContent = `₹${totalAssets.toLocaleString('en-IN')}`;
             document.getElementById('totalLiabilities').textContent = `₹${totalLiabilities.toLocaleString('en-IN')}`;
             document.getElementById('liabilitiesTotal').textContent = `₹${totalLiabilities.toLocaleString('en-IN')}`;
             
             const netWorth = totalAssets - totalLiabilities;
+            const liquidNetWorth = liquidAssets - totalLiabilities;
+            
             document.getElementById('netWorth').textContent = `₹${netWorth.toLocaleString('en-IN')}`;
+            
+            // Display liquid net worth if element exists
+            const liquidNetWorthElement = document.getElementById('liquidNetWorth');
+            if (liquidNetWorthElement) {
+                liquidNetWorthElement.textContent = `₹${liquidNetWorth.toLocaleString('en-IN')}`;
+            }
 
             // Auto-save
             setTimeout(() => {
@@ -694,6 +709,10 @@
                 }
             };
 
+            // Calculate liquid assets (excluding real estate and other assets)
+            let liquidAssets = 0;
+            const liquidCategories = ['equity', 'fixedIncome'];
+            
             // Save assets by category
             const categories = ['realEstate', 'equity', 'fixedIncome', 'otherAssets'];
             categories.forEach(category => {
@@ -702,11 +721,17 @@
                 items.forEach(item => {
                     const inputs = item.querySelectorAll('input');
                     if (inputs.length >= 3) {
+                        const assetValue = parseFloat(inputs[1].value) || 0;
                         data.assets[category].push({
                             name: inputs[0].value,
-                            value: parseFloat(inputs[1].value) || 0,
+                            value: assetValue,
                             yield: parseFloat(inputs[2].value) || 0
                         });
+                        
+                        // Add to liquid assets if it's a liquid category
+                        if (liquidCategories.includes(category)) {
+                            liquidAssets += assetValue;
+                        }
                     }
                 });
             });
@@ -724,6 +749,9 @@
                     });
                 }
             });
+
+            // Add liquid net worth to totals
+            data.totals.liquidNetWorth = liquidAssets - data.totals.totalLiabilities;
 
             localStorage.setItem('netWorthData', JSON.stringify(data));
         }
