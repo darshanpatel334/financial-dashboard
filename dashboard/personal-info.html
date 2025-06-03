@@ -21,9 +21,9 @@
     </nav>
 
     <!-- Multi-step Form Section -->
-    <section class="auth-section">
+    <section class="auth-section full-width">
         <div class="container">
-            <div class="auth-card">
+            <div class="auth-card wide-card">
                 <!-- Progress Steps -->
                 <div class="progress-steps">
                     <div class="step active" data-step="1">
@@ -48,26 +48,27 @@
                         <p>Help us understand your financial goals better</p>
                         
                         <form class="auth-form">
-                            <div class="form-group">
-                                <label for="fullName">Full Name</label>
-                                <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
-                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="fullName">Full Name</label>
+                                    <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
+                                </div>
 
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" name="email" required placeholder="Enter your email">
-                            </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                                </div>
 
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
-                            </div>
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
+                                </div>
 
-                            <div class="form-row">
                                 <div class="form-group">
                                     <label for="age">Age</label>
                                     <input type="number" id="age" name="age" required min="18" max="100" placeholder="Age">
                                 </div>
+
                                 <div class="form-group">
                                     <label for="occupation">Occupation</label>
                                     <select id="occupation" name="occupation" required>
@@ -93,14 +94,16 @@
                         <p>Tell us about your financial objectives</p>
 
                         <form class="auth-form">
-                            <div class="form-group">
-                                <label for="monthlyIncome">Monthly Income (₹)</label>
-                                <input type="number" id="monthlyIncome" name="monthlyIncome" required min="0" placeholder="Enter your monthly income">
-                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="monthlyIncome">Monthly Income (₹)</label>
+                                    <input type="number" id="monthlyIncome" name="monthlyIncome" required min="0" placeholder="Enter your monthly income">
+                                </div>
 
-                            <div class="form-group">
-                                <label for="monthlySavings">Monthly Savings (₹)</label>
-                                <input type="number" id="monthlySavings" name="monthlySavings" required min="0" placeholder="Enter your monthly savings">
+                                <div class="form-group">
+                                    <label for="monthlySavings">Monthly Savings (₹)</label>
+                                    <input type="number" id="monthlySavings" name="monthlySavings" required min="0" placeholder="Enter your monthly savings">
+                                </div>
                             </div>
 
                             <div class="goals-grid">
@@ -135,52 +138,54 @@
                         <p>Help us understand your risk tolerance</p>
 
                         <form class="auth-form" id="riskProfileForm">
-                            <div class="form-group">
-                                <label>Investment Experience</label>
-                                <div class="radio-group">
-                                    <label class="radio-label">
-                                        <input type="radio" name="experience" value="novice" required>
-                                        <span>Novice</span>
-                                    </label>
-                                    <label class="radio-label">
-                                        <input type="radio" name="experience" value="intermediate">
-                                        <span>Intermediate</span>
-                                    </label>
-                                    <label class="radio-label">
-                                        <input type="radio" name="experience" value="experienced">
-                                        <span>Experienced</span>
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label>Investment Experience</label>
+                                    <div class="radio-group">
+                                        <label class="radio-label">
+                                            <input type="radio" name="experience" value="novice" required>
+                                            <span>Novice</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="experience" value="intermediate">
+                                            <span>Intermediate</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="experience" value="experienced">
+                                            <span>Experienced</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label>Risk Tolerance</label>
+                                    <div class="radio-group">
+                                        <label class="radio-label">
+                                            <input type="radio" name="risk" value="conservative" required>
+                                            <span>Conservative</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="risk" value="moderate">
+                                            <span>Moderate</span>
+                                        </label>
+                                        <label class="radio-label">
+                                            <input type="radio" name="risk" value="aggressive">
+                                            <span>Aggressive</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" required name="terms">
+                                        <span>I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a></span>
                                     </label>
                                 </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Risk Tolerance</label>
-                                <div class="radio-group">
-                                    <label class="radio-label">
-                                        <input type="radio" name="risk" value="conservative" required>
-                                        <span>Conservative</span>
-                                    </label>
-                                    <label class="radio-label">
-                                        <input type="radio" name="risk" value="moderate">
-                                        <span>Moderate</span>
-                                    </label>
-                                    <label class="radio-label">
-                                        <input type="radio" name="risk" value="aggressive">
-                                        <span>Aggressive</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" required name="terms">
-                                    <span>I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a></span>
-                                </label>
                             </div>
 
                             <div class="form-actions">
                                 <button type="button" class="btn btn-secondary" onclick="prevStep(2)">Back</button>
-                                <button type="submit" class="btn btn-primary">Complete Profile</button>
+                                <button type="button" class="btn btn-primary" onclick="completeProfile()">Complete Profile</button>
                             </div>
                         </form>
                     </div>
@@ -208,14 +213,11 @@
             document.querySelector(`[data-step="${step}"]`).classList.add('active');
         }
 
-        // Form submission
-        document.getElementById('riskProfileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Add your form submission logic here
-            console.log('Risk profile form submitted');
-            // Redirect to networth page
+        // Complete profile and redirect
+        function completeProfile() {
+            // Add any form validation here if needed
             window.location.href = 'networth.html';
-        });
+        }
 
         // Goal card selection
         document.querySelectorAll('.goal-card').forEach(card => {
