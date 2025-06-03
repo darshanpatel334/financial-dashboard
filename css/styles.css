@@ -1195,6 +1195,26 @@ section.animate-on-scroll {
     text-align: center;
 }
 
+.get-started .cta-buttons {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    margin-top: var(--space-8);
+}
+
+.btn-outline-light {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    transition: all var(--transition-normal);
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    transform: translateY(-2px);
+}
+
 .get-started h2 {
     margin-bottom: var(--space-8);
     color: white;
@@ -1204,6 +1224,19 @@ section.animate-on-scroll {
     margin-bottom: var(--space-12);
     color: rgba(255, 255, 255, 0.9);
     font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .get-started .cta-buttons {
+        flex-direction: column;
+        gap: var(--space-4);
+        padding: 0 var(--space-4);
+    }
+    
+    .get-started .btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Enhanced Footer */
@@ -1608,6 +1641,26 @@ section {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
     text-align: center;
+}
+
+.get-started .cta-buttons {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    margin-top: var(--space-8);
+}
+
+.btn-outline-light {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    transition: all var(--transition-normal);
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    transform: translateY(-2px);
 }
 
 .get-started h2 {
