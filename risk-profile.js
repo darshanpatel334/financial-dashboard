@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initCommonElements();
         initQuestionListeners();
         loadRiskData();
+        
+        // Setup navigation system
+        if (typeof setupPageNavigation === 'function') {
+            setupPageNavigation(7); // 7 = Risk Profile page
+        }
     });
 });
 

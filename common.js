@@ -915,6 +915,7 @@ function getUserProgress() {
         completed: [],
         current: null,
         next: null,
+        currentStep: 0,
         percentage: 0,
         isComplete: false
     };
@@ -927,6 +928,7 @@ function getUserProgress() {
             if (progress.completed.length === JOURNEY_STEPS.length - 1) {
                 progress.isComplete = true;
                 progress.current = step;
+                progress.currentStep = JOURNEY_STEPS.length - 1;
                 progress.percentage = 100;
             }
             break;
@@ -937,9 +939,11 @@ function getUserProgress() {
         
         if (isStepComplete) {
             progress.completed.push(step);
+            progress.currentStep = i + 1;
         } else {
             progress.current = step;
             progress.next = JOURNEY_STEPS[i + 1];
+            if (progress.currentStep === 0) progress.currentStep = i;
             break;
         }
     }
@@ -999,17 +1003,15 @@ function initProgressTracking() {
     const currentPage = getCurrentPageName();
     const progress = checkUserProgress();
     
-    // Only redirect if we're on landing page or personal info page
-    if (currentPage === 'index.html' || currentPage === 'personal-info.html') {
+    // Only redirect if we're on landing page
+    if (currentPage === 'index.html') {
         // If user has completed everything, show option to go to dashboard
-        if (progress.isComplete && currentPage === 'index.html') {
+        if (progress.isComplete) {
             showDashboardOption();
         }
-        // If user is on personal-info but should be elsewhere, redirect
-        else if (currentPage === 'personal-info.html' && progress.current && progress.current.key !== 'personalInfo') {
-            window.location.href = progress.current.page;
-        }
     }
+    
+    // Remove auto-redirect from other pages - let users navigate freely
     
     return progress;
 }
@@ -1062,4 +1064,199 @@ function updateProgressDisplay(progress) {
 // Export progress functions
 window.checkUserProgress = checkUserProgress;
 window.smartRedirect = smartRedirect;
-window.initProgressTracking = initProgressTracking; 
+window.initProgressTracking = initProgressTracking;
+
+// ===== UNIVERSAL NAVIGATION SYSTEM =====
+
+// Create and setup progress navigation for any page
+function setupPageNavigation(currentPageIndex = 1) {
+    const navHtml = `
+        <div id="progressNavigation" style="margin-bottom: 2rem; text-align: center;">
+            <div class="progress-container" style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+                <div class="progress-dots" style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <div class="progress-step ${currentPageIndex === 1 ? 'current' : ''}" data-step="1" data-page="personal-info.html">
+                        <div class="progress-dot"></div>
+                        <span>Personal Info</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 2 ? 'current' : ''}" data-step="2" data-page="networth.html">
+                        <div class="progress-dot"></div>
+                        <span>Net Worth</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 3 ? 'current' : ''}" data-step="3" data-page="income.html">
+                        <div class="progress-dot"></div>
+                        <span>Income</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 4 ? 'current' : ''}" data-step="4" data-page="expenses.html">
+                        <div class="progress-dot"></div>
+                        <span>Expenses</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 5 ? 'current' : ''}" data-step="5" data-page="ff-score.html">
+                        <div class="progress-dot"></div>
+                        <span>FF Score</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 6 ? 'current' : ''}" data-step="6" data-page="insurance.html">
+                        <div class="progress-dot"></div>
+                        <span>Insurance</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 7 ? 'current' : ''}" data-step="7" data-page="risk-profile.html">
+                        <div class="progress-dot"></div>
+                        <span>Risk Profile</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 8 ? 'current' : ''}" data-step="8" data-page="dashboard.html">
+                        <div class="progress-dot"></div>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .progress-step {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                min-width: 80px;
+            }
+
+            .progress-step:hover {
+                transform: translateY(-2px);
+            }
+
+            .progress-dot {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #e0e0e0;
+                margin-bottom: 0.5rem;
+                transition: all 0.3s ease;
+                position: relative;
+                border: 2px solid #ffffff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .progress-step.completed .progress-dot {
+                background: #4CAF50;
+                border-color: #4CAF50;
+            }
+
+            .progress-step.completed .progress-dot::after {
+                content: '✓';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 12px;
+                font-weight: bold;
+            }
+
+            .progress-step.current .progress-dot {
+                background: #2196F3;
+                border-color: #2196F3;
+                animation: pulse 2s infinite;
+            }
+
+            .progress-step span {
+                font-size: 0.8rem;
+                color: #666;
+                text-align: center;
+                font-weight: 500;
+            }
+
+            .progress-step.completed span {
+                color: #4CAF50;
+                font-weight: 600;
+            }
+
+            .progress-step.current span {
+                color: #2196F3;
+                font-weight: 600;
+            }
+
+            .progress-line {
+                width: 30px;
+                height: 2px;
+                background: #e0e0e0;
+                margin: 0 0.5rem;
+                margin-top: 10px;
+            }
+
+            @keyframes pulse {
+                0% { 
+                    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
+                    transform: scale(1);
+                }
+                50% {
+                    box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+                    transform: scale(1.05);
+                }
+                100% { 
+                    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+                    transform: scale(1);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .progress-dots {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .progress-line {
+                    width: 2px;
+                    height: 20px;
+                    margin: 0;
+                }
+            }
+        </style>
+    `;
+    
+    // Find insertion point (after page header or at beginning of container)
+    let insertionPoint = document.querySelector('.page-header');
+    if (!insertionPoint) {
+        insertionPoint = document.querySelector('.container');
+    }
+    
+    if (insertionPoint) {
+        insertionPoint.insertAdjacentHTML('afterend', navHtml);
+        
+        // Setup click handlers and progress status
+        setupNavigationInteractions();
+    }
+}
+
+// Setup navigation interactions and progress updates
+function setupNavigationInteractions() {
+    const progress = getUserProgress();
+    const progressSteps = document.querySelectorAll('.progress-step');
+    
+    progressSteps.forEach((step) => {
+        const stepNumber = parseInt(step.getAttribute('data-step'));
+        step.classList.remove('completed');
+        
+        // Mark completed steps
+        if (stepNumber <= progress.currentStep) {
+            step.classList.add('completed');
+        }
+        
+        // Add click handler for navigation
+        step.addEventListener('click', () => {
+            const page = step.getAttribute('data-page');
+            if (page) {
+                window.location.href = page;
+            }
+        });
+    });
+}
+
+// Export navigation functions
+window.setupPageNavigation = setupPageNavigation;
+window.setupNavigationInteractions = setupNavigationInteractions; 

@@ -513,40 +513,14 @@
                     console.log('Current progress:', progress);
                 }
                 
-                // Setup progress navigation
-                setupProgressNavigation();
+                // Setup progress navigation using universal system
+                if (typeof setupPageNavigation === 'function') {
+                    setupPageNavigation(1); // 1 = Personal Info page
+                }
             } else {
                 window.location.href = 'index.html';
             }
         });
-
-        // Setup progress navigation functionality
-        function setupProgressNavigation() {
-            const progress = getUserProgress();
-            const progressSteps = document.querySelectorAll('.progress-step');
-            
-            // Update progress status
-            progressSteps.forEach((step) => {
-                const stepNumber = parseInt(step.getAttribute('data-step'));
-                step.classList.remove('completed', 'current');
-                
-                if (stepNumber < 1) {
-                    step.classList.add('completed');
-                } else if (stepNumber === 1) {
-                    step.classList.add('current');
-                }
-                
-                // Add click handler for completed steps
-                if (stepNumber <= progress.currentStep || stepNumber === 1) {
-                    step.addEventListener('click', () => {
-                        const page = step.getAttribute('data-page');
-                        if (page && stepNumber !== 1) {
-                            window.location.href = page;
-                        }
-                    });
-                }
-            });
-        }
 
         function showStatus(message, isError = false) {
             const statusElement = document.getElementById('status');

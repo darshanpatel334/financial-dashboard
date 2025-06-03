@@ -514,6 +514,11 @@
             if (user) {
                 document.getElementById('userEmail').textContent = user.email;
                 loadNetWorthData();
+                
+                // Setup navigation system
+                if (typeof setupPageNavigation === 'function') {
+                    setupPageNavigation(2); // 2 = Net Worth page
+                }
             } else {
                 window.location.href = 'index.html';
             }
