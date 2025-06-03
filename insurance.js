@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initCommonElements();
         loadInsuranceData();
         calculateTotals();
+        
+        // Setup navigation system
+        if (typeof setupPageNavigation === 'function') {
+            setupPageNavigation(6); // 6 = Insurance page
+        }
     });
 });
 

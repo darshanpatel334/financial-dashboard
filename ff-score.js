@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadDataFromPreviousPages();
         calculateFFScore();
         calculateScenarios();
+        
+        // Setup navigation system
+        if (typeof setupPageNavigation === 'function') {
+            setupPageNavigation(5); // 5 = FF Score page
+        }
     });
 });
 

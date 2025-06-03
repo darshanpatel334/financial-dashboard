@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initCommonElements();
         loadAllData();
         initDashboard();
+        
+        // Setup navigation system
+        if (typeof setupPageNavigation === 'function') {
+            setupPageNavigation(8); // 8 = Dashboard page
+        }
     });
 });
 

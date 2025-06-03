@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initCommonElements();
         loadIncomeData();
         calculateAutoIncomeFromNetWorth();
+        
+        // Setup navigation system
+        if (typeof setupPageNavigation === 'function') {
+            setupPageNavigation(3); // 3 = Income page
+        }
     });
 });
 

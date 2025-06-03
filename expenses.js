@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initCommonElements();
         loadExpenseData();
         loadIncomeDataForAnalysis();
+        
+        // Setup navigation system
+        if (typeof setupPageNavigation === 'function') {
+            setupPageNavigation(4); // 4 = Expenses page
+        }
     });
 });
 
