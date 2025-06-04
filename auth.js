@@ -13,6 +13,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
+// Configure Google Sign-In provider
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
+
 // Status message display function
 function showStatus(message, isError = false) {
     const statusElement = document.getElementById('status');
@@ -125,6 +130,70 @@ function handleLogout() {
         })
         .catch((error) => {
             showStatus(error.message, true);
+        });
+}
+
+// Google Sign-In functionality
+function handleGoogleSignIn() {
+    console.log('Google Sign-In initiated'); // Debug log
+    
+    auth.signInWithPopup(googleProvider)
+        .then((result) => {
+            console.log('Google Sign-In successful:', result.user.email); // Debug log
+            const user = result.user;
+            
+            // Extract user information
+            const userData = {
+                firstName: user.displayName ? user.displayName.split(' ')[0] : '',
+                lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
+                email: user.email,
+                photoURL: user.photoURL,
+                signupDate: new Date().toISOString(),
+                provider: 'google'
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            // Also save as personal info to kickstart the journey
+            const personalInfo = {
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                email: userData.email
+            };
+            localStorage.setItem('personalInfo', JSON.stringify(personalInfo));
+            
+            showStatus('Google Sign-In successful! Redirecting...');
+            
+            // Close any open modals
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => modal.style.display = 'none');
+            
+            // Use smart redirect to determine where to go
+            setTimeout(() => {
+                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info.html';
+                window.location.href = nextPage;
+            }, 1500);
+        })
+        .catch((error) => {
+            console.error('Google Sign-In error:', error); // Debug log
+            let errorMessage = 'Google Sign-In failed';
+            
+            switch (error.code) {
+                case 'auth/popup-closed-by-user':
+                    errorMessage = 'Sign-in was cancelled';
+                    break;
+                case 'auth/popup-blocked':
+                    errorMessage = 'Popup was blocked. Please allow popups and try again';
+                    break;
+                case 'auth/network-request-failed':
+                    errorMessage = 'Network error. Please check your connection';
+                    break;
+                default:
+                    errorMessage = error.message;
+            }
+            
+            showStatus(errorMessage, true);
         });
 }
 

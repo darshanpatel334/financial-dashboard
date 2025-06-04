@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Dashboard - NiveshMatrix</title>
+    <title>Financial Dashboard - Nivezo</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -13,11 +13,18 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <a href="index.html" class="nav-brand" style="text-decoration: none;">NiveshMatrix</a>
-            <div class="user-info">
-                <span class="user-email" id="userEmail"></span>
-                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand" style="text-decoration: none;">Nivezo</a>
+            <div class="nav-links">
+                <a href="personal-info.html"><i class="fas fa-user"></i> Personal Info</a>
+                <a href="income.html"><i class="fas fa-coins"></i> Income</a>
+                <a href="expenses.html"><i class="fas fa-receipt"></i> Expenses</a>
+                <a href="networth.html"><i class="fas fa-chart-line"></i> Net Worth</a>
+                <a href="risk-profile.html"><i class="fas fa-shield-alt"></i> Risk Profile</a>
+                <a href="ff-score.html"><i class="fas fa-calculator"></i> FF Score</a>
+                <a href="insurance.html"><i class="fas fa-umbrella"></i> Insurance</a>
+                <a href="advisor.html"><i class="fas fa-user-tie"></i> Advisor</a>
+                <a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             </div>
         </div>
     </nav>
