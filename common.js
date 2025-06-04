@@ -1140,6 +1140,16 @@ function setupPageNavigation(currentPageIndex = 1) {
                         <div class="progress-dot"></div>
                         <span>Dashboard</span>
                     </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 9 ? 'current' : ''}" data-step="9" data-page="advisor.html">
+                        <div class="progress-dot"></div>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step ${currentPageIndex === 10 ? 'current' : ''}" data-step="10" data-page="find-advisor.html">
+                        <div class="progress-dot"></div>
+                        <span>Find Advisor</span>
+                    </div>
                 </div>
             </div>
         </div>

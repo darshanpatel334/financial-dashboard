@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find an Advisor - Nivezo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Coming Soon Specific Styles */
+        .coming-soon-overlay {
+            position: relative;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
+            color: white;
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .coming-soon-overlay h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .coming-soon-overlay p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .coming-soon-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-preview {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-preview h4 {
+            color: white;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .feature-preview p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+        
+        /* Preview Layout Styles */
+        .preview-section {
+            opacity: 0.5;
+            pointer-events: none;
+            position: relative;
+        }
+        
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.8) 25%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(255, 255, 255, 0.8) 75%);
+            background-size: 20px 20px;
+            border-radius: 1rem;
+            z-index: 1;
+        }
+        
+        .advisor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .advisor-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .advisor-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .advisor-avatar {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .advisor-info h4 {
+            margin: 0 0 0.25rem 0;
+            color: var(--text-primary);
+        }
+        
+        .advisor-info .sebi-reg {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .advisor-details {
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .expertise-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tag {
+            background: #f1f5f9;
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .advisor-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .filter-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .why-advisor-section {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .why-advisor-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .why-advisor-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .why-advisor-list li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .why-advisor-list li::before {
+            content: '✓';
+            color: var(--success-color);
+            font-weight: bold;
+            margin-top: 0.1rem;
+        }
+        
+        .compliance-disclaimer {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .compliance-disclaimer h4 {
+            color: #dc2626;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .compliance-disclaimer p {
+            color: #dc2626;
+            font-weight: 500;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .notify-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #0ea5e9;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .notify-section h3 {
+            color: #0c4a6e;
+            margin-bottom: 1rem;
+        }
+        
+        .notify-form {
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .notify-form input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .coming-soon-overlay h2 {
+                font-size: 2rem;
+            }
+            
+            .advisor-actions {
+                flex-direction: column;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .notify-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand" style="text-decoration: none;">Nivezo</a>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button class="btn btn-secondary" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- SEBI Compliance Disclaimer (Top Alert) -->
+        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 0.5rem; padding: 1rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; color: #92400e;">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem; font-size: 1.2rem;"></i>
+                <strong>SEBI Compliance Notice:</strong> Nivezo is not a SEBI-registered investment advisor. This platform acts as a neutral referral service only.
+            </div>
+        </div>
+
+        <!-- Coming Soon Overlay -->
+        <div class="coming-soon-overlay">
+            <h2><i class="fas fa-rocket"></i> Coming Soon!</h2>
+            <p>We're building something amazing to connect you with verified SEBI-registered Investment Advisors</p>
+            
+            <div class="coming-soon-features">
+                <div class="feature-preview">
+                    <h4><i class="fas fa-search"></i> Discover Advisors</h4>
+                    <p>Browse verified SEBI-registered professionals by location, expertise, and experience</p>
+                </div>
+                <div class="feature-preview">
+                    <h4><i class="fas fa-filter"></i> Smart Filters</h4>
+                    <p>Filter by specialization, fees, language, and years of experience</p>
+                </div>
+                <div class="feature-preview">
+                    <h4><i class="fas fa-shield-alt"></i> Verified Profiles</h4>
+                    <p>All advisors are SEBI-registered with verified credentials and registration numbers</p>
+                </div>
+                <div class="feature-preview">
+                    <h4><i class="fas fa-handshake"></i> Easy Connect</h4>
+                    <p>Request callbacks and connect directly with advisors for personalized guidance</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Get Notified Section -->
+        <div class="notify-section">
+            <h3><i class="fas fa-bell"></i> Be the First to Know</h3>
+            <p style="margin-bottom: 1.5rem; color: #0c4a6e;">Get notified when our advisor marketplace goes live</p>
+            <div class="notify-form">
+                <input type="email" placeholder="Enter your email" id="notifyEmail">
+                <button class="btn btn-primary" onclick="notifyMe()">Notify Me</button>
+            </div>
+        </div>
+
+        <!-- Page Header (Preview) -->
+        <div class="preview-section">
+            <div class="preview-overlay"></div>
+            <div class="page-header">
+                <h1><i class="fas fa-user-tie"></i> Connect with a SEBI-Registered Investment Advisor</h1>
+                <p>We help you discover professionals who can guide your investment journey. Nivezo does not offer investment advice.</p>
+            </div>
+
+            <!-- Filter Bar (Preview) -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Location:</label>
+                    <select disabled>
+                        <option>All Cities</option>
+                        <option>Mumbai</option>
+                        <option>Delhi</option>
+                        <option>Bangalore</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Experience:</label>
+                    <select disabled>
+                        <option>All</option>
+                        <option>5+ Years</option>
+                        <option>10+ Years</option>
+                        <option>15+ Years</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Specialization:</label>
+                    <select disabled>
+                        <option>All</option>
+                        <option>Retirement Planning</option>
+                        <option>Tax Planning</option>
+                        <option>Mutual Funds</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Search:</label>
+                    <input type="text" placeholder="Search by name" disabled>
+                </div>
+            </div>
+
+            <!-- Advisor Cards Grid (Preview) -->
+            <div class="advisor-grid">
+                <!-- Sample Advisor Card 1 -->
+                <div class="advisor-card">
+                    <div class="advisor-profile">
+                        <div class="advisor-avatar">RA</div>
+                        <div class="advisor-info">
+                            <h4>Rajesh Agarwal</h4>
+                            <div class="sebi-reg">SEBI Reg: INA000001234</div>
+                        </div>
+                    </div>
+                    
+                    <div class="advisor-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>12+ Years Experience</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Mumbai, Maharashtra</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-language"></i>
+                            <span>English, Hindi, Marathi</span>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-tags">
+                        <span class="tag">Retirement Planning</span>
+                        <span class="tag">Mutual Funds</span>
+                        <span class="tag">Tax Planning</span>
+                    </div>
+                    
+                    <div class="advisor-actions">
+                        <button class="btn-outline" disabled>Know More</button>
+                        <button class="btn btn-primary" disabled>Connect</button>
+                    </div>
+                </div>
+
+                <!-- Sample Advisor Card 2 -->
+                <div class="advisor-card">
+                    <div class="advisor-profile">
+                        <div class="advisor-avatar">PS</div>
+                        <div class="advisor-info">
+                            <h4>Priya Sharma</h4>
+                            <div class="sebi-reg">SEBI Reg: INA000005678</div>
+                        </div>
+                    </div>
+                    
+                    <div class="advisor-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>8+ Years Experience</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Bangalore, Karnataka</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-language"></i>
+                            <span>English, Hindi, Kannada</span>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-tags">
+                        <span class="tag">Goal Planning</span>
+                        <span class="tag">Insurance</span>
+                        <span class="tag">Women's Finance</span>
+                    </div>
+                    
+                    <div class="advisor-actions">
+                        <button class="btn-outline" disabled>Know More</button>
+                        <button class="btn btn-primary" disabled>Connect</button>
+                    </div>
+                </div>
+
+                <!-- Sample Advisor Card 3 -->
+                <div class="advisor-card">
+                    <div class="advisor-profile">
+                        <div class="advisor-avatar">AK</div>
+                        <div class="advisor-info">
+                            <h4>Amit Kumar</h4>
+                            <div class="sebi-reg">SEBI Reg: INA000009876</div>
+                        </div>
+                    </div>
+                    
+                    <div class="advisor-details">
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>15+ Years Experience</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Delhi, NCR</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-language"></i>
+                            <span>English, Hindi, Punjabi</span>
+                        </div>
+                    </div>
+                    
+                    <div class="expertise-tags">
+                        <span class="tag">Portfolio Management</span>
+                        <span class="tag">Equity Research</span>
+                        <span class="tag">HNI Advisory</span>
+                    </div>
+                    
+                    <div class="advisor-actions">
+                        <button class="btn-outline" disabled>Know More</button>
+                        <button class="btn btn-primary" disabled>Connect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why Choose a Registered Advisor Section -->
+        <div class="why-advisor-section">
+            <h3><i class="fas fa-graduation-cap"></i> Why Choose a SEBI-Registered Advisor?</h3>
+            <ul class="why-advisor-list">
+                <li><strong>Legal Compliance:</strong> SEBI-registered advisors follow strict regulatory guidelines and fiduciary duties</li>
+                <li><strong>Transparency:</strong> Clear fee structure and no hidden commissions from product sales</li>
+                <li><strong>Professional Standards:</strong> Certified professionals with ongoing education requirements</li>
+                <li><strong>Client Protection:</strong> SEBI oversight ensures proper conduct and investor protection</li>
+                <li><strong>Unbiased Advice:</strong> Fee-only structure eliminates conflicts of interest from product commissions</li>
+            </ul>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                <i class="fas fa-external-link-alt"></i> 
+                Verify any advisor's registration at <a href="https://www.sebi.gov.in" target="_blank" style="color: var(--primary-color);">sebi.gov.in</a>
+            </p>
+        </div>
+
+        <!-- Compliance Disclaimer -->
+        <div class="compliance-disclaimer">
+            <h4><i class="fas fa-exclamation-triangle"></i> Important Disclaimer</h4>
+            <p>Nivezo is not a SEBI-registered investment adviser. This platform does not provide investment advice. We act solely as a neutral referral platform. All advice is independently provided by the listed professionals. Users are responsible for verifying advisor credentials before engaging services.</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Back: Analytics
+            </button>
+            <button type="button" class="nav-btn btn-primary" onclick="completeJourney()">
+                Complete Journey <i class="fas fa-check"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth().then(() => {
+                initCommonElements();
+                
+                // Setup navigation system
+                if (typeof setupPageNavigation === 'function') {
+                    setupPageNavigation(10); // 10 = Find Advisor page
+                }
+            });
+        });
+
+        // Notify Me functionality
+        function notifyMe() {
+            const email = document.getElementById('notifyEmail').value;
+            if (!email) {
+                showStatus('Please enter your email address', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showStatus('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Store email for notifications
+            const notificationData = {
+                email: email,
+                feature: 'advisor-marketplace',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save to localStorage for now (in production, save to Firebase)
+            let notifications = JSON.parse(localStorage.getItem('feature_notifications') || '[]');
+            notifications.push(notificationData);
+            localStorage.setItem('feature_notifications', JSON.stringify(notifications));
+            
+            showStatus('Thanks! We\'ll notify you when the advisor marketplace launches.', 'success');
+            document.getElementById('notifyEmail').value = '';
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Navigation functions
+        function goBack() {
+            window.location.href = 'advisor.html';
+        }
+
+        function completeJourney() {
+            showStatus('Journey completed! You can always return to explore advisors when the feature launches.', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html> 

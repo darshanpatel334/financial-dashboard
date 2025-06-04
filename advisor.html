@@ -777,8 +777,8 @@
             <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i> Back: Dashboard
             </button>
-            <button type="button" class="nav-btn btn-primary" onclick="completeJourney()">
-                Complete Journey <i class="fas fa-check"></i>
+            <button type="button" class="nav-btn btn-primary" onclick="goToFindAdvisor()">
+                Next: Find Advisor <i class="fas fa-arrow-right"></i>
             </button>
         </div>
     </div>
@@ -792,5 +792,21 @@
     <script src="auth.js"></script>
     <script src="common.js"></script>
     <script src="analytics.js"></script>
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth().then(() => {
+                initCommonElements();
+                loadAllUserData();
+                generateAnalytics();
+                initializeCalculators();
+                
+                // Setup navigation system
+                if (typeof setupPageNavigation === 'function') {
+                    setupPageNavigation(9); // 9 = Analytics page
+                }
+            });
+        });
+    </script>
 </body>
 </html> 

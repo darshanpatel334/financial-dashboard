@@ -259,21 +259,32 @@
         .features h2 {
             text-align: center;
             font-size: 2.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
             color: var(--text-primary);
+        }
+
+        .features-intro {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
+            margin-bottom: 3rem;
         }
 
         .feature-card {
             background: var(--bg-primary);
             padding: 2rem;
             border-radius: 1rem;
-            text-align: center;
+            text-align: left;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
@@ -292,7 +303,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
+            margin-bottom: 1.5rem;
             color: white;
             font-size: 1.5rem;
         }
@@ -306,6 +317,79 @@
         .feature-card p {
             color: var(--text-secondary);
             line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-card li {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-card li::before {
+            content: '•';
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .highlight-box h3 {
+            color: #92400e;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .highlight-box p {
+            color: #92400e;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .security-section {
+            background: #f0fdf4;
+            border: 1px solid #22c55e;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .security-section h3 {
+            color: #15803d;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #15803d;
+            font-weight: 500;
         }
 
         /* CTA Section */
@@ -358,6 +442,17 @@
             background: #ef4444;
         }
 
+        .disclaimer-note {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 3rem 0;
+            text-align: center;
+            color: #dc2626;
+            font-weight: 500;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero h1 {
@@ -376,6 +471,10 @@
             .features h2,
             .cta h2 {
                 font-size: 2rem;
+            }
+
+            .security-features {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -399,10 +498,10 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>Transform Your Financial Future</h1>
-            <p>Take control of your wealth with Nivezo's comprehensive financial planning tools. Track your net worth, analyze expenses, and discover your path to financial freedom.</p>
+            <h1>Nivezo – Investment Intelligence, Simplified</h1>
+            <p>Your personal finance dashboard for clarity, control, and confidence. Discover how smart planning and self-awareness can reshape your financial future — without complex advice or noise.</p>
             <button class="btn btn-primary btn-signup" data-modal="signupModal" id="startJourneyBtn">
-                <i class="fas fa-rocket"></i> Start Your Financial Journey
+                <i class="fas fa-rocket"></i> Start My Free Dashboard
             </button>
             <div class="hero-stats">
                 <div class="stat-item">
@@ -421,53 +520,126 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Why Nivezo Section -->
     <section class="features">
         <div class="container">
-            <h2>Comprehensive Financial Tools</h2>
+            <div class="highlight-box">
+                <h3>✅ Why Nivezo?</h3>
+                <p>India is witnessing a financial revolution — but most people still lack clarity on how much to save, where to allocate, or what they truly need to reach freedom. Nivezo helps you decode your financial life with intelligent tools, simple dashboards, and simulations designed for real people.</p>
+            </div>
+
+            <h2>🔍 What You Can Do on Nivezo</h2>
+            
             <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>Net Worth Tracking</h3>
-                    <p>Track your assets, liabilities, and overall net worth with detailed categorization and yield analysis.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <h3>Income & Expense Analysis</h3>
-                    <p>Monitor multiple income sources and categorize expenses to understand your cash flow patterns.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <h3>Financial Freedom Score</h3>
-                    <p>Calculate your FF score and discover how many years you can sustain your lifestyle without active income.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>Risk Assessment</h3>
-                    <p>Understand your risk profile through comprehensive analysis and educational insights.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-umbrella"></i>
-                    </div>
-                    <h3>Insurance Planning</h3>
-                    <p>Manage your life and health insurance portfolio to ensure adequate coverage.</p>
-                </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-chart-pie"></i>
                     </div>
-                    <h3>Financial Analytics Dashboard</h3>
-                    <p>Comprehensive charts, ratios, and analytics to help you understand your financial position.</p>
+                    <h3>📊 Track Your Complete Financial Picture</h3>
+                    <p>Get a 360° view of your income, expenses, assets, liabilities, insurance, and goals — all in one place.</p>
                 </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>⚙️ Run Smart Financial Simulations</h3>
+                    <p>No more guesswork. Use our intelligent tools to test scenarios and make smarter money moves:</p>
+                    <ul>
+                        <li>SIP Calculator</li>
+                        <li>Goal-Based Investment Simulator</li>
+                        <li>Retirement Corpus Estimator</li>
+                        <li>Freedom Score Evaluator</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3>🧠 Understand Your Risk Appetite</h3>
+                    <p>Answer a quick questionnaire and know whether you're a Conservative, Balanced, or Aggressive investor.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>🧾 Plan Like a Pro, Without an Advisor</h3>
+                    <p>Get suggestive asset allocation models based on your profile — age, income, risk appetite, and goals.</p>
+                    <p style="font-size: 0.9rem; font-style: italic;">📌 We don't give investment advice — just powerful insights to help you think better.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>🧠 Learn & Grow</h3>
+                    <p>Explore our Financial Literacy Center with easy guides, glossary terms, and explainers for everything from equity and debt to insurance and taxes.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>🚀 Who It's For</h3>
+                    <p>Whether you earn ₹5 lakh or ₹50 lakh per year — if you care about your financial freedom, Nivezo is built for you.</p>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div class="security-section">
+                <h3><i class="fas fa-shield-alt"></i> 🔐 Data Privacy and Security First</h3>
+                <p style="color: #15803d; margin-bottom: 1rem;">We follow strict data protection practices:</p>
+                <div class="security-features">
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Google-secured logins (OTP/Email)</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Encryption of sensitive financial inputs</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Hosted on secure cloud infrastructure</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Full transparency — your data, your control</span>
+                    </div>
+                </div>
+                <p style="color: #15803d; margin-top: 1rem; font-size: 0.9rem;">📌 We voluntarily follow best practices under IT Act and RBI KYC guidelines.</p>
+            </div>
+
+            <!-- Future Features -->
+            <div class="highlight-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-color: #0ea5e9;">
+                <h3 style="color: #0c4a6e;">💡 Future-Ready Features (Coming Soon)</h3>
+                <div style="color: #0c4a6e; text-align: left; max-width: 600px; margin: 0 auto;">
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0;">🔗</span>
+                            Connect with verified SEBI-registered investment advisors
+                        </li>
+                        <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0;">💾</span>
+                            Save & update your portfolio monthly
+                        </li>
+                        <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0;">💰</span>
+                            Tax-saving simulation tools
+                        </li>
+                        <li style="padding-left: 1.5rem; position: relative;">
+                            <span style="position: absolute; left: 0;">🧮</span>
+                            More goal-based calculators
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer-note">
+                <p><strong>📝 Important Note:</strong> Nivezo is not a SEBI-registered investment advisor. All tools and illustrations are for educational purposes only. Users are encouraged to consult SEBI-registered professionals before making investment decisions.</p>
             </div>
         </div>
     </section>
@@ -475,9 +647,9 @@
     <!-- CTA Section -->
     <section class="cta">
         <div class="container">
-            <h2>Ready to Take Control of Your Finances?</h2>
-            <p>Join thousands of users who have transformed their financial future with Nivezo.</p>
-            <button class="btn btn-primary btn-signup" data-modal="signupModal">Get Started Free</button>
+            <h2>🆓 Get Started — It's Free</h2>
+            <p>Start your journey with our basic plan and unlock smarter financial awareness in minutes.</p>
+            <button class="btn btn-primary btn-signup" data-modal="signupModal">Start My Free Dashboard</button>
         </div>
     </section>
 
@@ -609,7 +781,7 @@
                         startJourneyBtn.innerHTML = '<i class="fas fa-play"></i> Continue Your Journey';
                         startJourneyBtn.removeAttribute('data-modal');
                     } else {
-                        startJourneyBtn.innerHTML = '<i class="fas fa-rocket"></i> Start Your Financial Journey';
+                        startJourneyBtn.innerHTML = '<i class="fas fa-rocket"></i> Start My Free Dashboard';
                         startJourneyBtn.setAttribute('data-modal', 'signupModal');
                     }
                 });

@@ -559,6 +559,13 @@ function goBack() {
     window.location.href = 'dashboard.html';
 }
 
+function goToFindAdvisor() {
+    showStatus('Navigating to Find Advisor page...', 'success');
+    setTimeout(() => {
+        window.location.href = 'find-advisor.html';
+    }, 1000);
+}
+
 function completeJourney() {
     showStatus('Financial analytics review completed! You can always return to analyze your data.', 'success');
     setTimeout(() => {
