@@ -1,12 +1,24 @@
 // ===== UTILITY FUNCTIONS =====
 
-// Show status messages
+// Show status messages with proper z-index
 function showStatus(message, type = 'success') {
     const statusElement = document.getElementById('status');
     if (statusElement) {
         statusElement.textContent = message;
         statusElement.className = `status-message ${type}`;
         statusElement.style.display = 'block';
+        statusElement.style.zIndex = '10000'; // Ensure it appears above everything
+        statusElement.style.position = 'fixed';
+        statusElement.style.top = '20px';
+        statusElement.style.right = '20px';
+        statusElement.style.backgroundColor = type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : type === 'info' ? '#3b82f6' : '#22c55e';
+        statusElement.style.color = 'white';
+        statusElement.style.padding = '1rem 1.5rem';
+        statusElement.style.borderRadius = '0.5rem';
+        statusElement.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+        statusElement.style.maxWidth = '400px';
+        statusElement.style.wordWrap = 'break-word';
+        
         setTimeout(() => {
             statusElement.style.display = 'none';
         }, 3000);
@@ -225,6 +237,12 @@ function navigateToPage(targetPage, saveFunction = null) {
     if (saveFunction) {
         saveFunction();
     }
+    
+    // Refresh navigation to show updated completion status
+    setTimeout(() => {
+        refreshNavigationStatus();
+    }, 100);
+    
     showStatus('Data saved successfully!');
     setTimeout(() => {
         window.location.href = targetPage;
@@ -958,10 +976,13 @@ function validateStepCompletion(stepKey, data) {
     
     switch (stepKey) {
         case 'personalInfo':
-            return data.fullName && data.email && data.age;
+            // Check for either fullName or firstName+lastName, and age
+            return (data.fullName || (data.firstName && data.lastName)) && 
+                   (data.age || data.dateOfBirth);
             
         case 'netWorthData':
-            return data.totals && typeof data.totals.totalNetWorth === 'number';
+            // Check if totals exist and net worth is calculated
+            return data.totals && typeof data.totals.netWorth === 'number';
             
         case 'incomeData':
             return data.totals && typeof data.totals.annualTotal === 'number' && data.totals.annualTotal > 0;
@@ -970,10 +991,14 @@ function validateStepCompletion(stepKey, data) {
             return data.totals && typeof data.totals.annualTotal === 'number' && data.totals.annualTotal > 0;
             
         case 'ffScoreData':
-            return data.currentScore && typeof data.currentScore === 'number' && data.currentScore > 0;
+            return (data.currentScore && typeof data.currentScore === 'number' && data.currentScore > 0) ||
+                   (data.score && typeof data.score === 'number' && data.score > 0);
             
         case 'insuranceData':
-            return data.lifeInsurance || data.healthInsurance;
+            // Check for any insurance data - totals or insurance categories
+            return (data.totals && (data.totals.totalLifeCoverage > 0 || data.totals.totalHealthCoverage > 0)) ||
+                   (data.insurance && Object.keys(data.insurance).some(category => 
+                       Array.isArray(data.insurance[category]) && data.insurance[category].length > 0));
             
         case 'riskData':
             // Risk profile is complete when score is calculated
@@ -1281,6 +1306,28 @@ function setupNavigationInteractions() {
     });
 }
 
+// Refresh navigation status (useful when data changes)
+function refreshNavigationStatus() {
+    const progressSteps = document.querySelectorAll('.progress-step');
+    if (progressSteps.length > 0) {
+        setupNavigationInteractions();
+    }
+}
+
+// Auto-refresh navigation when localStorage changes
+window.addEventListener('storage', (e) => {
+    // Refresh navigation when data changes
+    if (e.key && (e.key.includes('Info') || e.key.includes('Data'))) {
+        setTimeout(refreshNavigationStatus, 100);
+    }
+});
+
+// Also refresh on focus (when returning to tab)
+window.addEventListener('focus', () => {
+    setTimeout(refreshNavigationStatus, 100);
+});
+
 // Export navigation functions
 window.setupPageNavigation = setupPageNavigation;
-window.setupNavigationInteractions = setupNavigationInteractions; 
+window.setupNavigationInteractions = setupNavigationInteractions;
+window.refreshNavigationStatus = refreshNavigationStatus; 

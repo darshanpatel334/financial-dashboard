@@ -532,6 +532,15 @@
                 dependents: []
             };
 
+            // Add computed fullName for compatibility
+            formData.fullName = `${formData.firstName} ${formData.lastName}`.trim();
+            
+            // Add email from Firebase auth
+            const user = firebase.auth().currentUser;
+            if (user) {
+                formData.email = user.email;
+            }
+
             // Collect dependents data
             const dependentItems = document.querySelectorAll('.dependent-item');
             dependentItems.forEach((item, index) => {
@@ -545,10 +554,18 @@
             });
 
             // Calculate age
-            const today = new Date();
-            const birthDate = new Date(formData.dateOfBirth);
-            const age = today.getFullYear() - birthDate.getFullYear();
-            formData.age = age;
+            if (formData.dateOfBirth) {
+                const today = new Date();
+                const birthDate = new Date(formData.dateOfBirth);
+                const age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                formData.age = age;
+            }
 
             // Save to localStorage
             localStorage.setItem('personalInfo', JSON.stringify(formData));
@@ -598,6 +615,10 @@
         document.getElementById('personalInfoForm').addEventListener('input', () => {
             setTimeout(() => {
                 savePersonalInfo();
+                // Refresh navigation to show completion status
+                if (typeof refreshNavigationStatus === 'function') {
+                    refreshNavigationStatus();
+                }
             }, 1000);
         });
     </script>
