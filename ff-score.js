@@ -74,8 +74,8 @@ function calculateFFScore() {
     // Update progress bar
     updateProgressBar(ffData.currentScore);
     
-    // Generate suggestions
-    generateSuggestions();
+    // Generate educational insights
+    generateEducationalInsights();
     
     // Save data
     saveFFData();
@@ -163,80 +163,57 @@ function updateProgressBar(score) {
     document.getElementById('ffProgress').style.width = percentage + '%';
 }
 
-// Generate improvement suggestions
-function generateSuggestions() {
+// Generate educational insights about financial freedom
+function generateEducationalInsights() {
     const suggestionsContainer = document.getElementById('suggestions');
-    const suggestions = [];
-    
-    if (ffData.currentScore < 10) {
-        suggestions.push({
-            icon: '🚨',
-            title: 'Critical: Build Emergency Fund',
-            description: 'Your current savings can only last ' + ffData.currentScore + ' years. Focus on building an emergency fund of 6-12 months expenses first.',
-            priority: 'high'
-        });
-        
-        suggestions.push({
+    const insights = [
+        {
             icon: '💰',
-            title: 'Increase Savings Rate',
-            description: 'Try to save at least 20-30% of your income. Consider reducing discretionary expenses.',
-            priority: 'high'
-        });
-    } else if (ffData.currentScore < 25) {
-        suggestions.push({
+            title: 'Understanding Financial Freedom Score',
+            description: 'Your FF Score represents how many years it would take to achieve financial independence based on current savings and expenses. Lower is better.',
+            priority: 'info'
+        },
+        {
             icon: '📈',
-            title: 'Optimize Investment Returns',
-            description: 'Consider diversifying into higher-return assets like equity mutual funds or stocks.',
-            priority: 'medium'
-        });
-        
-        suggestions.push({
-            icon: '💸',
-            title: 'Review and Reduce Expenses',
-            description: 'Look for opportunities to reduce monthly expenses without compromising lifestyle.',
-            priority: 'medium'
-        });
-    } else if (ffData.currentScore < 50) {
-        suggestions.push({
+            title: 'The Power of Saving Rate',
+            description: 'Increasing your savings rate has the biggest impact on financial freedom. Even small improvements in savings rate can dramatically reduce your FF Score.',
+            priority: 'success'
+        },
+        {
+            icon: '📊',
+            title: 'Expense Management',
+            description: 'Reducing expenses not only increases your savings rate but also reduces the amount needed for financial independence.',
+            priority: 'info'
+        },
+        {
             icon: '🎯',
-            title: 'You\'re on the Right Track!',
-            description: 'Continue your current strategy. Consider increasing investments in growth assets.',
-            priority: 'low'
-        });
-    } else {
-        suggestions.push({
-            icon: '🏆',
-            title: 'Excellent Financial Position!',
-            description: 'You have achieved strong financial independence. Consider philanthropic goals or early retirement.',
-            priority: 'low'
-        });
-    }
-    
-    // Always add income suggestion if applicable
-    const incomeData = Storage.get('incomeData', {});
-    const expenseData = Storage.get('expenseData', {});
-    
-    if (incomeData.totals && expenseData.analysis) {
-        const savingsRate = expenseData.analysis.savingsRate || 0;
-        if (savingsRate < 20) {
-            suggestions.push({
-                icon: '💼',
-                title: 'Increase Income Sources',
-                description: 'Consider side hustles, skill development, or passive income streams to boost your savings rate.',
-                priority: 'medium'
-            });
+            title: 'Income Growth',
+            description: 'Growing your income through skills development, career advancement, or side income can accelerate your path to financial freedom.',
+            priority: 'success'
+        },
+        {
+            icon: '⏰',
+            title: 'Time and Compounding',
+            description: 'Starting early gives you the advantage of compound growth. Even small amounts invested early can grow significantly over time.',
+            priority: 'info'
+        },
+        {
+            icon: '🔄',
+            title: 'Regular Monitoring',
+            description: 'Review and update your financial metrics regularly. Track progress and adjust strategies as your life situation changes.',
+            priority: 'info'
         }
-    }
-    
-    // Render suggestions
-    suggestionsContainer.innerHTML = suggestions.map(suggestion => `
-        <div class="card" style="margin-bottom: 1rem; border-left: 4px solid ${getPriorityColor(suggestion.priority)};">
+    ];
+
+    // Render educational insights
+    suggestionsContainer.innerHTML = insights.map(insight => `
+        <div class="card" style="margin-bottom: 1rem; border-left: 4px solid ${getPriorityColor(insight.priority)};">
             <div class="card-body">
                 <h4 style="margin-bottom: 0.5rem;">
-                    <span style="margin-right: 0.5rem;">${suggestion.icon}</span>
-                    ${suggestion.title}
+                    <span style="margin-right: 0.5rem;">${insight.icon}</span>
+                    ${insight.title}
                 </h4>
-                <p style="margin-bottom: 0; color: var(--text-secondary);">${suggestion.description}</p>
+                <p style="margin-bottom: 0; color: var(--text-secondary);">${insight.description}</p>
             </div>
         </div>
     `).join('');

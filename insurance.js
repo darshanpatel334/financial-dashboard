@@ -134,8 +134,8 @@ function calculateTotals() {
     // Calculate adequacy analysis
     calculateAdequacyAnalysis(totalLifeCoverage, totalHealthCoverage);
     
-    // Generate recommendations
-    generateInsuranceRecommendations();
+    // Generate educational insights instead of recommendations
+    generateInsuranceEducation();
     
     // Auto-save after calculation
     setTimeout(() => {
@@ -208,110 +208,45 @@ function calculateAdequacyAnalysis(totalLifeCoverage, totalHealthCoverage) {
     document.getElementById('healthCoverageScore').style.color = healthCoverageColor;
 }
 
-// Generate insurance recommendations
-function generateInsuranceRecommendations() {
-    const recommendationsContainer = document.getElementById('insuranceRecommendations');
-    const recommendations = [];
-    
-    // Get current data
-    const incomeData = Storage.get('incomeData', {});
-    const personalData = Storage.get('personalData', {});
-    const annualIncome = incomeData.totals?.annualTotal || 0;
-    const totalLifeCoverage = parseCurrency(document.getElementById('totalLifeCoverage').textContent);
-    const totalHealthCoverage = parseCurrency(document.getElementById('totalHealthCoverage').textContent);
-    
-    // Life insurance recommendations
-    const lifeInsuranceRatio = annualIncome > 0 ? totalLifeCoverage / annualIncome : 0;
-    
-    if (lifeInsuranceRatio < 5) {
-        recommendations.push({
-            icon: '🚨',
-            title: 'Critical: Increase Life Insurance',
-            description: `Your life insurance is only ${lifeInsuranceRatio.toFixed(1)}x your annual income. Aim for at least 10-15x (₹${formatNumber(annualIncome * 10)} - ₹${formatNumber(annualIncome * 15)}).`,
-            priority: 'high'
-        });
-    } else if (lifeInsuranceRatio < 10) {
-        recommendations.push({
-            icon: '⚠️',
-            title: 'Consider Increasing Life Insurance',
-            description: `Your current coverage is ${lifeInsuranceRatio.toFixed(1)}x income. Consider increasing to 10-15x for better family protection.`,
-            priority: 'medium'
-        });
-    }
-    
-    // Health insurance recommendations
-    if (totalHealthCoverage < 500000) {
-        recommendations.push({
+// Generate insurance education instead of recommendations
+function generateInsuranceEducation() {
+    const educationContainer = document.getElementById('insuranceRecommendations');
+    const educationalInsights = [
+        {
             icon: '🏥',
-            title: 'Increase Health Insurance Coverage',
-            description: 'Medical inflation is high. Consider coverage of at least ₹5-10 lakhs for adequate protection against major illnesses.',
+            title: 'Health Insurance Importance',
+            description: 'Health insurance protects you from medical emergencies and rising healthcare costs. Consider coverage that matches your family needs.',
             priority: 'high'
-        });
-    } else if (totalHealthCoverage < 1000000) {
-        recommendations.push({
-            icon: '💊',
-            title: 'Consider Higher Health Coverage',
-            description: 'Your current health coverage is decent, but consider increasing to ₹10-20 lakhs for comprehensive protection.',
-            priority: 'medium'
-        });
-    }
-    
-    // Term vs Endowment analysis
-    const termCoverage = parseCurrency(document.getElementById('termInsuranceTotal').textContent);
-    const endowmentCoverage = parseCurrency(document.getElementById('endowmentInsuranceTotal').textContent);
-    
-    if (endowmentCoverage > termCoverage && endowmentCoverage > 0) {
-        recommendations.push({
+        },
+        {
+            icon: '🛡️',
+            title: 'Life Insurance Basics',
+            description: 'Life insurance provides financial security to your family. Term insurance is generally more cost-effective than endowment plans.',
+            priority: 'high'
+        },
+        {
             icon: '📊',
-            title: 'Optimize Insurance Strategy',
-            description: 'Consider converting endowment policies to term insurance + separate mutual fund investments for better returns.',
+            title: 'Coverage Calculation',
+            description: 'Life insurance coverage is typically calculated as 10-15 times your annual income to ensure adequate family protection.',
             priority: 'medium'
-        });
-    }
-    
-    // Age-based recommendations
-    if (personalData.age) {
-        if (personalData.age > 40 && totalHealthCoverage < 1000000) {
-            recommendations.push({
-                icon: '⏰',
-                title: 'Age-Based Health Coverage',
-                description: 'As you age, medical expenses increase. Consider higher health insurance coverage and critical illness riders.',
-                priority: 'medium'
-            });
+        },
+        {
+            icon: '💡',
+            title: 'Insurance vs Investment',
+            description: 'Insurance should primarily provide protection. For investments, consider dedicated investment products rather than insurance-investment hybrids.',
+            priority: 'medium'
         }
-    }
-    
-    // Family recommendations
-    if (personalData.maritalStatus === 'married' || (personalData.dependents && personalData.dependents.length > 0)) {
-        if (lifeInsuranceRatio < 15) {
-            recommendations.push({
-                icon: '👨‍👩‍👧‍👦',
-                title: 'Family Protection',
-                description: 'With family responsibilities, ensure adequate life insurance coverage of 15x annual income.',
-                priority: 'high'
-            });
-        }
-    }
-    
-    // If no major issues, provide positive reinforcement
-    if (recommendations.length === 0) {
-        recommendations.push({
-            icon: '✅',
-            title: 'Well Protected!',
-            description: 'Your insurance coverage appears adequate. Review annually and adjust for income changes.',
-            priority: 'low'
-        });
-    }
-    
-    // Render recommendations
-    recommendationsContainer.innerHTML = recommendations.map(recommendation => `
-        <div class="card" style="margin-bottom: 1rem; border-left: 4px solid ${getPriorityColor(recommendation.priority)};">
+    ];
+
+    // Render educational insights
+    educationContainer.innerHTML = educationalInsights.map(insight => `
+        <div class="card" style="margin-bottom: 1rem; border-left: 4px solid ${getPriorityColor(insight.priority)};">
             <div class="card-body">
                 <h4 style="margin-bottom: 0.5rem;">
-                    <span style="margin-right: 0.5rem;">${recommendation.icon}</span>
-                    ${recommendation.title}
+                    <span style="margin-right: 0.5rem;">${insight.icon}</span>
+                    ${insight.title}
                 </h4>
-                <p style="margin-bottom: 0; color: var(--text-secondary);">${recommendation.description}</p>
+                <p style="margin-bottom: 0; color: var(--text-secondary);">${insight.description}</p>
             </div>
         </div>
     `).join('');
@@ -443,7 +378,7 @@ function getInsuranceData() {
     return {
         totals: data.totals || {},
         analysis: data.analysis || {},
-        recommendations: generateInsuranceRecommendations,
+        recommendations: generateInsuranceEducation,
         categories: data.insurance || {}
     };
 } 

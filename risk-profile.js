@@ -1,10 +1,10 @@
 // ===== RISK PROFILE PAGE FUNCTIONALITY =====
 
 let riskData = {
+    currentQuestionIndex: 0,
     responses: {},
     totalScore: 0,
-    riskProfile: '',
-    assetAllocation: {}
+    riskProfile: ''
 };
 
 // Initialize page
@@ -96,15 +96,17 @@ function calculateRiskProfile() {
     // Display risk score
     displayRiskScore(totalScore, riskProfile);
     
-    // Generate asset allocation (save to data but don't display here)
-    const assetAllocation = generateAssetAllocation(riskProfile.type);
-    riskData.assetAllocation = assetAllocation;
+    // Save data without asset allocation
+    riskData = {
+        responses: responses,
+        totalScore: totalScore,
+        riskProfile: riskProfile.type
+    };
     
-    // Save data
-    saveRiskData();
+    Storage.set('riskProfileData', riskData);
     
     // Show success message
-    showStatus('Risk profile calculated successfully! Proceed to Dashboard to see your investment recommendations.', 'success');
+    showStatus('Risk profile calculated successfully! View your analytics dashboard to understand your profile.', 'success');
 }
 
 // Determine risk profile based on score
@@ -173,73 +175,6 @@ function displayRiskScore(score, profile) {
     document.getElementById('riskProfileDescription').textContent = profile.description;
     
     document.getElementById('riskScoreDisplay').style.display = 'block';
-}
-
-// Generate asset allocation based on risk profile
-function generateAssetAllocation(riskProfile) {
-    const allocations = {
-        'Conservative': {
-            equity: 20,
-            debt: 60,
-            gold: 10,
-            reits: 5,
-            cash: 5
-        },
-        'Risk Averse': {
-            equity: 35,
-            debt: 45,
-            gold: 10,
-            reits: 5,
-            cash: 5
-        },
-        'Balanced': {
-            equity: 50,
-            debt: 30,
-            gold: 10,
-            reits: 5,
-            cash: 5
-        },
-        'Aggressive': {
-            equity: 70,
-            debt: 15,
-            gold: 5,
-            reits: 5,
-            cash: 5
-        }
-    };
-    
-    return allocations[riskProfile] || allocations['Balanced'];
-}
-
-// Display asset allocation
-function displayAssetAllocation(allocation) {
-    const allocationContainer = document.getElementById('assetAllocation');
-    
-    const assetDetails = {
-        equity: { name: 'Equity', icon: '📈', color: '#22c55e', description: 'Stocks, Mutual Funds, ETFs' },
-        debt: { name: 'Fixed Income', icon: '🏦', color: '#3b82f6', description: 'Bonds, FDs, Debt Funds' },
-        gold: { name: 'Gold', icon: '🥇', color: '#f59e0b', description: 'Gold ETFs, Gold Bonds' },
-        reits: { name: 'REITs', icon: '🏢', color: '#8b5cf6', description: 'Real Estate Investment Trusts' },
-        cash: { name: 'Cash', icon: '💰', color: '#64748b', description: 'Savings Account, Liquid Funds' }
-    };
-    
-    allocationContainer.innerHTML = Object.keys(allocation).map(asset => {
-        const details = assetDetails[asset];
-        const percentage = allocation[asset];
-        
-        return `
-            <div class="card">
-                <div class="card-body text-center">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">${details.icon}</div>
-                    <h4>${details.name}</h4>
-                    <div class="score-number" style="color: ${details.color}; font-size: 1.5rem;">${percentage}%</div>
-                    <p class="text-secondary" style="font-size: 0.8rem;">${details.description}</p>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    document.getElementById('allocationSection').style.display = 'block';
 }
 
 // Generate risk insights
@@ -347,22 +282,9 @@ function getInsightColor(type) {
     }
 }
 
-// Save risk data
-function saveRiskData() {
-    const data = {
-        responses: riskData.responses,
-        totalScore: riskData.totalScore,
-        riskProfile: riskData.riskProfile,
-        assetAllocation: riskData.assetAllocation,
-        calculatedAt: new Date().toISOString()
-    };
-    
-    Storage.set('riskData', data);
-}
-
 // Load risk data
 function loadRiskData() {
-    const savedData = Storage.get('riskData', {});
+    const savedData = Storage.get('riskProfileData', {});
     
     if (savedData.responses) {
         // Restore form selections
@@ -383,10 +305,21 @@ function loadRiskData() {
             riskData = { ...savedData };
             const profile = determineRiskProfile(savedData.totalScore);
             displayRiskScore(savedData.totalScore, profile);
-            displayAssetAllocation(savedData.assetAllocation);
             generateRiskInsights(profile, savedData.responses);
         }
     }
+}
+
+// Save risk data
+function saveRiskData() {
+    const data = {
+        responses: riskData.responses,
+        totalScore: riskData.totalScore,
+        riskProfile: riskData.riskProfile,
+        calculatedAt: new Date().toISOString()
+    };
+    
+    Storage.set('riskProfileData', data);
 }
 
 // Navigation functions
@@ -399,7 +332,7 @@ function goNext() {
         showStatus('Please complete the risk assessment before proceeding', 'error');
         return;
     }
-    navigateToPage('dashboard.html', saveRiskData);
+    navigateToPage('advisor.html', saveRiskData);
 }
 
 // ===== EXPORT FUNCTIONS =====
@@ -409,7 +342,6 @@ function getRiskProfileData() {
     return {
         riskProfile: riskData.riskProfile,
         totalScore: riskData.totalScore,
-        assetAllocation: riskData.assetAllocation,
         responses: riskData.responses,
         profileDetails: riskData.riskProfile ? determineRiskProfile(riskData.totalScore) : null
     };
