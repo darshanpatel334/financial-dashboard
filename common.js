@@ -909,73 +909,75 @@ function checkUserProgress() {
     return progress;
 }
 
-// Get detailed user progress
+// Get user progress with step validation
 function getUserProgress() {
-    const progress = {
-        completed: [],
-        current: null,
-        next: null,
-        currentStep: 0,
-        percentage: 0,
-        isComplete: false
-    };
+    const steps = [
+        { key: 'personalInfo', page: 'personal-info.html', name: 'Personal Info' },
+        { key: 'netWorthData', page: 'networth.html', name: 'Net Worth' },
+        { key: 'incomeData', page: 'income.html', name: 'Income' },
+        { key: 'expenseData', page: 'expenses.html', name: 'Expenses' },
+        { key: 'ffScoreData', page: 'ff-score.html', name: 'FF Score' },
+        { key: 'insuranceData', page: 'insurance.html', name: 'Insurance' },
+        { key: 'riskData', page: 'risk-profile.html', name: 'Risk Profile' },
+        { key: 'dashboard', page: 'dashboard.html', name: 'Dashboard' }
+    ];
     
-    for (let i = 0; i < JOURNEY_STEPS.length; i++) {
-        const step = JOURNEY_STEPS[i];
+    let currentStep = 1;
+    let completedSteps = [];
+    
+    steps.forEach((step, index) => {
+        const stepNumber = index + 1;
+        let isCompleted = false;
         
-        if (step.key === 'completed') {
-            // Check if all previous steps are completed
-            if (progress.completed.length === JOURNEY_STEPS.length - 1) {
-                progress.isComplete = true;
-                progress.current = step;
-                progress.currentStep = JOURNEY_STEPS.length - 1;
-                progress.percentage = 100;
-            }
-            break;
-        }
-        
-        const data = Storage.get(step.key, {});
-        const isStepComplete = validateStepCompletion(step.key, data);
-        
-        if (isStepComplete) {
-            progress.completed.push(step);
-            progress.currentStep = i + 1;
+        if (step.key === 'dashboard') {
+            // Dashboard is accessible if at least risk profile is completed
+            const riskData = Storage.get('riskData', {});
+            isCompleted = riskData.totalScore && riskData.totalScore > 0;
         } else {
-            progress.current = step;
-            progress.next = JOURNEY_STEPS[i + 1];
-            if (progress.currentStep === 0) progress.currentStep = i;
-            break;
+            const stepData = Storage.get(step.key, {});
+            isCompleted = validateStepCompletion(step.key, stepData);
         }
-    }
+        
+        if (isCompleted) {
+            completedSteps.push(stepNumber);
+            currentStep = Math.max(currentStep, stepNumber + 1);
+        }
+    });
     
-    progress.percentage = Math.round((progress.completed.length / (JOURNEY_STEPS.length - 1)) * 100);
-    
-    return progress;
+    return {
+        currentStep: Math.min(currentStep, 8), // Cap at 8 (dashboard)
+        completedSteps,
+        totalSteps: 8,
+        canAccessDashboard: completedSteps.includes(7) // Can access dashboard if risk profile is complete
+    };
 }
 
-// Validate if a step is completed
+// Validate step completion
 function validateStepCompletion(stepKey, data) {
+    if (!data || typeof data !== 'object') return false;
+    
     switch (stepKey) {
         case 'personalInfo':
-            return data.firstName && data.lastName && data.dateOfBirth && data.maritalStatus;
+            return data.fullName && data.email && data.age;
             
         case 'netWorthData':
-            return data.totals && (data.totals.totalAssets > 0 || data.totals.totalLiabilities > 0);
+            return data.totals && typeof data.totals.totalNetWorth === 'number';
             
         case 'incomeData':
-            return data.totals && data.totals.annualTotal > 0;
+            return data.totals && typeof data.totals.annualTotal === 'number' && data.totals.annualTotal > 0;
             
         case 'expenseData':
-            return data.totals && data.totals.annualTotal > 0;
+            return data.totals && typeof data.totals.annualTotal === 'number' && data.totals.annualTotal > 0;
             
         case 'ffScoreData':
-            return data.currentScore !== undefined || data.score !== undefined;
+            return data.currentScore && typeof data.currentScore === 'number' && data.currentScore > 0;
             
         case 'insuranceData':
-            return Object.keys(data).length > 0; // Basic check for any insurance data
+            return data.lifeInsurance || data.healthInsurance;
             
-        case 'riskProfileData':
-            return data.riskProfile && data.riskScore;
+        case 'riskData':
+            // Risk profile is complete when score is calculated
+            return data.totalScore && typeof data.totalScore === 'number' && data.totalScore > 0 && data.riskProfile;
             
         default:
             return false;
@@ -1219,15 +1221,32 @@ function setupPageNavigation(currentPageIndex = 1) {
         </style>
     `;
     
-    // Find insertion point (after page header or at beginning of container)
+    // Find insertion point - first look for page-header, then h1, then container
     let insertionPoint = document.querySelector('.page-header');
+    
     if (!insertionPoint) {
+        // Look for h1 tag
+        insertionPoint = document.querySelector('h1');
+        if (insertionPoint) {
+            // Insert before h1
+            insertionPoint.insertAdjacentHTML('beforebegin', navHtml);
+            setupNavigationInteractions();
+            return;
+        }
+    }
+    
+    if (!insertionPoint) {
+        // Fall back to container
         insertionPoint = document.querySelector('.container');
+        if (insertionPoint) {
+            insertionPoint.insertAdjacentHTML('afterbegin', navHtml);
+        }
+    } else {
+        // Insert before page-header
+        insertionPoint.insertAdjacentHTML('beforebegin', navHtml);
     }
     
     if (insertionPoint) {
-        insertionPoint.insertAdjacentHTML('afterend', navHtml);
-        
         // Setup click handlers and progress status
         setupNavigationInteractions();
     }
@@ -1243,7 +1262,7 @@ function setupNavigationInteractions() {
         step.classList.remove('completed');
         
         // Mark completed steps
-        if (stepNumber <= progress.currentStep) {
+        if (progress.completedSteps.includes(stepNumber)) {
             step.classList.add('completed');
         }
         
@@ -1251,7 +1270,12 @@ function setupNavigationInteractions() {
         step.addEventListener('click', () => {
             const page = step.getAttribute('data-page');
             if (page) {
-                window.location.href = page;
+                // Allow navigation to completed steps or next available step
+                if (progress.completedSteps.includes(stepNumber) || stepNumber <= progress.currentStep) {
+                    window.location.href = page;
+                } else {
+                    showStatus('Please complete the previous steps first', 'warning');
+                }
             }
         });
     });

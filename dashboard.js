@@ -34,10 +34,12 @@ function loadAllData() {
 
 // Initialize dashboard
 function initDashboard() {
+    loadAllData();
     updateSummaryCards();
     updateHealthIndicators();
     createCharts();
     generateActionItems();
+    displayInvestmentInsights();
 }
 
 // Update summary cards
@@ -119,39 +121,40 @@ function createCharts() {
     createTimelineChart();
 }
 
-// Create asset allocation chart
+// Create asset allocation chart with enhanced legend
 function createAssetChart() {
     const ctx = document.getElementById('assetChart').getContext('2d');
-    const netWorthData = dashboardData.netWorth;
     
-    if (!netWorthData.assets) {
-        console.log('No asset data available');
-        return;
-    }
-    
-    const labels = [];
+    // Calculate asset allocation
+    const assets = dashboardData.netWorth.assets || {};
     const data = [];
-    const colors = [chartColors.primary, chartColors.success, chartColors.warning, chartColors.info, chartColors.purple];
+    const labels = [];
     
-    // Calculate totals for each category from the assets data
-    Object.keys(netWorthData.assets).forEach((category, index) => {
-        let categoryTotal = 0;
-        if (Array.isArray(netWorthData.assets[category])) {
-            categoryTotal = netWorthData.assets[category].reduce((sum, asset) => {
-                return sum + (asset.value || 0);
-            }, 0);
-        }
-        
-        if (categoryTotal > 0) {
-            labels.push(formatCategoryName(category));
-            data.push(categoryTotal);
+    Object.keys(assets).forEach(category => {
+        if (Array.isArray(assets[category])) {
+            const total = assets[category].reduce((sum, item) => sum + (item.value || 0), 0);
+            if (total > 0) {
+                data.push(total);
+                labels.push(formatCategoryName(category));
+            }
         }
     });
     
-    if (labels.length === 0) {
-        console.log('No asset data to display');
+    const total = data.reduce((sum, value) => sum + value, 0);
+    
+    if (total === 0) {
+        ctx.canvas.style.display = 'none';
         return;
     }
+    
+    const colors = [
+        chartColors.primary,
+        chartColors.success, 
+        chartColors.warning,
+        chartColors.danger,
+        chartColors.info,
+        chartColors.purple
+    ];
     
     charts.assetChart = new Chart(ctx, {
         type: 'doughnut',
@@ -169,13 +172,37 @@ function createAssetChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                const dataset = data.datasets[0];
+                                const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                                
+                                return data.labels.map((label, i) => {
+                                    const value = dataset.data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    
+                                    return {
+                                        text: `${label}: ${percentage}%`,
+                                        fillStyle: dataset.backgroundColor[i],
+                                        strokeStyle: dataset.borderColor,
+                                        lineWidth: dataset.borderWidth,
+                                        hidden: isNaN(value) || chart.getDatasetMeta(0).data[i].hidden,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             const value = formatCurrency(context.raw);
-                            const percentage = ((context.raw / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+                            const percentage = ((context.raw / total) * 100).toFixed(1);
                             return `${context.label}: ${value} (${percentage}%)`;
                         }
                     }
@@ -235,73 +262,41 @@ function createIncomeExpenseChart() {
     });
 }
 
-// Create income composition chart
+// Create income chart with enhanced legend
 function createIncomeChart() {
     const ctx = document.getElementById('incomeChart').getContext('2d');
-    const incomeData = dashboardData.income;
     
-    if (!incomeData.income) {
-        console.log('No income data available');
-        return;
-    }
-    
-    const labels = [];
+    const incomeData = dashboardData.income.sources || {};
     const data = [];
-    const colors = [chartColors.primary, chartColors.success, chartColors.warning, chartColors.info, chartColors.purple];
+    const labels = [];
     
-    // Calculate totals for each income category
-    Object.keys(incomeData.income).forEach((category, index) => {
-        let categoryTotal = 0;
-        if (Array.isArray(incomeData.income[category])) {
-            categoryTotal = incomeData.income[category].reduce((sum, income) => {
-                let annualAmount = 0;
-                if (income.amount && income.frequency) {
-                    switch (income.frequency) {
-                        case 'monthly':
-                            annualAmount = income.amount * 12;
-                            break;
-                        case 'quarterly':
-                            annualAmount = income.amount * 4;
-                            break;
-                        case 'annual':
-                            annualAmount = income.amount;
-                            break;
-                    }
-                }
-                return sum + annualAmount;
+    Object.keys(incomeData).forEach(category => {
+        if (Array.isArray(incomeData[category])) {
+            const monthlyTotal = incomeData[category].reduce((sum, item) => {
+                return sum + (item.monthlyAmount || 0);
             }, 0);
-        }
-        
-        if (categoryTotal > 0) {
-            labels.push(formatCategoryName(category));
-            data.push(categoryTotal);
+            
+            if (monthlyTotal > 0) {
+                data.push(monthlyTotal);
+                labels.push(formatCategoryName(category));
+            }
         }
     });
     
-    // Add auto-calculated income from assets
-    const netWorthData = dashboardData.netWorth;
-    if (netWorthData.assets) {
-        let assetYieldIncome = 0;
-        Object.keys(netWorthData.assets).forEach(category => {
-            if (Array.isArray(netWorthData.assets[category])) {
-                netWorthData.assets[category].forEach(asset => {
-                    if (asset.value && asset.yield) {
-                        assetYieldIncome += (asset.value * asset.yield) / 100;
-                    }
-                });
-            }
-        });
-        
-        if (assetYieldIncome > 0) {
-            labels.push('Asset Yields');
-            data.push(assetYieldIncome);
-        }
-    }
+    const total = data.reduce((sum, value) => sum + value, 0);
     
-    if (labels.length === 0) {
-        console.log('No income data to display');
+    if (total === 0) {
+        ctx.canvas.style.display = 'none';
         return;
     }
+    
+    const colors = [
+        chartColors.success,
+        chartColors.primary,
+        chartColors.info,
+        chartColors.warning,
+        chartColors.purple
+    ];
     
     charts.incomeChart = new Chart(ctx, {
         type: 'doughnut',
@@ -319,14 +314,38 @@ function createIncomeChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                const dataset = data.datasets[0];
+                                const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                                
+                                return data.labels.map((label, i) => {
+                                    const value = dataset.data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    
+                                    return {
+                                        text: `${label}: ${percentage}%`,
+                                        fillStyle: dataset.backgroundColor[i],
+                                        strokeStyle: dataset.borderColor,
+                                        lineWidth: dataset.borderWidth,
+                                        hidden: isNaN(value) || chart.getDatasetMeta(0).data[i].hidden,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             const value = formatCurrency(context.raw);
-                            const percentage = ((context.raw / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
-                            return `${context.label}: ${value} (${percentage}%)`;
+                            const percentage = ((context.raw / total) * 100).toFixed(1);
+                            return `${context.label}: ${value}/month (${percentage}%)`;
                         }
                     }
                 }
@@ -335,61 +354,41 @@ function createIncomeChart() {
     });
 }
 
-// Create expense breakdown chart
+// Create expense chart with enhanced legend
 function createExpenseChart() {
     const ctx = document.getElementById('expenseChart').getContext('2d');
-    const expenseData = dashboardData.expenses;
     
-    if (!expenseData.expenses) {
-        console.log('No expense data available');
-        return;
-    }
-    
-    const labels = [];
+    const expenseData = dashboardData.expenses.categories || {};
     const data = [];
-    const colors = [chartColors.danger, chartColors.warning, chartColors.orange];
+    const labels = [];
     
-    // Monthly recurring expenses
-    if (expenseData.expenses.monthlyRecurring && expenseData.expenses.monthlyRecurring.length > 0) {
-        const monthlyTotal = expenseData.expenses.monthlyRecurring.reduce((sum, expense) => {
-            return sum + (expense.amount || 0);
-        }, 0) * 12;
-        
-        if (monthlyTotal > 0) {
-            labels.push('Monthly Recurring');
-            data.push(monthlyTotal);
+    Object.keys(expenseData).forEach(category => {
+        if (Array.isArray(expenseData[category])) {
+            const monthlyTotal = expenseData[category].reduce((sum, item) => {
+                return sum + (item.monthlyAmount || 0);
+            }, 0);
+            
+            if (monthlyTotal > 0) {
+                data.push(monthlyTotal);
+                labels.push(formatCategoryName(category));
+            }
         }
-    }
+    });
     
-    // Annual recurring expenses
-    if (expenseData.expenses.annualRecurring && expenseData.expenses.annualRecurring.length > 0) {
-        const annualTotal = expenseData.expenses.annualRecurring.reduce((sum, expense) => {
-            return sum + (expense.amount || 0);
-        }, 0);
-        
-        if (annualTotal > 0) {
-            labels.push('Annual Recurring');
-            data.push(annualTotal);
-        }
-    }
+    const total = data.reduce((sum, value) => sum + value, 0);
     
-    // Big expenses (amortized)
-    if (expenseData.expenses.bigExpenses && expenseData.expenses.bigExpenses.length > 0) {
-        const bigExpensesTotal = expenseData.expenses.bigExpenses.reduce((sum, expense) => {
-            const years = expense.replacementYears || 1;
-            return sum + (expense.amount / years);
-        }, 0);
-        
-        if (bigExpensesTotal > 0) {
-            labels.push('Big Expenses (Amortized)');
-            data.push(bigExpensesTotal);
-        }
-    }
-    
-    if (labels.length === 0) {
-        console.log('No expense data to display');
+    if (total === 0) {
+        ctx.canvas.style.display = 'none';
         return;
     }
+    
+    const colors = [
+        chartColors.danger,
+        chartColors.warning,
+        chartColors.info,
+        chartColors.purple,
+        chartColors.primary
+    ];
     
     charts.expenseChart = new Chart(ctx, {
         type: 'doughnut',
@@ -407,14 +406,38 @@ function createExpenseChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                const dataset = data.datasets[0];
+                                const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                                
+                                return data.labels.map((label, i) => {
+                                    const value = dataset.data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    
+                                    return {
+                                        text: `${label}: ${percentage}%`,
+                                        fillStyle: dataset.backgroundColor[i],
+                                        strokeStyle: dataset.borderColor,
+                                        lineWidth: dataset.borderWidth,
+                                        hidden: isNaN(value) || chart.getDatasetMeta(0).data[i].hidden,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             const value = formatCurrency(context.raw);
-                            const percentage = ((context.raw / data.reduce((a, b) => a + b, 0)) * 100).toFixed(1);
-                            return `${context.label}: ${value} (${percentage}%)`;
+                            const percentage = ((context.raw / total) * 100).toFixed(1);
+                            return `${context.label}: ${value}/month (${percentage}%)`;
                         }
                     }
                 }
@@ -516,14 +539,45 @@ function createAllocationChartData(allocation) {
     };
 }
 
-// Get allocation chart options
+// Get allocation chart options with enhanced legend
 function getAllocationChartOptions() {
     return {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                position: 'bottom'
+                position: 'bottom',
+                labels: {
+                    generateLabels: function(chart) {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                            const dataset = data.datasets[0];
+                            const total = dataset.data.reduce((sum, value) => sum + value, 0);
+                            
+                            return data.labels.map((label, i) => {
+                                const value = dataset.data[i];
+                                const percentage = value ? value.toFixed(1) : '0.0';
+                                
+                                return {
+                                    text: `${label}: ${percentage}%`,
+                                    fillStyle: dataset.backgroundColor[i],
+                                    strokeStyle: dataset.borderColor,
+                                    lineWidth: dataset.borderWidth,
+                                    hidden: isNaN(value) || chart.getDatasetMeta(0).data[i].hidden,
+                                    index: i
+                                };
+                            });
+                        }
+                        return [];
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${context.label}: ${context.raw.toFixed(1)}%`;
+                    }
+                }
             }
         }
     };
@@ -714,32 +768,427 @@ function formatCategoryName(category) {
     return names[category] || category;
 }
 
-// Download report functionality
-function downloadReport() {
-    const reportData = {
-        generatedAt: new Date().toISOString(),
-        userEmail: firebase.auth().currentUser?.email,
-        summary: {
-            netWorth: dashboardData.netWorth.totals?.totalNetWorth || 0,
-            annualIncome: dashboardData.income.totals?.annualTotal || 0,
-            annualExpenses: dashboardData.expenses.totals?.annualTotal || 0,
-            ffScore: dashboardData.ffScore.currentScore || 0,
-            riskProfile: dashboardData.riskProfile.riskProfile || 'Not Assessed'
-        },
-        data: dashboardData
-    };
-    
-    const dataStr = JSON.stringify(reportData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = `NiveshMatrix_Financial_Report_${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-    
-    showStatus('Financial report downloaded successfully!', 'success');
+// Download report functionality - Beautiful PDF with all data
+async function downloadReport() {
+    try {
+        showStatus('Generating comprehensive financial report...', 'info');
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        // Get all data from localStorage
+        const allData = {
+            personalInfo: Storage.get('personalInfo', {}),
+            netWorth: Storage.get('netWorthData', {}),
+            income: Storage.get('incomeData', {}),
+            expenses: Storage.get('expenseData', {}),
+            ffScore: Storage.get('ffScoreData', {}),
+            insurance: Storage.get('insuranceData', {}),
+            riskProfile: Storage.get('riskData', {})
+        };
+        
+        const user = firebase.auth().currentUser;
+        const currentDate = new Date().toLocaleDateString('en-IN');
+        
+        // Page dimensions
+        const pageWidth = 210;
+        const pageHeight = 297;
+        const margin = 20;
+        const contentWidth = pageWidth - (2 * margin);
+        
+        let yPosition = margin;
+        
+        // Header with logo and title
+        pdf.setFillColor(37, 99, 235); // Primary blue
+        pdf.rect(0, 0, pageWidth, 40, 'F');
+        
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(24);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('NiveshMatrix', margin, 25);
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Comprehensive Financial Report', margin, 35);
+        
+        yPosition = 55;
+        
+        // User info section
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Report Details', margin, yPosition);
+        yPosition += 10;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Generated for: ${user?.email || 'User'}`, margin, yPosition);
+        yPosition += 6;
+        pdf.text(`Generated on: ${currentDate}`, margin, yPosition);
+        yPosition += 6;
+        pdf.text(`Name: ${allData.personalInfo.fullName || 'Not provided'}`, margin, yPosition);
+        yPosition += 6;
+        pdf.text(`Age: ${allData.personalInfo.age || 'Not provided'} years`, margin, yPosition);
+        yPosition += 15;
+        
+        // Executive Summary
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('Executive Summary', margin, yPosition);
+        yPosition += 12;
+        
+        // Summary cards
+        const netWorth = allData.netWorth.totals?.totalNetWorth || 0;
+        const annualIncome = allData.income.totals?.annualTotal || 0;
+        const annualExpenses = allData.expenses.totals?.annualTotal || 0;
+        const ffScore = allData.ffScore.currentScore || 0;
+        const riskProfile = allData.riskProfile.riskProfile || 'Not Assessed';
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(11);
+        
+        // Create summary table
+        const summaryData = [
+            ['Net Worth', formatCurrency(netWorth)],
+            ['Annual Income', formatCurrency(annualIncome)],
+            ['Annual Expenses', formatCurrency(annualExpenses)],
+            ['Financial Freedom Score', `${ffScore} years`],
+            ['Risk Profile', riskProfile],
+            ['Savings Rate', `${annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome * 100).toFixed(1) : 0}%`]
+        ];
+        
+        summaryData.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label + ':', margin, yPosition);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 60, yPosition);
+            yPosition += 8;
+        });
+        
+        yPosition += 10;
+        
+        // Personal Information Section
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('1. Personal Information', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        
+        const personalData = [
+            ['Full Name', allData.personalInfo.fullName || 'Not provided'],
+            ['Email', allData.personalInfo.email || user?.email || 'Not provided'],
+            ['Phone', allData.personalInfo.phone || 'Not provided'],
+            ['Date of Birth', allData.personalInfo.dateOfBirth || 'Not provided'],
+            ['Age', `${allData.personalInfo.age || 'Not provided'} years`],
+            ['Marital Status', allData.personalInfo.maritalStatus || 'Not provided'],
+            ['Dependents', allData.personalInfo.dependents || 'Not provided'],
+            ['Occupation', allData.personalInfo.occupation || 'Not provided'],
+            ['Annual Income', formatCurrency(allData.personalInfo.annualIncome || 0)],
+            ['City', allData.personalInfo.city || 'Not provided'],
+            ['Financial Goals', allData.personalInfo.financialGoals || 'Not provided']
+        ];
+        
+        personalData.forEach(([label, value]) => {
+            if (yPosition > 270) {
+                pdf.addPage();
+                yPosition = margin;
+            }
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label + ':', margin, yPosition);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value.toString(), margin + 50, yPosition);
+            yPosition += 6;
+        });
+        
+        // Net Worth Section
+        yPosition += 10;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('2. Net Worth Analysis', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        
+        // Assets breakdown
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Assets:', margin, yPosition);
+        yPosition += 8;
+        
+        if (allData.netWorth.assets) {
+            Object.keys(allData.netWorth.assets).forEach(category => {
+                const assets = allData.netWorth.assets[category];
+                if (Array.isArray(assets) && assets.length > 0) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(`  ${formatCategoryName(category)}:`, margin + 5, yPosition);
+                    yPosition += 6;
+                    
+                    assets.forEach(asset => {
+                        if (yPosition > 280) {
+                            pdf.addPage();
+                            yPosition = margin;
+                        }
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`    • ${asset.description || 'Asset'}: ${formatCurrency(asset.value || 0)}`, margin + 10, yPosition);
+                        yPosition += 5;
+                    });
+                    yPosition += 3;
+                }
+            });
+        }
+        
+        // Liabilities breakdown
+        yPosition += 5;
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Liabilities:', margin, yPosition);
+        yPosition += 8;
+        
+        if (allData.netWorth.liabilities) {
+            Object.keys(allData.netWorth.liabilities).forEach(category => {
+                const liabilities = allData.netWorth.liabilities[category];
+                if (Array.isArray(liabilities) && liabilities.length > 0) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(`  ${formatCategoryName(category)}:`, margin + 5, yPosition);
+                    yPosition += 6;
+                    
+                    liabilities.forEach(liability => {
+                        if (yPosition > 280) {
+                            pdf.addPage();
+                            yPosition = margin;
+                        }
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`    • ${liability.description || 'Liability'}: ${formatCurrency(liability.value || 0)}`, margin + 10, yPosition);
+                        yPosition += 5;
+                    });
+                    yPosition += 3;
+                }
+            });
+        }
+        
+        // Income Section
+        yPosition += 10;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('3. Income Analysis', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        
+        if (allData.income.sources) {
+            Object.keys(allData.income.sources).forEach(category => {
+                const sources = allData.income.sources[category];
+                if (Array.isArray(sources) && sources.length > 0) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(`${formatCategoryName(category)}:`, margin, yPosition);
+                    yPosition += 8;
+                    
+                    sources.forEach(source => {
+                        if (yPosition > 280) {
+                            pdf.addPage();
+                            yPosition = margin;
+                        }
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`  • ${source.description || 'Income'}: ${formatCurrency(source.monthlyAmount || 0)}/month`, margin + 5, yPosition);
+                        yPosition += 5;
+                    });
+                    yPosition += 5;
+                }
+            });
+        }
+        
+        // Expenses Section
+        yPosition += 5;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('4. Expense Analysis', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        
+        if (allData.expenses.categories) {
+            Object.keys(allData.expenses.categories).forEach(category => {
+                const expenses = allData.expenses.categories[category];
+                if (Array.isArray(expenses) && expenses.length > 0) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(`${formatCategoryName(category)}:`, margin, yPosition);
+                    yPosition += 8;
+                    
+                    expenses.forEach(expense => {
+                        if (yPosition > 280) {
+                            pdf.addPage();
+                            yPosition = margin;
+                        }
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`  • ${expense.description || 'Expense'}: ${formatCurrency(expense.monthlyAmount || 0)}/month`, margin + 5, yPosition);
+                        yPosition += 5;
+                    });
+                    yPosition += 5;
+                }
+            });
+        }
+        
+        // FF Score Section
+        yPosition += 5;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('5. Financial Freedom Score Analysis', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        
+        const ffData = [
+            ['Current FF Score', `${ffScore} years`],
+            ['Asset Growth Rate', `${allData.ffScore.assetGrowthRate || 8}% per annum`],
+            ['Inflation Rate', `${allData.ffScore.inflationRate || 6}% per annum`],
+            ['Monthly Surplus', formatCurrency((annualIncome - annualExpenses) / 12)],
+            ['Years to Financial Freedom', `${allData.ffScore.yearsToFI || 'Not calculated'} years`]
+        ];
+        
+        ffData.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label + ':', margin, yPosition);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 60, yPosition);
+            yPosition += 8;
+        });
+        
+        // Insurance Section
+        yPosition += 10;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('6. Insurance Analysis', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        
+        const insuranceData = [
+            ['Life Insurance Coverage', formatCurrency(allData.insurance.lifeInsurance?.coverageAmount || 0)],
+            ['Life Insurance Premium', formatCurrency(allData.insurance.lifeInsurance?.annualPremium || 0)],
+            ['Health Insurance Coverage', formatCurrency(allData.insurance.healthInsurance?.coverageAmount || 0)],
+            ['Health Insurance Premium', formatCurrency(allData.insurance.healthInsurance?.annualPremium || 0)],
+            ['Life Insurance Ratio', `${(allData.insurance.analysis?.lifeInsuranceRatio || 0).toFixed(1)}x of annual income`],
+            ['Total Annual Premium', formatCurrency((allData.insurance.lifeInsurance?.annualPremium || 0) + (allData.insurance.healthInsurance?.annualPremium || 0))]
+        ];
+        
+        insuranceData.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label + ':', margin, yPosition);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 60, yPosition);
+            yPosition += 8;
+        });
+        
+        // Risk Profile Section
+        yPosition += 10;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('7. Risk Profile Assessment', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        
+        const riskData = [
+            ['Risk Score', `${allData.riskProfile.totalScore || 0}/32`],
+            ['Risk Profile', riskProfile],
+            ['Investment Horizon', 'Based on questionnaire responses'],
+            ['Risk Tolerance', 'Assessed through 8-question survey']
+        ];
+        
+        riskData.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label + ':', margin, yPosition);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 60, yPosition);
+            yPosition += 8;
+        });
+        
+        // Asset Allocation Recommendations
+        if (allData.riskProfile.assetAllocation) {
+            yPosition += 5;
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Recommended Asset Allocation:', margin, yPosition);
+            yPosition += 8;
+            
+            Object.keys(allData.riskProfile.assetAllocation).forEach(asset => {
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(`  • ${formatCategoryName(asset)}: ${allData.riskProfile.assetAllocation[asset]}%`, margin + 5, yPosition);
+                yPosition += 6;
+            });
+        }
+        
+        // Footer
+        const pageCount = pdf.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            pdf.setPage(i);
+            pdf.setFontSize(8);
+            pdf.setTextColor(128, 128, 128);
+            pdf.text(`Page ${i} of ${pageCount}`, pageWidth - 30, pageHeight - 10);
+            pdf.text('Generated by NiveshMatrix - Your Financial Journey Partner', margin, pageHeight - 10);
+        }
+        
+        // Save the PDF
+        const filename = `NiveshMatrix_Financial_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+        pdf.save(filename);
+        
+        showStatus('Comprehensive financial report downloaded successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error generating PDF report:', error);
+        showStatus('Error generating report. Please try again.', 'error');
+    }
 }
 
 // Navigation functions
@@ -759,4 +1208,174 @@ window.addEventListener('beforeunload', () => {
             chart.destroy();
         }
     });
-}); 
+});
+
+// Display investment insights from risk profile
+function displayInvestmentInsights() {
+    const riskData = dashboardData.riskProfile || {};
+    const insightsContainer = document.getElementById('investmentInsights');
+    
+    if (!riskData.riskProfile || !riskData.responses) {
+        insightsContainer.innerHTML = `
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                <h4>Complete Risk Assessment</h4>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Complete your risk profile assessment to see personalized investment insights and recommendations.
+                </p>
+                <a href="risk-profile.html" class="btn btn-primary">
+                    <i class="fas fa-balance-scale"></i> Take Risk Assessment
+                </a>
+            </div>
+        `;
+        return;
+    }
+    
+    const insights = generateInvestmentInsights(riskData);
+    
+    insightsContainer.innerHTML = `
+        <div style="margin-bottom: 2rem;">
+            <div class="card" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: none;">
+                <div class="card-body" style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">${getRiskProfileEmoji(riskData.riskProfile)}</div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">Risk Profile: ${riskData.riskProfile}</h3>
+                    <p style="color: var(--text-secondary);">Score: ${riskData.totalScore}/32</p>
+                </div>
+            </div>
+        </div>
+        
+        ${insights.map(insight => `
+            <div class="card" style="margin-bottom: 1rem; border-left: 4px solid ${getInsightColor(insight.type)};">
+                <div class="card-body">
+                    <h4 style="margin-bottom: 0.5rem;">
+                        <span style="margin-right: 0.5rem;">${insight.icon}</span>
+                        ${insight.title}
+                    </h4>
+                    <p style="margin-bottom: 0; color: var(--text-secondary);">${insight.description}</p>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+// Generate investment insights based on risk profile
+function generateInvestmentInsights(riskData) {
+    const insights = [];
+    const responses = riskData.responses || {};
+    const riskProfile = riskData.riskProfile;
+    
+    // Age-based insights
+    if (responses.age <= 2) {
+        insights.push({
+            icon: '⏰',
+            title: 'Age Consideration',
+            description: 'Given your age, consider shifting towards more conservative investments to preserve capital for retirement.',
+            type: 'info'
+        });
+    } else if (responses.age >= 4) {
+        insights.push({
+            icon: '🚀',
+            title: 'Young Investor Advantage',
+            description: 'You have time on your side. Consider higher equity allocation for long-term wealth creation through compounding.',
+            type: 'success'
+        });
+    }
+    
+    // Emergency fund insights
+    if (responses.emergency <= 2) {
+        insights.push({
+            icon: '🚨',
+            title: 'Build Emergency Fund First',
+            description: 'Before investing in risky assets, ensure you have 6+ months of expenses in an emergency fund.',
+            type: 'warning'
+        });
+    }
+    
+    // Investment horizon insights
+    if (responses.horizon >= 3) {
+        insights.push({
+            icon: '📈',
+            title: 'Long-term Investment Horizon',
+            description: 'Your long investment horizon allows you to ride out market volatility and benefit from the power of compounding.',
+            type: 'success'
+        });
+    }
+    
+    // Knowledge-based insights
+    if (responses.knowledge <= 2) {
+        insights.push({
+            icon: '📚',
+            title: 'Investment Education',
+            description: 'Consider learning more about investing or consulting a financial advisor before making complex investment decisions.',
+            type: 'info'
+        });
+    }
+    
+    // Risk-specific recommendations
+    if (riskProfile === 'Conservative') {
+        insights.push({
+            icon: '🔒',
+            title: 'Conservative Strategy',
+            description: 'Focus on capital preservation with high-grade bonds, FDs, and blue-chip dividend-paying stocks.',
+            type: 'info'
+        });
+    } else if (riskProfile === 'Aggressive') {
+        insights.push({
+            icon: '⚡',
+            title: 'Aggressive Strategy',
+            description: 'Consider growth stocks, small-cap funds, and emerging market investments, but ensure proper diversification.',
+            type: 'warning'
+        });
+    } else if (riskProfile === 'Balanced') {
+        insights.push({
+            icon: '⚖️',
+            title: 'Balanced Strategy',
+            description: 'Mix growth and income investments. Consider systematic investment plans (SIPs) for regular equity investment.',
+            type: 'success'
+        });
+    }
+    
+    // Income stability insights
+    if (responses.income <= 2) {
+        insights.push({
+            icon: '💼',
+            title: 'Income Stability',
+            description: 'With variable income, maintain a larger emergency fund and avoid highly leveraged investments.',
+            type: 'warning'
+        });
+    }
+    
+    // Asset allocation recommendation
+    if (riskData.assetAllocation) {
+        const allocation = riskData.assetAllocation;
+        insights.push({
+            icon: '📊',
+            title: 'Recommended Asset Mix',
+            description: `Based on your profile: ${allocation.equity}% Equity, ${allocation.debt}% Fixed Income, ${allocation.gold}% Gold, ${allocation.reits}% REITs, ${allocation.cash}% Cash.`,
+            type: 'success'
+        });
+    }
+    
+    return insights;
+}
+
+// Get risk profile emoji
+function getRiskProfileEmoji(riskProfile) {
+    const emojis = {
+        'Conservative': '🔒',
+        'Risk Averse': '🛡️',
+        'Balanced': '⚖️',
+        'Aggressive': '🚀'
+    };
+    return emojis[riskProfile] || '📊';
+}
+
+// Get insight color based on type
+function getInsightColor(type) {
+    switch (type) {
+        case 'success': return 'var(--success-color)';
+        case 'warning': return 'var(--warning-color)';
+        case 'info': return 'var(--info-color)';
+        default: return 'var(--primary-color)';
+    }
+} 

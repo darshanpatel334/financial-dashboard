@@ -96,19 +96,15 @@ function calculateRiskProfile() {
     // Display risk score
     displayRiskScore(totalScore, riskProfile);
     
-    // Generate asset allocation
+    // Generate asset allocation (save to data but don't display here)
     const assetAllocation = generateAssetAllocation(riskProfile.type);
     riskData.assetAllocation = assetAllocation;
-    displayAssetAllocation(assetAllocation);
-    
-    // Generate insights
-    generateRiskInsights(riskProfile, responses);
     
     // Save data
     saveRiskData();
     
     // Show success message
-    showStatus('Risk profile calculated successfully!', 'success');
+    showStatus('Risk profile calculated successfully! Proceed to Dashboard to see your investment recommendations.', 'success');
 }
 
 // Determine risk profile based on score
@@ -361,12 +357,12 @@ function saveRiskData() {
         calculatedAt: new Date().toISOString()
     };
     
-    Storage.set('riskProfileData', data);
+    Storage.set('riskData', data);
 }
 
 // Load risk data
 function loadRiskData() {
-    const savedData = Storage.get('riskProfileData', {});
+    const savedData = Storage.get('riskData', {});
     
     if (savedData.responses) {
         // Restore form selections
