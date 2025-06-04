@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initCommonElements();
         loadAllUserData();
         generateAnalytics();
+        initializeCalculators();
         
         // Setup navigation system
         if (typeof setupPageNavigation === 'function') {
@@ -40,6 +41,14 @@ function generateAnalytics() {
     displayFinancialHealthInsights();
     displayRiskProfile();
     createCharts();
+}
+
+// Initialize calculators with default calculations
+function initializeCalculators() {
+    calculateSIP();
+    calculateGoal();
+    calculateFreedom();
+    calculateRetirement();
 }
 
 // 1. Display Net Worth Summary
@@ -277,6 +286,152 @@ function getRiskProfileDescription(riskProfile) {
     return descriptions[riskProfile] || 'Risk profile assessment pending';
 }
 
+// ===== CALCULATOR FUNCTIONS =====
+
+// 1. SIP Calculator
+function calculateSIP() {
+    const monthlyAmount = parseFloat(document.getElementById('sipAmount').value) || 5000;
+    const annualReturn = parseFloat(document.getElementById('sipReturn').value) || 12;
+    const years = parseFloat(document.getElementById('sipDuration').value) || 10;
+    
+    const monthlyReturn = annualReturn / 12 / 100;
+    const months = years * 12;
+    
+    // SIP Formula: FV = P * [((1 + r)^n - 1) / r] * (1 + r)
+    const futureValue = monthlyAmount * (((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn) * (1 + monthlyReturn));
+    const totalInvested = monthlyAmount * months;
+    const returns = futureValue - totalInvested;
+    
+    document.getElementById('sipInvested').textContent = formatCurrency(totalInvested);
+    document.getElementById('sipFutureValue').textContent = formatCurrency(futureValue);
+    document.getElementById('sipReturns').textContent = formatCurrency(returns);
+}
+
+// 2. Goal-Based Investment Calculator
+function calculateGoal() {
+    const targetAmount = parseFloat(document.getElementById('goalTarget').value) || 1000000;
+    const years = parseFloat(document.getElementById('goalYears').value) || 10;
+    const annualReturn = parseFloat(document.getElementById('goalReturn').value) || 12;
+    
+    const monthlyReturn = annualReturn / 12 / 100;
+    const months = years * 12;
+    
+    // Reverse SIP Formula: P = FV * r / [((1 + r)^n - 1) * (1 + r)]
+    const monthlySIP = targetAmount * monthlyReturn / (((Math.pow(1 + monthlyReturn, months) - 1) * (1 + monthlyReturn)));
+    const totalInvestment = monthlySIP * months;
+    const wealthCreation = targetAmount - totalInvestment;
+    
+    document.getElementById('goalMonthlySIP').textContent = formatCurrency(monthlySIP);
+    document.getElementById('goalTotalInvestment').textContent = formatCurrency(totalInvestment);
+    document.getElementById('goalWealthCreation').textContent = formatCurrency(wealthCreation);
+}
+
+// 3. Financial Freedom Calculator
+function calculateFreedom() {
+    const netWorth = parseFloat(document.getElementById('freedomNetWorth').value) || 500000;
+    const annualExpenses = parseFloat(document.getElementById('freedomExpenses').value) || 360000;
+    const growthRate = parseFloat(document.getElementById('freedomGrowth').value) || 10;
+    const inflationRate = parseFloat(document.getElementById('freedomInflation').value) || 6;
+    
+    let currentNetWorth = netWorth;
+    let currentExpenses = annualExpenses;
+    let years = 0;
+    const maxYears = 100;
+    
+    // Simulation with compound growth and inflation
+    while (currentNetWorth > currentExpenses && years < maxYears) {
+        // Deduct annual expenses first
+        currentNetWorth -= currentExpenses;
+        
+        // If net worth becomes negative or zero, break
+        if (currentNetWorth <= 0) {
+            break;
+        }
+        
+        // Apply asset growth to remaining net worth
+        currentNetWorth *= (1 + growthRate / 100);
+        
+        // Apply inflation to expenses for next year
+        currentExpenses *= (1 + inflationRate / 100);
+        
+        years++;
+    }
+    
+    const freedomYears = Math.min(years, maxYears);
+    
+    // Update display
+    document.getElementById('freedomYears').textContent = freedomYears;
+    
+    // Update progress bar (scale 0-100, where 25+ years = 100%)
+    const progressPercentage = Math.min((freedomYears / 25) * 100, 100);
+    document.getElementById('freedomScoreBar').style.width = progressPercentage + '%';
+    
+    // Update status and color
+    let status = '';
+    let color = '';
+    
+    if (freedomYears >= 25) {
+        status = 'Excellent - Financially Independent';
+        color = 'var(--success-color)';
+    } else if (freedomYears >= 15) {
+        status = 'Good - On track to freedom';
+        color = 'var(--primary-color)';
+    } else if (freedomYears >= 5) {
+        status = 'Moderate - Building wealth';
+        color = 'var(--warning-color)';
+    } else {
+        status = 'Critical - Needs immediate attention';
+        color = 'var(--danger-color)';
+    }
+    
+    document.getElementById('freedomStatus').textContent = status;
+    document.getElementById('freedomYears').style.color = color;
+}
+
+// 4. Retirement Corpus Calculator
+function calculateRetirement() {
+    const currentExpense = parseFloat(document.getElementById('retirementExpense').value) || 600000;
+    const yearsToRetirement = parseFloat(document.getElementById('retirementYears').value) || 25;
+    const inflationRate = parseFloat(document.getElementById('retirementInflation').value) || 6;
+    const postRetirementReturn = parseFloat(document.getElementById('retirementReturn').value) || 7;
+    const retirementDuration = parseFloat(document.getElementById('retirementDuration').value) || 20;
+    
+    // Calculate inflation-adjusted expense at retirement
+    const inflatedExpense = currentExpense * Math.pow(1 + inflationRate / 100, yearsToRetirement);
+    
+    // Calculate corpus needed using present value of annuity formula
+    const monthlyReturn = postRetirementReturn / 12 / 100;
+    const months = retirementDuration * 12;
+    const monthlyExpense = inflatedExpense / 12;
+    
+    // PV = PMT * [(1 - (1 + r)^(-n)) / r]
+    const corpusRequired = monthlyExpense * ((1 - Math.pow(1 + monthlyReturn, -months)) / monthlyReturn);
+    
+    // Calculate monthly SIP needed (assuming 12% pre-retirement return)
+    const preRetirementReturn = 12 / 12 / 100;
+    const preRetirementMonths = yearsToRetirement * 12;
+    const monthlySIP = corpusRequired * preRetirementReturn / (((Math.pow(1 + preRetirementReturn, preRetirementMonths) - 1) * (1 + preRetirementReturn)));
+    
+    document.getElementById('retirementCorpus').textContent = formatCurrency(corpusRequired);
+    document.getElementById('retirementInflatedExpense').textContent = formatCurrency(inflatedExpense);
+    document.getElementById('retirementMonthlySIP').textContent = formatCurrency(monthlySIP);
+}
+
+// ===== FAQ FUNCTIONALITY =====
+
+function toggleFAQ() {
+    const content = document.getElementById('faqContent');
+    const chevron = document.getElementById('faqChevron');
+    
+    if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        chevron.style.transform = 'rotate(0deg)';
+    } else {
+        content.classList.add('open');
+        chevron.style.transform = 'rotate(180deg)';
+    }
+}
+
 // Create Charts
 function createCharts() {
     createAssetDistributionChart();
@@ -397,31 +552,6 @@ function createCashFlowChart(monthlyIncome, monthlyExpenses) {
             }
         }
     });
-}
-
-// Open simulation tools (placeholder for external calculator links)
-function openSimulationTool(toolType) {
-    const tools = {
-        'sip': 'https://www.mutualfundsindia.com/sip-calculator',
-        'goal': 'https://cleartax.in/s/goal-planning-calculator',
-        'freedom': 'ff-score.html', // Internal tool
-        'retirement': 'https://www.bankbazaar.com/retirement-planning-calculator.html'
-    };
-    
-    const url = tools[toolType];
-    if (url) {
-        if (url.startsWith('http')) {
-            // External tool - open in new tab with disclaimer
-            if (confirm('This will open an external calculator for educational simulation purposes only. The results should not be considered as financial advice. Continue?')) {
-                window.open(url, '_blank');
-            }
-        } else {
-            // Internal tool
-            window.location.href = url;
-        }
-    } else {
-        showStatus('Calculator not available yet', 'info');
-    }
 }
 
 // Navigation functions

@@ -7,6 +7,245 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        /* Enhanced styles for calculators */
+        .calculator-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .calculator-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .calculator-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+        
+        .calculator-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        .calculator-inputs {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .calculator-results {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 1rem;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .result-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .calculator-note {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #92400e;
+            line-height: 1.4;
+        }
+        
+        .freedom-score-display {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .freedom-score-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .freedom-score-bar {
+            width: 100%;
+            height: 1rem;
+            background: #e2e8f0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .freedom-score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 25%, #22c55e 50%, #3b82f6 100%);
+            transition: width 0.8s ease;
+            border-radius: 0.5rem;
+        }
+        
+        .faq-container {
+            background: white;
+            border-radius: 1rem;
+            margin-top: 2rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .faq-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-content.open {
+            max-height: 500px;
+        }
+        
+        .faq-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-answer {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        .final-disclaimer {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .calculator-container {
+                padding: 1rem;
+            }
+            
+            .freedom-score-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -213,58 +452,246 @@
             </div>
         </div>
 
-        <!-- 5. Simulation Tools -->
+        <!-- 5. Interactive Financial Simulation Tools -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <i class="fas fa-calculator"></i> Financial Simulation Tools
+                    <i class="fas fa-calculator"></i> Interactive Financial Simulation Tools
                 </h2>
-                <small class="text-secondary">Educational calculators for financial planning (for simulation purposes only)</small>
+                <small class="text-secondary">Educational calculators to help you understand financial planning concepts</small>
             </div>
             
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-body">
-                        <h4><i class="fas fa-chart-line"></i> SIP Calculator</h4>
-                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Calculate potential returns from systematic investments</p>
-                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('sip')">
-                            <i class="fas fa-external-link-alt"></i> Open SIP Calculator
+            <!-- 1. SIP Calculator -->
+            <div class="calculator-container">
+                <div class="calculator-header">
+                    <div class="calculator-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="calculator-title">SIP Growth Simulator</h3>
+                </div>
+                
+                <div class="calculator-grid">
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label class="input-label">Monthly SIP Amount (₹)</label>
+                            <input type="number" class="input-field" id="sipAmount" placeholder="5000" value="5000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Expected Annual Return (%)</label>
+                            <input type="number" class="input-field" id="sipReturn" placeholder="12" value="12" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Investment Duration (Years)</label>
+                            <input type="number" class="input-field" id="sipDuration" placeholder="10" value="10">
+                        </div>
+                        <button class="calculate-btn" onclick="calculateSIP()">
+                            <i class="fas fa-calculator"></i> Calculate SIP Growth
                         </button>
-                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
+                    </div>
+                    
+                    <div class="calculator-results">
+                        <div class="result-item">
+                            <div class="result-label">Total Invested</div>
+                            <div class="result-value" id="sipInvested">₹0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Estimated Future Value</div>
+                            <div class="result-value" id="sipFutureValue">₹0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Estimated Returns</div>
+                            <div class="result-value" id="sipReturns">₹0</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="card">
-                    <div class="card-body">
-                        <h4><i class="fas fa-bullseye"></i> Goal-Based Investment Simulator</h4>
-                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Estimate corpus needed for financial goals</p>
-                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('goal')">
-                            <i class="fas fa-external-link-alt"></i> Open Goal Calculator
+                <div class="calculator-note">
+                    <i class="fas fa-info-circle"></i>
+                    This tool helps you estimate long-term growth through regular investing. No returns are guaranteed.
+                </div>
+            </div>
+
+            <!-- 2. Goal-Based Investment Simulator -->
+            <div class="calculator-container">
+                <div class="calculator-header">
+                    <div class="calculator-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="calculator-title">Plan for a Future Goal</h3>
+                </div>
+                
+                <div class="calculator-grid">
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label class="input-label">Target Amount (₹)</label>
+                            <input type="number" class="input-field" id="goalTarget" placeholder="1000000" value="1000000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Years to Goal</label>
+                            <input type="number" class="input-field" id="goalYears" placeholder="10" value="10">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Expected Annual Return (%)</label>
+                            <input type="number" class="input-field" id="goalReturn" placeholder="12" value="12" step="0.1">
+                        </div>
+                        <button class="calculate-btn" onclick="calculateGoal()">
+                            <i class="fas fa-calculator"></i> Calculate Monthly SIP
                         </button>
-                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
+                    </div>
+                    
+                    <div class="calculator-results">
+                        <div class="result-item">
+                            <div class="result-label">Monthly SIP Required</div>
+                            <div class="result-value" id="goalMonthlySIP">₹0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Total Investment</div>
+                            <div class="result-value" id="goalTotalInvestment">₹0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Wealth Creation</div>
+                            <div class="result-value" id="goalWealthCreation">₹0</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="card">
-                    <div class="card-body">
-                        <h4><i class="fas fa-trophy"></i> Freedom Score Estimator</h4>
-                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Analyze your path to financial independence</p>
-                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('freedom')">
-                            <i class="fas fa-external-link-alt"></i> Open FF Calculator
+                <div class="calculator-note">
+                    <i class="fas fa-info-circle"></i>
+                    This simulator helps estimate the monthly amount needed for a financial goal. Results are not personalized recommendations.
+                </div>
+            </div>
+
+            <!-- 3. Freedom Score Estimator -->
+            <div class="calculator-container">
+                <div class="calculator-header">
+                    <div class="calculator-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="calculator-title">Financial Freedom Score</h3>
+                </div>
+                
+                <div class="calculator-grid">
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label class="input-label">Current Net Worth (₹)</label>
+                            <input type="number" class="input-field" id="freedomNetWorth" placeholder="500000" value="500000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Annual Expenses (₹)</label>
+                            <input type="number" class="input-field" id="freedomExpenses" placeholder="360000" value="360000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Expected Growth Rate (%)</label>
+                            <input type="number" class="input-field" id="freedomGrowth" placeholder="10" value="10" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Expected Inflation (%)</label>
+                            <input type="number" class="input-field" id="freedomInflation" placeholder="6" value="6" step="0.1">
+                        </div>
+                        <button class="calculate-btn" onclick="calculateFreedom()">
+                            <i class="fas fa-calculator"></i> Calculate Freedom Score
                         </button>
-                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
+                    </div>
+                    
+                    <div class="calculator-results">
+                        <div class="freedom-score-display">
+                            <div class="freedom-score-number" id="freedomYears">0</div>
+                            <div style="font-size: 1.1rem; margin-bottom: 1rem;">Years of Financial Freedom</div>
+                            <div class="freedom-score-bar">
+                                <div class="freedom-score-fill" id="freedomScoreBar"></div>
+                            </div>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);" id="freedomStatus">Calculating...</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="card">
-                    <div class="card-body">
-                        <h4><i class="fas fa-bed"></i> Retirement Corpus Estimator</h4>
-                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Estimate retirement corpus requirements</p>
-                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('retirement')">
-                            <i class="fas fa-external-link-alt"></i> Open Retirement Calculator
-                        </button>
-                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
+                <div class="calculator-note">
+                    <i class="fas fa-info-circle"></i>
+                    This tool provides a directional view of your financial freedom based on your inputs.
+                </div>
+            </div>
+
+            <!-- 4. Retirement Corpus Estimator -->
+            <div class="calculator-container">
+                <div class="calculator-header">
+                    <div class="calculator-icon">
+                        <i class="fas fa-bed"></i>
                     </div>
+                    <h3 class="calculator-title">Plan Your Retirement Corpus</h3>
+                </div>
+                
+                <div class="calculator-grid">
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label class="input-label">Annual Post-Retirement Expense (₹)</label>
+                            <input type="number" class="input-field" id="retirementExpense" placeholder="600000" value="600000">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Years till Retirement</label>
+                            <input type="number" class="input-field" id="retirementYears" placeholder="25" value="25">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Expected Inflation (%)</label>
+                            <input type="number" class="input-field" id="retirementInflation" placeholder="6" value="6" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Expected Post-Retirement Return (%)</label>
+                            <input type="number" class="input-field" id="retirementReturn" placeholder="7" value="7" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Retirement Duration (Years)</label>
+                            <input type="number" class="input-field" id="retirementDuration" placeholder="20" value="20">
+                        </div>
+                        <button class="calculate-btn" onclick="calculateRetirement()">
+                            <i class="fas fa-calculator"></i> Calculate Retirement Corpus
+                        </button>
+                    </div>
+                    
+                    <div class="calculator-results">
+                        <div class="result-item">
+                            <div class="result-label">Required Corpus at Retirement</div>
+                            <div class="result-value" id="retirementCorpus">₹0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Inflation-Adjusted Annual Expense</div>
+                            <div class="result-value" id="retirementInflatedExpense">₹0</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Monthly SIP Needed (12% return)</div>
+                            <div class="result-value" id="retirementMonthlySIP">₹0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="calculator-note">
+                    <i class="fas fa-info-circle"></i>
+                    This simulation estimates how much you may need to accumulate to sustain retirement. Always consult an advisor before planning.
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-container">
+            <div class="faq-header" onclick="toggleFAQ()">
+                <span><i class="fas fa-question-circle"></i> Frequently Asked Questions</span>
+                <i class="fas fa-chevron-down" id="faqChevron"></i>
+            </div>
+            <div class="faq-content" id="faqContent">
+                <div class="faq-item">
+                    <div class="faq-question">How accurate are these financial simulation tools?</div>
+                    <div class="faq-answer">These tools provide estimates based on mathematical formulas and the inputs you provide. They are educational and indicative only. Actual investment returns can vary significantly due to market volatility, economic conditions, and other factors. These calculations should not be considered as guaranteed outcomes.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Can I use these calculators for making investment decisions?</div>
+                    <div class="faq-answer">No, these tools are designed for educational and self-assessment purposes only. They help you understand financial concepts and get a directional view of your financial planning needs. For actual investment decisions, please consult with a qualified, SEBI-registered financial advisor who can provide personalized advice based on your complete financial situation.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Are the returns shown in these calculators guaranteed?</div>
+                    <div class="faq-answer">Absolutely not. All returns shown are estimates based on your input assumptions. Actual market returns can be higher or lower than expected. Past performance does not guarantee future results. These tools use mathematical projections that may not reflect real market conditions.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">Should I rely solely on these tools for financial planning?</div>
+                    <div class="faq-answer">No, these tools are meant to complement, not replace, professional financial advice. They provide a starting point for understanding your financial needs. For comprehensive financial planning, consider factors like risk tolerance, tax implications, insurance needs, and specific life goals with a qualified financial advisor.</div>
                 </div>
             </div>
         </div>
@@ -337,6 +764,12 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Final Disclaimer -->
+        <div class="final-disclaimer">
+            <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+            <strong>Important Disclaimer:</strong> Nivezo is not a SEBI-registered investment advisor. These tools are for educational and self-assessment purposes only. Please consult a licensed advisor before taking investment actions.
         </div>
 
         <!-- Navigation -->
