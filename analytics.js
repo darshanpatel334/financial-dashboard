@@ -34,179 +34,177 @@ function loadAllUserData() {
 
 // Generate comprehensive analytics
 function generateAnalytics() {
-    calculateFinancialHealthScore();
-    calculateKeyRatios();
-    generateEducationalInsights();
+    displayNetWorthSummary();
+    displayIncomeExpenseAnalysis();
+    displayEmergencyFundStatus();
+    displayFinancialHealthInsights();
     displayRiskProfile();
-    populateResourcesAndTools();
-    createAnalyticsCharts();
+    createCharts();
 }
 
-// Calculate overall financial health score (for educational purposes)
-function calculateFinancialHealthScore() {
-    let totalScore = 0;
-    let maxScore = 100;
+// 1. Display Net Worth Summary
+function displayNetWorthSummary() {
+    const netWorthData = analyticsData.netWorth.totals || {};
     
-    // FF Score (30 points)
-    const ffScore = analyticsData.ffScore.currentScore || 0;
-    const ffPoints = Math.min((ffScore / 25) * 30, 30);
-    totalScore += ffPoints;
+    // Display totals
+    document.getElementById('totalAssets').textContent = formatCurrency(netWorthData.totalAssets || 0);
+    document.getElementById('totalLiabilities').textContent = formatCurrency(netWorthData.totalLiabilities || 0);
+    document.getElementById('netWorthValue').textContent = formatCurrency(netWorthData.netWorth || 0);
     
-    // Savings Rate (25 points)
-    const annualIncome = analyticsData.income.totals?.annualTotal || 0;
-    const annualExpenses = analyticsData.expenses.totals?.annualTotal || 0;
-    const savingsRate = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
-    const savingsPoints = Math.min((savingsRate / 30) * 25, 25);
-    totalScore += savingsPoints;
+    // Create asset distribution chart
+    createAssetDistributionChart();
+}
+
+// 2. Display Income vs Expense Analysis
+function displayIncomeExpenseAnalysis() {
+    const incomeData = analyticsData.income.totals || {};
+    const expenseData = analyticsData.expenses.totals || {};
     
-    // Insurance Coverage (20 points)
-    const lifeInsuranceRatio = analyticsData.insurance.analysis?.lifeInsuranceRatio || 0;
-    const insurancePoints = Math.min((lifeInsuranceRatio / 10) * 20, 20);
-    totalScore += insurancePoints;
+    const monthlyIncome = (incomeData.annualTotal || 0) / 12;
+    const monthlyExpenses = (expenseData.annualTotal || 0) / 12;
+    const savingsRatio = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100 : 0;
     
-    // Diversification (15 points)
-    const diversificationPoints = calculateDiversificationScore();
-    totalScore += diversificationPoints;
+    document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncome);
+    document.getElementById('monthlyExpenses').textContent = formatCurrency(monthlyExpenses);
+    document.getElementById('savingsRatio').textContent = Math.round(savingsRatio) + '%';
     
-    // Emergency Fund (10 points)
-    const emergencyFundPoints = calculateEmergencyFundScore();
-    totalScore += emergencyFundPoints;
+    // Create cash flow chart
+    createCashFlowChart(monthlyIncome, monthlyExpenses);
+}
+
+// 3. Display Emergency Fund Status
+function displayEmergencyFundStatus() {
+    const netWorthData = analyticsData.netWorth.assets || {};
+    const monthlyExpenses = (analyticsData.expenses.totals?.annualTotal || 0) / 12;
     
-    const healthScore = Math.round(totalScore);
-    document.getElementById('healthScore').textContent = healthScore;
+    // Calculate liquid assets (cash + FD + liquid funds)
+    let liquidAssets = 0;
     
-    // Color code the score
-    const scoreElement = document.getElementById('healthScore');
-    if (healthScore >= 80) {
-        scoreElement.style.color = 'var(--success-color)';
-    } else if (healthScore >= 60) {
-        scoreElement.style.color = 'var(--warning-color)';
+    // Add cash
+    if (netWorthData.cash && Array.isArray(netWorthData.cash)) {
+        liquidAssets += netWorthData.cash.reduce((sum, item) => sum + (parseFloat(item.currentValue) || 0), 0);
+    }
+    
+    // Add fixed deposits
+    if (netWorthData.fixedDeposits && Array.isArray(netWorthData.fixedDeposits)) {
+        liquidAssets += netWorthData.fixedDeposits.reduce((sum, item) => sum + (parseFloat(item.currentValue) || 0), 0);
+    }
+    
+    // Add debt funds (assuming they're liquid)
+    if (netWorthData.mutualFunds && Array.isArray(netWorthData.mutualFunds)) {
+        liquidAssets += netWorthData.mutualFunds
+            .filter(item => item.category?.toLowerCase().includes('debt') || item.category?.toLowerCase().includes('liquid'))
+            .reduce((sum, item) => sum + (parseFloat(item.currentValue) || 0), 0);
+    }
+    
+    const emergencyFundMonths = monthlyExpenses > 0 ? liquidAssets / monthlyExpenses : 0;
+    const progressPercentage = Math.min((emergencyFundMonths / 6) * 100, 100);
+    
+    document.getElementById('emergencyFundMonths').textContent = emergencyFundMonths.toFixed(1);
+    document.getElementById('emergencyFundProgress').style.width = progressPercentage + '%';
+    
+    // Color code based on adequacy
+    const monthsElement = document.getElementById('emergencyFundMonths');
+    if (emergencyFundMonths >= 6) {
+        monthsElement.style.color = 'var(--success-color)';
+        document.getElementById('emergencyFundProgress').style.background = 'var(--success-color)';
+    } else if (emergencyFundMonths >= 3) {
+        monthsElement.style.color = 'var(--warning-color)';
+        document.getElementById('emergencyFundProgress').style.background = 'var(--warning-color)';
     } else {
-        scoreElement.style.color = 'var(--danger-color)';
+        monthsElement.style.color = 'var(--danger-color)';
+        document.getElementById('emergencyFundProgress').style.background = 'var(--danger-color)';
     }
     
-    // Generate breakdown
-    generateHealthScoreBreakdown({
-        ffScore: ffPoints,
-        savingsRate: savingsPoints,
-        insurance: insurancePoints,
-        diversification: diversificationPoints,
-        emergencyFund: emergencyFundPoints
-    });
-    
-    // Generate improvement areas
-    generateImprovementAreas(healthScore, {
-        ffScore: ffPoints,
-        savingsRate: savingsPoints,
-        insurance: insurancePoints,
-        diversification: diversificationPoints,
-        emergencyFund: emergencyFundPoints
-    });
+    // Display liquid assets breakdown
+    displayLiquidAssetsBreakdown(liquidAssets, netWorthData);
 }
 
-// Calculate diversification score
-function calculateDiversificationScore() {
-    const netWorthData = analyticsData.netWorth;
-    if (!netWorthData.assets) return 0;
+// Display liquid assets breakdown
+function displayLiquidAssetsBreakdown(totalLiquid, netWorthData) {
+    const breakdown = [];
     
-    const categories = Object.keys(netWorthData.assets || {}).filter(cat => 
-        Array.isArray(netWorthData.assets[cat]) && netWorthData.assets[cat].length > 0
-    );
-    
-    if (categories.length < 2) return 0;
-    if (categories.length < 3) return 5;
-    if (categories.length < 4) return 10;
-    return 15;
-}
-
-// Calculate emergency fund score
-function calculateEmergencyFundScore() {
-    const riskProfile = analyticsData.riskProfile.responses?.emergency || 1;
-    return Math.min(riskProfile * 2.5, 10);
-}
-
-// Generate health score breakdown
-function generateHealthScoreBreakdown(scores) {
-    const breakdown = [
-        { label: 'Financial Freedom Score', score: scores.ffScore, max: 30 },
-        { label: 'Savings Rate', score: scores.savingsRate, max: 25 },
-        { label: 'Insurance Coverage', score: scores.insurance, max: 20 },
-        { label: 'Portfolio Diversification', score: scores.diversification, max: 15 },
-        { label: 'Emergency Fund', score: scores.emergencyFund, max: 10 }
-    ];
-    
-    const breakdownContainer = document.getElementById('healthScoreBreakdown');
-    breakdownContainer.innerHTML = breakdown.map(item => {
-        const percentage = (item.score / item.max) * 100;
-        return `
-            <div style="margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
-                    <span>${item.label}</span>
-                    <span>${Math.round(item.score)}/${item.max}</span>
-                </div>
-                <div class="progress-bar" style="height: 0.4rem; background: #e5e7eb; border-radius: 0.2rem;">
-                    <div class="progress-fill" style="width: ${percentage}%; height: 100%; background: ${percentage >= 80 ? 'var(--success-color)' : percentage >= 60 ? 'var(--warning-color)' : 'var(--danger-color)'}; border-radius: 0.2rem; transition: width 0.3s ease;"></div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// Generate improvement areas (educational insights)
-function generateImprovementAreas(healthScore, scores) {
-    const areas = [];
-    
-    if (scores.ffScore < 15) areas.push({ icon: '🎯', text: 'Consider building emergency fund and reducing expenses', priority: 'high' });
-    if (scores.savingsRate < 15) areas.push({ icon: '💰', text: 'Review spending patterns to increase savings rate', priority: 'high' });
-    if (scores.insurance < 12) areas.push({ icon: '🛡️', text: 'Evaluate insurance coverage adequacy', priority: 'medium' });
-    if (scores.diversification < 8) areas.push({ icon: '📊', text: 'Consider diversifying across asset classes', priority: 'medium' });
-    if (scores.emergencyFund < 6) areas.push({ icon: '⚠️', text: 'Build emergency fund for financial security', priority: 'medium' });
-    
-    if (areas.length === 0) {
-        areas.push({ icon: '✅', text: 'Financial metrics look healthy - continue monitoring', priority: 'low' });
+    // Cash
+    if (netWorthData.cash && Array.isArray(netWorthData.cash)) {
+        const cashTotal = netWorthData.cash.reduce((sum, item) => sum + (parseFloat(item.currentValue) || 0), 0);
+        if (cashTotal > 0) {
+            breakdown.push({ label: 'Cash & Savings', amount: cashTotal, percentage: (cashTotal / totalLiquid) * 100 });
+        }
     }
     
-    const areasContainer = document.getElementById('improvementAreas');
-    areasContainer.innerHTML = areas.map(area => {
-        const color = area.priority === 'high' ? 'var(--danger-color)' : 
-                     area.priority === 'medium' ? 'var(--warning-color)' : 'var(--success-color)';
-        return `
-            <div style="display: flex; align-items: center; margin-bottom: 0.75rem; padding: 0.75rem; border-left: 3px solid ${color}; background: ${color}20; border-radius: 0.25rem;">
-                <span style="margin-right: 0.75rem; font-size: 1.2rem;">${area.icon}</span>
-                <span style="flex: 1; font-size: 0.9rem;">${area.text}</span>
-                <span style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background: ${color}; color: white; border-radius: 0.2rem; text-transform: uppercase;">
-                    ${area.priority}
-                </span>
+    // Fixed Deposits
+    if (netWorthData.fixedDeposits && Array.isArray(netWorthData.fixedDeposits)) {
+        const fdTotal = netWorthData.fixedDeposits.reduce((sum, item) => sum + (parseFloat(item.currentValue) || 0), 0);
+        if (fdTotal > 0) {
+            breakdown.push({ label: 'Fixed Deposits', amount: fdTotal, percentage: (fdTotal / totalLiquid) * 100 });
+        }
+    }
+    
+    // Liquid/Debt Funds
+    if (netWorthData.mutualFunds && Array.isArray(netWorthData.mutualFunds)) {
+        const liquidFunds = netWorthData.mutualFunds
+            .filter(item => item.category?.toLowerCase().includes('debt') || item.category?.toLowerCase().includes('liquid'))
+            .reduce((sum, item) => sum + (parseFloat(item.currentValue) || 0), 0);
+        if (liquidFunds > 0) {
+            breakdown.push({ label: 'Liquid/Debt Funds', amount: liquidFunds, percentage: (liquidFunds / totalLiquid) * 100 });
+        }
+    }
+    
+    const container = document.getElementById('liquidAssetsBreakdown');
+    container.innerHTML = breakdown.map(item => `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding: 0.5rem; background: #f8fafc; border-radius: 0.25rem;">
+            <span style="font-weight: 500;">${item.label}</span>
+            <div style="text-align: right;">
+                <div style="font-weight: 600;">${formatCurrency(item.amount)}</div>
+                <small style="color: var(--text-secondary);">${item.percentage.toFixed(1)}%</small>
             </div>
-        `;
-    }).join('');
+        </div>
+    `).join('') || '<p style="color: var(--text-secondary); text-align: center;">No liquid assets found</p>';
 }
 
-// Calculate key financial ratios
-function calculateKeyRatios() {
+// 4. Display Financial Health Insights
+function displayFinancialHealthInsights() {
     const annualIncome = analyticsData.income.totals?.annualTotal || 0;
     const annualExpenses = analyticsData.expenses.totals?.annualTotal || 0;
     const totalLiabilities = analyticsData.netWorth.totals?.totalLiabilities || 0;
-    const lifeInsuranceRatio = analyticsData.insurance.analysis?.lifeInsuranceRatio || 0;
+    const totalAssets = analyticsData.netWorth.totals?.totalAssets || 0;
     
-    // Savings Rate
-    const savingsRate = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
-    document.getElementById('savingsRateMetric').textContent = Math.round(savingsRate) + '%';
-    colorizeMetric('savingsRateMetric', savingsRate, 15, 25);
+    // 1. Savings Ratio
+    const savingsRatio = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
+    document.getElementById('savingsRatioMetric').textContent = Math.round(savingsRatio) + '%';
+    updateProgressBar('savingsRatioBar', savingsRatio, 30, 'var(--success-color)');
+    colorizeMetric('savingsRatioMetric', savingsRatio, 15, 25);
     
-    // Debt-to-Income
-    const debtToIncome = annualIncome > 0 ? (totalLiabilities / annualIncome) * 100 : 0;
-    document.getElementById('debtToIncome').textContent = Math.round(debtToIncome) + '%';
-    colorizeMetric('debtToIncome', debtToIncome, 30, 20, true); // Lower is better
+    // 2. EMI-to-Income (estimate from liabilities)
+    const estimatedEMI = totalLiabilities * 0.012; // Rough estimate: 1.2% monthly EMI rate
+    const monthlyIncome = annualIncome / 12;
+    const emiToIncomeRatio = monthlyIncome > 0 ? (estimatedEMI / monthlyIncome) * 100 : 0;
+    document.getElementById('emiToIncomeRatio').textContent = Math.round(emiToIncomeRatio) + '%';
+    updateProgressBar('emiToIncomeBar', emiToIncomeRatio, 40, 'var(--danger-color)');
+    colorizeMetric('emiToIncomeRatio', emiToIncomeRatio, 30, 20, true); // Lower is better
     
-    // Insurance Coverage
-    document.getElementById('insuranceCoverage').textContent = lifeInsuranceRatio.toFixed(1) + 'x';
-    colorizeMetric('insuranceCoverage', lifeInsuranceRatio, 8, 12);
+    // 3. Asset-to-Liability Ratio
+    const assetLiabilityRatio = totalLiabilities > 0 ? totalAssets / totalLiabilities : totalAssets > 0 ? 99 : 0;
+    document.getElementById('assetLiabilityRatio').textContent = assetLiabilityRatio.toFixed(1) + 'x';
+    updateProgressBar('assetLiabilityBar', Math.min(assetLiabilityRatio * 20, 100), 100, 'var(--success-color)');
+    colorizeMetric('assetLiabilityRatio', assetLiabilityRatio, 2, 5);
     
-    // Emergency Fund
-    const emergencyFundRatio = analyticsData.riskProfile.responses?.emergency || 0;
-    document.getElementById('emergencyFundRatio').textContent = emergencyFundRatio * 1.5; // Rough estimation
-    colorizeMetric('emergencyFundRatio', emergencyFundRatio, 2, 4);
+    // 4. YoY Net Worth Growth (estimated)
+    const ffScoreData = analyticsData.ffScore;
+    const estimatedGrowth = ffScoreData.assetGrowthRate || 8;
+    document.getElementById('netWorthGrowth').textContent = estimatedGrowth.toFixed(1) + '%';
+    updateProgressBar('netWorthGrowthBar', estimatedGrowth * 5, 100, 'var(--primary-color)');
+    colorizeMetric('netWorthGrowth', estimatedGrowth, 6, 12);
+}
+
+// Update progress bar
+function updateProgressBar(elementId, value, maxValue, color) {
+    const percentage = Math.min((value / maxValue) * 100, 100);
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.style.width = percentage + '%';
+        element.style.background = color;
+    }
 }
 
 // Colorize metric based on thresholds
@@ -215,7 +213,7 @@ function colorizeMetric(elementId, value, lowThreshold, highThreshold, isReverse
     if (!element) return;
     
     if (isReverse) {
-        // For debt ratios where lower is better
+        // For ratios where lower is better
         if (value <= lowThreshold) {
             element.style.color = 'var(--success-color)';
         } else if (value <= highThreshold) {
@@ -235,67 +233,29 @@ function colorizeMetric(elementId, value, lowThreshold, highThreshold, isReverse
     }
 }
 
-// Generate educational insights
-function generateEducationalInsights() {
-    const insights = [
-        {
-            title: 'Savings Rate',
-            content: 'Your savings rate indicates what percentage of your income you save. A higher savings rate (20%+) typically leads to faster wealth building and financial independence.'
-        },
-        {
-            title: 'Debt-to-Income Ratio',
-            content: 'This ratio shows how much of your income goes toward debt payments. Generally, keeping this below 20% is considered healthy for long-term financial stability.'
-        },
-        {
-            title: 'Emergency Fund',
-            content: 'An emergency fund covering 6+ months of expenses provides financial security during unexpected situations like job loss or medical emergencies.'
-        },
-        {
-            title: 'Life Insurance Coverage',
-            content: 'Life insurance should typically be 10-15 times your annual income to adequately protect your family\'s financial future.'
-        },
-        {
-            title: 'Portfolio Diversification',
-            content: 'Diversifying across different asset classes (equity, fixed income, real estate) can help reduce risk and optimize returns over time.'
-        }
-    ];
-    
-    const insightsContainer = document.getElementById('educationalInsights');
-    insightsContainer.innerHTML = insights.map(insight => `
-        <div class="card" style="margin-bottom: 1rem;">
-            <div class="card-body">
-                <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">${insight.title}</h4>
-                <p style="margin: 0; color: var(--text-secondary); line-height: 1.5;">${insight.content}</p>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Display risk profile information
+// 5. Display Risk Profile
 function displayRiskProfile() {
     const riskProfile = analyticsData.riskProfile.riskProfile || 'Not Assessed';
     const totalScore = analyticsData.riskProfile.totalScore || 0;
     
-    document.getElementById('riskProfileDisplay').innerHTML = `
-        <div style="text-align: center; padding: 1rem;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">${getRiskProfileEmoji(riskProfile)}</div>
-            <h3 style="color: var(--primary-color);">${riskProfile}</h3>
-            <p style="color: var(--text-secondary);">Score: ${totalScore}/32</p>
-        </div>
-    `;
+    const riskProfileEmoji = getRiskProfileEmoji(riskProfile);
     
-    const responses = analyticsData.riskProfile.responses || {};
-    document.getElementById('riskAssessmentDetails').innerHTML = `
-        <div style="font-size: 0.9rem;">
-            <div style="margin-bottom: 0.5rem;"><strong>Investment Horizon:</strong> ${getHorizonText(responses.horizon)}</div>
-            <div style="margin-bottom: 0.5rem;"><strong>Risk Tolerance:</strong> ${getRiskToleranceText(responses.volatility)}</div>
-            <div style="margin-bottom: 0.5rem;"><strong>Investment Knowledge:</strong> ${getKnowledgeText(responses.knowledge)}</div>
-            <div><strong>Income Stability:</strong> ${getIncomeText(responses.income)}</div>
+    document.getElementById('riskProfileDisplay').innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">${riskProfileEmoji}</div>
+            <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">${riskProfile}</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Risk Score: ${totalScore}/32</p>
+            <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; text-align: left;">
+                <h4 style="margin-bottom: 0.5rem;">Profile Characteristics:</h4>
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                    ${getRiskProfileDescription(riskProfile)}
+                </div>
+            </div>
         </div>
     `;
 }
 
-// Helper functions for risk profile display
+// Get risk profile emoji
 function getRiskProfileEmoji(riskProfile) {
     const emojis = {
         'Conservative': '🔒',
@@ -306,133 +266,94 @@ function getRiskProfileEmoji(riskProfile) {
     return emojis[riskProfile] || '📊';
 }
 
-function getHorizonText(horizon) {
-    const texts = { 1: 'Less than 2 years', 2: '2-5 years', 3: '5-10 years', 4: 'More than 10 years' };
-    return texts[horizon] || 'Not specified';
+// Get risk profile description
+function getRiskProfileDescription(riskProfile) {
+    const descriptions = {
+        'Conservative': 'Prioritizes capital preservation • Low risk tolerance • Prefers guaranteed returns • Suitable for debt instruments',
+        'Risk Averse': 'Moderate risk tolerance • Prefers stable investments • Some allocation to growth assets • Balanced approach',
+        'Balanced': 'Balanced risk approach • Comfortable with volatility • Mix of growth and income assets • Long-term perspective',
+        'Aggressive': 'High risk tolerance • Seeks maximum returns • Comfortable with volatility • Growth-focused strategy'
+    };
+    return descriptions[riskProfile] || 'Risk profile assessment pending';
 }
 
-function getRiskToleranceText(volatility) {
-    const texts = { 1: 'Very Low', 2: 'Low', 3: 'Moderate', 4: 'High' };
-    return texts[volatility] || 'Not specified';
+// Create Charts
+function createCharts() {
+    createAssetDistributionChart();
+    // Note: cashFlowChart is created in displayIncomeExpenseAnalysis
 }
 
-function getKnowledgeText(knowledge) {
-    const texts = { 1: 'Beginner', 2: 'Basic', 3: 'Good', 4: 'Expert' };
-    return texts[knowledge] || 'Not specified';
-}
-
-function getIncomeText(income) {
-    const texts = { 1: 'Variable', 2: 'Moderately Stable', 3: 'Very Stable', 4: 'Multiple Sources' };
-    return texts[income] || 'Not specified';
-}
-
-// Populate resources and tools
-function populateResourcesAndTools() {
-    // Useful Apps
-    const apps = [
-        'ET Money - Expense tracking',
-        'Coin by Zerodha - Mutual funds',
-        'Kuvera - Investment platform',
-        'PayTM Money - Investment app',
-        'CRED - Credit card management'
-    ];
+// Create asset distribution pie chart
+function createAssetDistributionChart() {
+    const ctx = document.getElementById('assetDistributionChart').getContext('2d');
+    const netWorthData = analyticsData.netWorth.assets || {};
     
-    document.getElementById('usefulApps').innerHTML = apps.map(app => 
-        `<div style="margin-bottom: 0.5rem; font-size: 0.9rem;">• ${app}</div>`
-    ).join('');
+    const assetData = [];
+    const assetLabels = [];
+    const assetColors = ['#3b82f6', '#ef4444', '#f59e0b', '#22c55e', '#8b5cf6', '#06b6d4'];
     
-    // Educational Resources
-    const resources = [
-        'Varsity by Zerodha - Free trading courses',
-        'RBI Financial Education - Official guides',
-        'SEBI Investor Education - Regulatory guidance',
-        'Economic Times - Financial news',
-        'MoneyControl - Market analysis'
-    ];
+    // Calculate asset values by category
+    const categories = {
+        'Equity': ['stocks', 'mutualFunds'],
+        'Fixed Deposits': ['fixedDeposits'],
+        'Cash': ['cash'],
+        'Gold': ['gold'],
+        'Real Estate': ['realEstate'],
+        'Others': ['otherAssets']
+    };
     
-    document.getElementById('educationalResources').innerHTML = resources.map(resource => 
-        `<div style="margin-bottom: 0.5rem; font-size: 0.9rem;">• ${resource}</div>`
-    ).join('');
+    Object.keys(categories).forEach((categoryName, index) => {
+        let categoryTotal = 0;
+        categories[categoryName].forEach(assetType => {
+            if (netWorthData[assetType] && Array.isArray(netWorthData[assetType])) {
+                categoryTotal += netWorthData[assetType].reduce((sum, item) => 
+                    sum + (parseFloat(item.currentValue) || 0), 0
+                );
+            }
+        });
+        
+        if (categoryTotal > 0) {
+            assetLabels.push(categoryName);
+            assetData.push(categoryTotal);
+        }
+    });
     
-    // Online Calculators
-    const calculators = [
-        'SIP Calculator',
-        'Retirement Planning Calculator',
-        'EMI Calculator',
-        'Tax Calculator',
-        'FD Calculator'
-    ];
-    
-    document.getElementById('onlineCalculators').innerHTML = calculators.map(calc => 
-        `<div style="margin-bottom: 0.5rem; font-size: 0.9rem;">• ${calc}</div>`
-    ).join('');
-}
-
-// Create analytics charts
-function createAnalyticsCharts() {
-    createNetWorthTrendChart();
-    createCashFlowChart();
-}
-
-// Create net worth trend chart (simulated data)
-function createNetWorthTrendChart() {
-    const ctx = document.getElementById('netWorthTrendChart').getContext('2d');
-    const currentNetWorth = analyticsData.netWorth.totals?.netWorth || 0;
-    
-    // Generate trend data (current month and 11 previous months)
-    const months = [];
-    const netWorthData = [];
-    
-    for (let i = 11; i >= 0; i--) {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        months.push(date.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' }));
-        // Simulate growth with some variation
-        const growthFactor = (12 - i) / 12;
-        netWorthData.push(Math.round(currentNetWorth * (0.7 + growthFactor * 0.3)));
+    if (assetData.length === 0) {
+        // Show placeholder if no data
+        assetLabels.push('No Assets');
+        assetData.push(1);
     }
     
-    charts.netWorthTrend = new Chart(ctx, {
-        type: 'line',
+    charts.assetDistribution = new Chart(ctx, {
+        type: 'doughnut',
         data: {
-            labels: months,
+            labels: assetLabels,
             datasets: [{
-                label: 'Net Worth',
-                data: netWorthData,
-                borderColor: chartColors.primary,
-                backgroundColor: chartColors.primary + '20',
-                fill: true,
-                tension: 0.1
+                data: assetData,
+                backgroundColor: assetColors.slice(0, assetData.length),
+                borderWidth: 2,
+                borderColor: '#ffffff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '₹' + (value / 100000).toFixed(0) + 'L';
-                        }
-                    }
-                }
-            },
             plugins: {
                 legend: {
-                    display: false
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        font: { size: 12 }
+                    }
                 }
             }
         }
     });
 }
 
-// Create cash flow chart
-function createCashFlowChart() {
+// Create cash flow bar chart
+function createCashFlowChart(monthlyIncome, monthlyExpenses) {
     const ctx = document.getElementById('cashFlowChart').getContext('2d');
-    
-    const monthlyIncome = (analyticsData.income.totals?.annualTotal || 0) / 12;
-    const monthlyExpenses = (analyticsData.expenses.totals?.annualTotal || 0) / 12;
     const monthlySavings = monthlyIncome - monthlyExpenses;
     
     charts.cashFlow = new Chart(ctx, {
@@ -442,17 +363,17 @@ function createCashFlowChart() {
             datasets: [{
                 label: 'Income',
                 data: [monthlyIncome],
-                backgroundColor: chartColors.success,
+                backgroundColor: '#22c55e',
                 borderWidth: 0
             }, {
                 label: 'Expenses',
                 data: [monthlyExpenses],
-                backgroundColor: chartColors.danger,
+                backgroundColor: '#ef4444',
                 borderWidth: 0
             }, {
-                label: 'Surplus',
+                label: 'Savings',
                 data: [monthlySavings],
-                backgroundColor: chartColors.primary,
+                backgroundColor: monthlySavings >= 0 ? '#3b82f6' : '#f59e0b',
                 borderWidth: 0
             }]
         },
@@ -478,28 +399,42 @@ function createCashFlowChart() {
     });
 }
 
+// Open simulation tools (placeholder for external calculator links)
+function openSimulationTool(toolType) {
+    const tools = {
+        'sip': 'https://www.mutualfundsindia.com/sip-calculator',
+        'goal': 'https://cleartax.in/s/goal-planning-calculator',
+        'freedom': 'ff-score.html', // Internal tool
+        'retirement': 'https://www.bankbazaar.com/retirement-planning-calculator.html'
+    };
+    
+    const url = tools[toolType];
+    if (url) {
+        if (url.startsWith('http')) {
+            // External tool - open in new tab with disclaimer
+            if (confirm('This will open an external calculator for educational simulation purposes only. The results should not be considered as financial advice. Continue?')) {
+                window.open(url, '_blank');
+            }
+        } else {
+            // Internal tool
+            window.location.href = url;
+        }
+    } else {
+        showStatus('Calculator not available yet', 'info');
+    }
+}
+
 // Navigation functions
 function goBack() {
     window.location.href = 'dashboard.html';
 }
 
 function completeJourney() {
-    // Clear any temporary data and redirect to dashboard
-    showStatus('Financial journey completed! You can always come back to review your analytics.', 'success');
+    showStatus('Financial analytics review completed! You can always return to analyze your data.', 'success');
     setTimeout(() => {
         window.location.href = 'dashboard.html';
     }, 2000);
 }
-
-// Chart colors (consistent with other pages)
-const chartColors = {
-    primary: '#2563eb',
-    success: '#22c55e',
-    warning: '#f59e0b',
-    danger: '#ef4444',
-    info: '#06b6d4',
-    purple: '#8b5cf6'
-};
 
 // Clean up charts when navigating away
 window.addEventListener('beforeunload', () => {

@@ -21,217 +21,321 @@
     </nav>
 
     <div class="container">
+        <!-- SEBI Compliance Disclaimer (Top Alert) -->
+        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 0.5rem; padding: 1rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; color: #92400e;">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem; font-size: 1.2rem;"></i>
+                <strong>SEBI Compliance Notice:</strong> Nivezo is not a SEBI-registered investment advisor. This dashboard provides analytical tools for educational use only. No investment advice is provided.
+            </div>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header">
             <h1><i class="fas fa-chart-pie"></i> Financial Analytics Dashboard</h1>
-            <p>Comprehensive analysis of your financial position with key ratios and insights</p>
+            <p>Educational insights and analytical tools to understand your financial position</p>
         </div>
 
-        <!-- Financial Health Metrics -->
+        <!-- 1. Net Worth Summary -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <i class="fas fa-heartbeat"></i> Financial Health Metrics
+                    <i class="fas fa-chart-pie"></i> Net Worth Summary
                 </h2>
-                <small class="text-secondary">Key ratios and indicators for financial health assessment</small>
+                <small class="text-secondary">Overview of your assets, liabilities, and net worth distribution</small>
             </div>
             
             <div class="grid-2">
                 <div class="card">
                     <div class="card-body">
-                        <h4><i class="fas fa-chart-line"></i> Financial Health Score</h4>
-                        <div class="score-display" style="padding: 1rem; margin: 1rem 0;">
-                            <div class="score-number" id="healthScore">0</div>
-                            <div class="score-label">Out of 100</div>
-                        </div>
-                        <div id="healthScoreBreakdown">
-                            <!-- Health score breakdown will be populated here -->
+                        <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center;">
+                                <h4 style="margin-bottom: 0.5rem;">Total Assets</h4>
+                                <div class="score-number" style="color: var(--success-color);" id="totalAssets">₹0</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <h4 style="margin-bottom: 0.5rem;">Total Liabilities</h4>
+                                <div class="score-number" style="color: var(--danger-color);" id="totalLiabilities">₹0</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <h4 style="margin-bottom: 0.5rem;">Net Worth</h4>
+                                <div class="score-number" style="color: var(--primary-color);" id="netWorthValue">₹0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-body">
-                        <h4><i class="fas fa-exclamation-triangle"></i> Areas for Improvement</h4>
-                        <div id="improvementAreas">
-                            <!-- Areas for improvement will be populated here -->
+                        <h4 style="text-align: center; margin-bottom: 1rem;">Asset Distribution</h4>
+                        <div class="chart-wrapper" style="height: 200px;">
+                            <canvas id="assetDistributionChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Key Financial Ratios -->
+        <!-- 2. Expense vs Income Tracker -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <i class="fas fa-calculator"></i> Key Financial Ratios
+                    <i class="fas fa-balance-scale"></i> Income vs Expense Analysis
                 </h2>
-                <small class="text-secondary">Important metrics to understand your financial position</small>
+                <small class="text-secondary">Monthly cash flow and savings ratio analysis</small>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="text-align: center;">
+                                <h4 style="margin-bottom: 0.5rem;">Monthly Income</h4>
+                                <div class="score-number" style="color: var(--success-color);" id="monthlyIncome">₹0</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <h4 style="margin-bottom: 0.5rem;">Monthly Expenses</h4>
+                                <div class="score-number" style="color: var(--danger-color);" id="monthlyExpenses">₹0</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <h4 style="margin-bottom: 0.5rem;">Savings Ratio</h4>
+                                <div class="score-number" style="color: var(--primary-color);" id="savingsRatio">0%</div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; margin-top: 1rem;">
+                            <small style="color: var(--text-secondary);">
+                                <i class="fas fa-info-circle"></i> 
+                                Average Indian household saves 22% of income (for reference)
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h4 style="text-align: center; margin-bottom: 1rem;">Monthly Cash Flow</h4>
+                        <div class="chart-wrapper" style="height: 200px;">
+                            <canvas id="cashFlowChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Emergency Fund Status -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-umbrella"></i> Emergency Fund Status
+                </h2>
+                <small class="text-secondary">Liquid assets coverage for unexpected expenses</small>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Emergency Fund Coverage</h4>
+                        <div class="score-number" id="emergencyFundMonths" style="font-size: 3rem; margin: 1rem 0;">0</div>
+                        <p style="margin-bottom: 1rem;">Months of expenses covered</p>
+                        <div class="progress-bar" style="height: 1rem; margin-bottom: 0.5rem;">
+                            <div class="progress-fill" id="emergencyFundProgress" style="background: var(--warning-color);"></div>
+                        </div>
+                        <small style="color: var(--text-secondary);">
+                            <i class="fas fa-lightbulb"></i> 
+                            Many financial planners recommend 6 months as a buffer
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h4 style="margin-bottom: 1rem;">Liquid Assets Breakdown</h4>
+                        <div id="liquidAssetsBreakdown">
+                            <!-- Liquid assets breakdown will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Financial Health Insights -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heartbeat"></i> Financial Health Insights
+                </h2>
+                <small class="text-secondary">Key financial ratios and peer comparisons</small>
             </div>
             
             <div class="grid-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h4>Savings Rate</h4>
-                        <div class="score-number" id="savingsRateMetric">0%</div>
-                        <p class="text-secondary">Income - Expenses / Income</p>
+                        <h4>Savings Ratio</h4>
+                        <div class="score-number" id="savingsRatioMetric">0%</div>
+                        <div class="progress-bar" style="margin: 1rem 0;">
+                            <div class="progress-fill" id="savingsRatioBar"></div>
+                        </div>
+                        <small>Peer Avg: 22%</small>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-body text-center">
-                        <h4>Debt-to-Income</h4>
-                        <div class="score-number" id="debtToIncome">0%</div>
-                        <p class="text-secondary">Total Debt / Annual Income</p>
+                        <h4>EMI-to-Income</h4>
+                        <div class="score-number" id="emiToIncomeRatio">0%</div>
+                        <div class="progress-bar" style="margin: 1rem 0;">
+                            <div class="progress-fill" id="emiToIncomeBar"></div>
+                        </div>
+                        <small>Recommended: <30%</small>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-body text-center">
-                        <h4>Insurance Coverage Ratio</h4>
-                        <div class="score-number" id="insuranceCoverage">0x</div>
-                        <p class="text-secondary">Life Insurance / Annual Income</p>
+                        <h4>Asset-to-Liability</h4>
+                        <div class="score-number" id="assetLiabilityRatio">0x</div>
+                        <div class="progress-bar" style="margin: 1rem 0;">
+                            <div class="progress-fill" id="assetLiabilityBar"></div>
+                        </div>
+                        <small>Higher is better</small>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-body text-center">
-                        <h4>Emergency Fund Ratio</h4>
-                        <div class="score-number" id="emergencyFundRatio">0</div>
-                        <p class="text-secondary">Months of expenses covered</p>
+                        <h4>YoY Net Worth Growth</h4>
+                        <div class="score-number" id="netWorthGrowth">0%</div>
+                        <div class="progress-bar" style="margin: 1rem 0;">
+                            <div class="progress-fill" id="netWorthGrowthBar"></div>
+                        </div>
+                        <small>Estimated growth</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Analytics Charts -->
+        <!-- 5. Simulation Tools -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <i class="fas fa-chart-bar"></i> Financial Analytics
+                    <i class="fas fa-calculator"></i> Financial Simulation Tools
                 </h2>
-            </div>
-            
-            <div class="grid-2">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3>Net Worth Trend Analysis</h3>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="netWorthTrendChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3>Cash Flow Analysis</h3>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="cashFlowChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Educational Insights -->
-        <div class="section-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-graduation-cap"></i> Educational Insights
-                </h2>
-                <small class="text-secondary">Learn about your financial metrics and ratios</small>
-            </div>
-            
-            <div id="educationalInsights">
-                <!-- Educational insights will be populated here -->
-            </div>
-        </div>
-
-        <!-- Risk Profile Analysis -->
-        <div class="section-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-balance-scale"></i> Risk Profile Analysis
-                </h2>
+                <small class="text-secondary">Educational calculators for financial planning (for simulation purposes only)</small>
             </div>
             
             <div class="grid-2">
                 <div class="card">
                     <div class="card-body">
-                        <h4>Your Risk Profile</h4>
-                        <div id="riskProfileDisplay">
-                            <!-- Risk profile display will be populated here -->
-                        </div>
+                        <h4><i class="fas fa-chart-line"></i> SIP Calculator</h4>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Calculate potential returns from systematic investments</p>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('sip')">
+                            <i class="fas fa-external-link-alt"></i> Open SIP Calculator
+                        </button>
+                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-body">
-                        <h4>Risk Assessment Details</h4>
-                        <div id="riskAssessmentDetails">
-                            <!-- Risk assessment details will be populated here -->
-                        </div>
+                        <h4><i class="fas fa-bullseye"></i> Goal-Based Investment Simulator</h4>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Estimate corpus needed for financial goals</p>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('goal')">
+                            <i class="fas fa-external-link-alt"></i> Open Goal Calculator
+                        </button>
+                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h4><i class="fas fa-trophy"></i> Freedom Score Estimator</h4>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Analyze your path to financial independence</p>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('freedom')">
+                            <i class="fas fa-external-link-alt"></i> Open FF Calculator
+                        </button>
+                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h4><i class="fas fa-bed"></i> Retirement Corpus Estimator</h4>
+                        <p style="margin: 0.5rem 0; color: var(--text-secondary);">Estimate retirement corpus requirements</p>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="openSimulationTool('retirement')">
+                            <i class="fas fa-external-link-alt"></i> Open Retirement Calculator
+                        </button>
+                        <small style="color: var(--warning-color);">⚠️ For simulation purposes only</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tools & Calculators -->
-        <div class="section-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-tools"></i> Financial Tools & Calculators
-                </h2>
-            </div>
-            
-            <div class="grid-3">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
-                        <h4>Useful Apps</h4>
-                        <div id="usefulApps">
-                            <!-- Useful financial apps will be listed here -->
-                        </div>
+        <!-- Main Content and Educational Sidebar Layout -->
+        <div class="grid-4" style="grid-template-columns: 3fr 1fr; gap: 2rem;">
+            <!-- Main Content Area -->
+            <div>
+                <!-- Risk Profile Analysis -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-balance-scale"></i> Risk Profile Analysis
+                        </h2>
                     </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-body text-center">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
-                        <h4>Educational Resources</h4>
-                        <div id="educationalResources">
-                            <!-- Educational resources will be listed here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-body text-center">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🧮</div>
-                        <h4>Online Calculators</h4>
-                        <div id="onlineCalculators">
-                            <!-- Online calculators will be listed here -->
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="riskProfileDisplay">
+                                <!-- Risk profile display will be populated here -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Important Disclaimer -->
-        <div class="section-card" style="background: #fef3c7; border: 2px solid #f59e0b;">
-            <div class="section-header">
-                <h2 class="section-title" style="color: #92400e;">
-                    <i class="fas fa-exclamation-triangle"></i> Important Disclaimer
-                </h2>
-            </div>
-            
-            <div style="color: #92400e; line-height: 1.6;">
-                <p><strong>This platform provides educational information and analytical tools only.</strong></p>
-                <p>• We do not provide personalized financial advice or specific investment recommendations</p>
-                <p>• All information is for educational purposes and should not be considered as financial advice</p>
-                <p>• Please consult with a qualified, SEBI-registered financial advisor for personalized advice</p>
-                <p>• Always do your own research before making any financial decisions</p>
+            <!-- 6. Educational Cards Sidebar -->
+            <div>
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 style="font-size: 1.2rem;">
+                            <i class="fas fa-graduation-cap"></i> Learn & Understand
+                        </h3>
+                    </div>
+                    
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div class="card-body">
+                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">What is Asset Allocation?</h4>
+                            <p style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); line-height: 1.4;">
+                                Asset allocation is the strategy of dividing investments among different asset categories like equity, debt, gold, and real estate to optimize risk and returns based on goals and risk tolerance.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div class="card-body">
+                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Emergency Fund — Why It Matters</h4>
+                            <p style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); line-height: 1.4;">
+                                An emergency fund provides financial security during unexpected events like job loss or medical emergencies. It should cover 6-12 months of living expenses in easily accessible accounts.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-bottom: 1rem;">
+                        <div class="card-body">
+                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">What is a Healthy Savings Rate?</h4>
+                            <p style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); line-height: 1.4;">
+                                A healthy savings rate is typically 20-30% of income. This includes emergency funds, retirement savings, and goal-specific investments. Higher rates accelerate wealth building and financial freedom.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Understanding Risk vs Return</h4>
+                            <p style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); line-height: 1.4;">
+                                Higher potential returns typically come with higher risk. Diversification across asset classes helps balance risk while pursuing growth over the long term.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
