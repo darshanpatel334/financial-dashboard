@@ -205,7 +205,7 @@
         .hero {
             padding: 10rem 0 6rem;
             text-align: center;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f4ff 100%);
+            background: linear-gradient(135deg, #fafbfc 0%, #f8fafc 50%, #ffffff 100%);
             margin-top: 4rem;
             position: relative;
             overflow: hidden;
@@ -425,7 +425,7 @@
         /* Features Section */
         .features {
             padding: 6rem 0;
-            background: var(--bg-primary);
+            background: #fafbfc;
             position: relative;
         }
 
@@ -455,45 +455,27 @@
         }
 
         .feature-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
+            background: #ffffff;
             padding: 2.5rem;
-            border-radius: 20px;
+            border-radius: 16px;
             text-align: left;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(226, 232, 240, 0.5);
-            transition: all 0.4s ease;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1;
-        }
-
-        .feature-card:hover::before {
-            opacity: 0.05;
         }
 
         .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-            border-color: rgba(37, 99, 235, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-color);
         }
 
         .feature-icon {
-            width: 4.5rem;
-            height: 4.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            border-radius: 20px;
+            width: 4rem;
+            height: 4rem;
+            background: var(--primary-color);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -546,42 +528,27 @@
         }
 
         .highlight-box {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 2px solid #f59e0b;
-            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
             padding: 3rem;
             margin: 4rem 0;
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
-
-        .highlight-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-            animation: shimmer 3s ease-in-out infinite;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .highlight-box h3 {
-            color: #92400e;
+            color: var(--text-primary);
             margin-bottom: 1.5rem;
             font-size: 1.8rem;
             font-weight: 700;
-            position: relative;
-            z-index: 1;
         }
 
         .highlight-box p {
-            color: #92400e;
+            color: var(--text-secondary);
             font-size: 1.1rem;
             line-height: 1.7;
-            position: relative;
-            z-index: 1;
         }
 
         .security-section {
@@ -711,13 +678,13 @@
         }
 
         .disclaimer-note {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem;
             margin: 3rem 0;
             text-align: center;
-            color: #dc2626;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
@@ -923,36 +890,13 @@
                 </div>
             </div>
 
-            <!-- Security Section -->
-            <div class="security-section">
-                <h3><i class="fas fa-shield-alt"></i> 🔐 Data Privacy and Security First</h3>
-                <p style="color: #15803d; margin-bottom: 1rem;">We follow strict data protection practices:</p>
-                <div class="security-features">
-                    <div class="security-item">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Google-secured logins (OTP/Email)</span>
-                    </div>
-                    <div class="security-item">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Encryption of sensitive financial inputs</span>
-                    </div>
-                    <div class="security-item">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Hosted on secure cloud infrastructure</span>
-                    </div>
-                    <div class="security-item">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Full transparency — your data, your control</span>
-                    </div>
-                </div>
-                <p style="color: #15803d; margin-top: 1rem; font-size: 0.9rem;">📌 We voluntarily follow best practices under IT Act and RBI KYC guidelines.</p>
-            </div>
+
 
             <!-- Future Features -->
-            <div class="highlight-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-color: #0ea5e9;">
-                <h3 style="color: #0c4a6e;">💡 What's Coming Next</h3>
-                <div style="color: #0c4a6e; text-align: left; max-width: 600px; margin: 0 auto;">
-                    <p style="margin-bottom: 1rem;">We're building even more tools to support your journey:</p>
+            <div class="highlight-box">
+                <h3>💡 What's Coming Next</h3>
+                <p>We're building even more tools to support your journey:</p>
+                <div style="text-align: left; max-width: 600px; margin: 0 auto;">
                     <ul style="list-style: none; padding: 0;">
                         <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
                             <span style="position: absolute; left: 0;">🔗</span>
