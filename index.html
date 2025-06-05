@@ -265,7 +265,7 @@
         .hero-description {
             color: var(--text-secondary);
             font-size: 2.2rem;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
@@ -273,6 +273,19 @@
             position: relative;
             z-index: 2;
             font-weight: 600;
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+            font-weight: 400;
         }
 
         .hero-cta {
@@ -746,24 +759,6 @@
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.8s ease 0.2s;
-            position: relative;
-        }
-
-        .problem-header p::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(79, 70, 229, 0.1));
-            border-radius: 8px;
-            transition: width 1.5s ease 0.8s;
-            z-index: -1;
-        }
-
-        .problem-section.animated .problem-header p::before {
-            width: 100%;
         }
 
         .problem-section.animated .problem-header h3,
@@ -924,6 +919,11 @@
             .hero-description {
                 font-size: 1.8rem;
                 line-height: 1.5;
+                margin-bottom: 1.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
                 margin-bottom: 2.5rem;
             }
 
@@ -1074,6 +1074,11 @@
 
             .hero-description {
                 font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
                 margin-bottom: 2rem;
             }
 
@@ -1239,9 +1244,8 @@
                 <h1 class="brand-name">Nivezo</h1>
                 <p class="brand-tagline">Track Better. Learn Smarter. Decide Wisely.</p>
             </div>
-            <p class="hero-description">Your personal finance dashboard for clarity, control, and confidence<br>
-            Stop guessing. Start understanding.<br><br>
-            Nivezo helps you organize your financial life, simulate important decisions, and build the common-sense knowledge you need to take charge of your future.</p>
+            <p class="hero-description">Your personal finance dashboard for clarity, control, and confidence</p>
+            <p class="hero-subtitle">Nivezo helps you organize your financial life, simulate important decisions, and build the common-sense knowledge you need to take charge of your future.</p>
             <div class="hero-cta">
                 <button class="btn btn-primary btn-signup btn-hero" data-modal="signupModal" id="startJourneyBtn">
                     <i class="fas fa-rocket"></i> Start My Free Dashboard
