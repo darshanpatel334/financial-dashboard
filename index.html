@@ -56,23 +56,22 @@
         }
 
         .nav-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark), #6366f1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: flex;
             align-items: center;
-        }
-
-        .nav-brand img {
-            height: 40px;
-            width: auto;
+            letter-spacing: -0.02em;
             transition: all 0.3s ease;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        .nav-brand:hover img {
+        .nav-brand:hover {
             transform: scale(1.05);
+            filter: brightness(1.1);
         }
 
         /* Buttons */
@@ -759,7 +758,7 @@
     <nav class="navbar">
         <div class="container">
             <a href="index.html" class="nav-brand" style="text-decoration: none;">
-                <img src="assets/images/nivezo-logo.png" alt="Nivezo" style="height: 40px; width: auto;">
+                Nivezo
             </a>
             <div class="nav-links">
                 <div class="auth-buttons">
