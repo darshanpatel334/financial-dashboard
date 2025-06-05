@@ -1124,6 +1124,12 @@ const NAVIGATION_STEPS = [
 ];
 
 function setupPageNavigation(currentPageIndex = 1) {
+    // Ensure DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setupPageNavigation(currentPageIndex));
+        return;
+    }
+    
     // Generate navigation steps dynamically
     const stepsHtml = NAVIGATION_STEPS.map((step, index) => {
         const isLast = index === NAVIGATION_STEPS.length - 1;
@@ -1247,34 +1253,40 @@ function setupPageNavigation(currentPageIndex = 1) {
         </style>
     `;
     
+    // Check if navigation already exists to avoid duplicates
+    if (document.getElementById('progressNavigation')) {
+        console.log('Navigation already exists, refreshing...');
+        setupNavigationInteractions();
+        return;
+    }
+    
     // Find insertion point - first look for page-header, then h1, then container
     let insertionPoint = document.querySelector('.page-header');
+    let insertionMethod = 'beforebegin';
     
     if (!insertionPoint) {
         // Look for h1 tag
         insertionPoint = document.querySelector('h1');
-        if (insertionPoint) {
-            // Insert before h1
-            insertionPoint.insertAdjacentHTML('beforebegin', navHtml);
-            setupNavigationInteractions();
-            return;
-        }
+        insertionMethod = 'beforebegin';
     }
     
     if (!insertionPoint) {
         // Fall back to container
         insertionPoint = document.querySelector('.container');
-        if (insertionPoint) {
-            insertionPoint.insertAdjacentHTML('afterbegin', navHtml);
-        }
-    } else {
-        // Insert before page-header
-        insertionPoint.insertAdjacentHTML('beforebegin', navHtml);
+        insertionMethod = 'afterbegin';
     }
     
     if (insertionPoint) {
-        // Setup click handlers and progress status
-        setupNavigationInteractions();
+        try {
+            insertionPoint.insertAdjacentHTML(insertionMethod, navHtml);
+            console.log('Navigation inserted successfully at:', insertionPoint.tagName);
+            // Setup click handlers and progress status
+            setupNavigationInteractions();
+        } catch (error) {
+            console.error('Error inserting navigation:', error);
+        }
+    } else {
+        console.error('No suitable insertion point found for navigation');
     }
 }
 
@@ -1328,7 +1340,32 @@ window.addEventListener('focus', () => {
     setTimeout(refreshNavigationStatus, 100);
 });
 
+// Helper function to safely setup navigation with proper timing
+function safeSetupNavigation(pageIndex) {
+    console.log('Safe navigation setup called for page:', pageIndex);
+    
+    // Multiple timing strategies to ensure it works
+    if (document.readyState === 'complete') {
+        setupPageNavigation(pageIndex);
+    } else if (document.readyState === 'interactive') {
+        setTimeout(() => setupPageNavigation(pageIndex), 100);
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => setupPageNavigation(pageIndex), 50);
+        });
+    }
+    
+    // Also try after window load as fallback
+    window.addEventListener('load', () => {
+        if (!document.getElementById('progressNavigation')) {
+            console.log('Navigation not found after load, retrying...');
+            setupPageNavigation(pageIndex);
+        }
+    });
+}
+
 // Export navigation functions
 window.setupPageNavigation = setupPageNavigation;
+window.safeSetupNavigation = safeSetupNavigation;
 window.setupNavigationInteractions = setupNavigationInteractions;
 window.refreshNavigationStatus = refreshNavigationStatus; 
