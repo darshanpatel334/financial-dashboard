@@ -558,7 +558,7 @@
         }
 
         .dashboard-preview {
-            margin: 2rem 0;
+            margin: 2rem 0 0 0;
             perspective: 1000px;
         }
 
@@ -786,6 +786,51 @@
             font-size: 0.95rem;
             line-height: 1.6;
             margin: 0;
+        }
+
+        /* Problem Cards Grid */
+        .problem-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .problem-card {
+            background: #ffffff;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(248, 113, 113, 0.1);
+        }
+
+        .problem-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(248, 113, 113, 0.15);
+            border-color: #f87171;
+        }
+
+        .problem-card-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .problem-card p {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin: 0;
+            font-weight: 500;
         }
 
         .security-section {
@@ -1204,6 +1249,15 @@
                 padding: 1.2rem;
             }
 
+            .problem-cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.2rem;
+            }
+
+            .problem-card {
+                padding: 1.2rem;
+            }
+
             .problem-section {
                 padding: 2rem;
                 margin: 2rem 0;
@@ -1418,6 +1472,25 @@
                 font-size: 0.95rem;
             }
 
+            .problem-cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .problem-card {
+                padding: 1rem;
+            }
+
+            .problem-card-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+                font-size: 1rem;
+            }
+
+            .problem-card p {
+                font-size: 0.9rem;
+            }
+
             .floating-element {
                 font-size: 1.5rem;
             }
@@ -1617,26 +1690,36 @@
                     <div class="problem-title">
                         <h4>Without a clear picture:</h4>
                     </div>
-                    <div class="problem-points">
-                        <div class="problem-point">
-                            <i class="fas fa-circle"></i>
-                            <span>They don't know how much they spend or save</span>
+                    <div class="problem-cards-grid">
+                        <div class="problem-card">
+                            <div class="problem-card-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <p>They don't know how much they spend or save</p>
                         </div>
-                        <div class="problem-point">
-                            <i class="fas fa-circle"></i>
-                            <span>Investment choices are made based on tips, not analysis</span>
+                        <div class="problem-card">
+                            <div class="problem-card-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <p>Investment choices are made based on tips, not analysis</p>
                         </div>
-                        <div class="problem-point">
-                            <i class="fas fa-circle"></i>
-                            <span>Financial goals feel abstract and unmeasurable</span>
+                        <div class="problem-card">
+                            <div class="problem-card-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <p>Financial goals feel abstract and unmeasurable</p>
                         </div>
-                        <div class="problem-point">
-                            <i class="fas fa-circle"></i>
-                            <span>Insurance and risk planning remain neglected</span>
+                        <div class="problem-card">
+                            <div class="problem-card-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <p>Insurance and risk planning remain neglected</p>
                         </div>
-                        <div class="problem-point">
-                            <i class="fas fa-circle"></i>
-                            <span>People don't know who to turn to when decisions matter</span>
+                        <div class="problem-card">
+                            <div class="problem-card-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <p>People don't know who to turn to when decisions matter</p>
                         </div>
                     </div>
                 </div>
