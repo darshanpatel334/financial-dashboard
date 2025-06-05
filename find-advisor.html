@@ -584,6 +584,11 @@
             checkAuth().then(() => {
                 initCommonElements();
                 
+                // Mark find advisor as visited for progress tracking
+                if (typeof Storage !== 'undefined') {
+                    Storage.set('findAdvisorVisited', true);
+                }
+                
                 // Setup navigation system
                 if (typeof setupPageNavigation === 'function') {
                     setupPageNavigation(10); // 10 = Find Advisor page

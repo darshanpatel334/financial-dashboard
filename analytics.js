@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
         generateAnalytics();
         initializeCalculators();
         
+        // Mark analytics as visited for progress tracking
+        Storage.set('analyticsVisited', true);
+        
         // Setup navigation system
         if (typeof setupPageNavigation === 'function') {
             setupPageNavigation(9); // 9 = Analytics page

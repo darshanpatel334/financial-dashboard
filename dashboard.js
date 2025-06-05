@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loadAllData();
         initDashboard();
         
+        // Mark dashboard as visited for progress tracking
+        Storage.set('dashboardVisited', true);
+        
         // Setup navigation system
         if (typeof setupPageNavigation === 'function') {
             setupPageNavigation(8); // 8 = Dashboard page

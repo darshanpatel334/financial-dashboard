@@ -936,8 +936,10 @@ function getUserProgress() {
         { key: 'expenseData', page: 'expenses.html', name: 'Expenses' },
         { key: 'ffScoreData', page: 'ff-score.html', name: 'FF Score' },
         { key: 'insuranceData', page: 'insurance.html', name: 'Insurance' },
-        { key: 'riskData', page: 'risk-profile.html', name: 'Risk Profile' },
-        { key: 'dashboard', page: 'dashboard.html', name: 'Dashboard' }
+        { key: 'riskProfileData', page: 'risk-profile.html', name: 'Risk Profile' },
+        { key: 'dashboard', page: 'dashboard.html', name: 'Dashboard' },
+        { key: 'analytics', page: 'advisor.html', name: 'Analytics' },
+        { key: 'findAdvisor', page: 'find-advisor.html', name: 'Find Advisor' }
     ];
     
     let currentStep = 1;
@@ -949,8 +951,19 @@ function getUserProgress() {
         
         if (step.key === 'dashboard') {
             // Dashboard is accessible if at least risk profile is completed
-            const riskData = Storage.get('riskData', {});
+            const riskData = Storage.get('riskProfileData', {});
             isCompleted = riskData.totalScore && riskData.totalScore > 0;
+        } else if (step.key === 'analytics') {
+            // Analytics is accessible if dashboard is completed OR if risk profile is completed
+            const riskData = Storage.get('riskProfileData', {});
+            const dashboardVisited = Storage.get('dashboardVisited', false);
+            isCompleted = dashboardVisited || (riskData.totalScore && riskData.totalScore > 0);
+        } else if (step.key === 'findAdvisor') {
+            // Find Advisor is accessible if analytics is accessible
+            const findAdvisorVisited = Storage.get('findAdvisorVisited', false);
+            const analyticsVisited = Storage.get('analyticsVisited', false);
+            const riskData = Storage.get('riskProfileData', {});
+            isCompleted = findAdvisorVisited || analyticsVisited || (riskData.totalScore && riskData.totalScore > 0);
         } else {
             const stepData = Storage.get(step.key, {});
             isCompleted = validateStepCompletion(step.key, stepData);
@@ -963,9 +976,9 @@ function getUserProgress() {
     });
     
     return {
-        currentStep: Math.min(currentStep, 8), // Cap at 8 (dashboard)
+        currentStep: Math.min(currentStep, 10), // Cap at 10 (find advisor)
         completedSteps,
-        totalSteps: 8,
+        totalSteps: 10,
         canAccessDashboard: completedSteps.includes(7) // Can access dashboard if risk profile is complete
     };
 }
@@ -1000,7 +1013,7 @@ function validateStepCompletion(stepKey, data) {
                    (data.insurance && Object.keys(data.insurance).some(category => 
                        Array.isArray(data.insurance[category]) && data.insurance[category].length > 0));
             
-        case 'riskData':
+        case 'riskProfileData':
             // Risk profile is complete when score is calculated
             return data.totalScore && typeof data.totalScore === 'number' && data.totalScore > 0 && data.riskProfile;
             
@@ -1096,60 +1109,38 @@ window.initProgressTracking = initProgressTracking;
 // ===== UNIVERSAL NAVIGATION SYSTEM =====
 
 // Create and setup progress navigation for any page
+// Define navigation steps configuration
+const NAVIGATION_STEPS = [
+    { id: 1, name: 'Personal Info', page: 'personal-info.html' },
+    { id: 2, name: 'Net Worth', page: 'networth.html' },
+    { id: 3, name: 'Income', page: 'income.html' },
+    { id: 4, name: 'Expenses', page: 'expenses.html' },
+    { id: 5, name: 'FF Score', page: 'ff-score.html' },
+    { id: 6, name: 'Insurance', page: 'insurance.html' },
+    { id: 7, name: 'Risk Profile', page: 'risk-profile.html' },
+    { id: 8, name: 'Dashboard', page: 'dashboard.html' },
+    { id: 9, name: 'Analytics', page: 'advisor.html' },
+    { id: 10, name: 'Find Advisor', page: 'find-advisor.html' }
+];
+
 function setupPageNavigation(currentPageIndex = 1) {
+    // Generate navigation steps dynamically
+    const stepsHtml = NAVIGATION_STEPS.map((step, index) => {
+        const isLast = index === NAVIGATION_STEPS.length - 1;
+        return `
+            <div class="progress-step ${currentPageIndex === step.id ? 'current' : ''}" data-step="${step.id}" data-page="${step.page}">
+                <div class="progress-dot"></div>
+                <span>${step.name}</span>
+            </div>
+            ${!isLast ? '<div class="progress-line"></div>' : ''}
+        `;
+    }).join('');
+
     const navHtml = `
         <div id="progressNavigation" style="margin-bottom: 2rem; text-align: center;">
             <div class="progress-container" style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
                 <div class="progress-dots" style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                    <div class="progress-step ${currentPageIndex === 1 ? 'current' : ''}" data-step="1" data-page="personal-info.html">
-                        <div class="progress-dot"></div>
-                        <span>Personal Info</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 2 ? 'current' : ''}" data-step="2" data-page="networth.html">
-                        <div class="progress-dot"></div>
-                        <span>Net Worth</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 3 ? 'current' : ''}" data-step="3" data-page="income.html">
-                        <div class="progress-dot"></div>
-                        <span>Income</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 4 ? 'current' : ''}" data-step="4" data-page="expenses.html">
-                        <div class="progress-dot"></div>
-                        <span>Expenses</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 5 ? 'current' : ''}" data-step="5" data-page="ff-score.html">
-                        <div class="progress-dot"></div>
-                        <span>FF Score</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 6 ? 'current' : ''}" data-step="6" data-page="insurance.html">
-                        <div class="progress-dot"></div>
-                        <span>Insurance</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 7 ? 'current' : ''}" data-step="7" data-page="risk-profile.html">
-                        <div class="progress-dot"></div>
-                        <span>Risk Profile</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 8 ? 'current' : ''}" data-step="8" data-page="dashboard.html">
-                        <div class="progress-dot"></div>
-                        <span>Dashboard</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 9 ? 'current' : ''}" data-step="9" data-page="advisor.html">
-                        <div class="progress-dot"></div>
-                        <span>Analytics</span>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step ${currentPageIndex === 10 ? 'current' : ''}" data-step="10" data-page="find-advisor.html">
-                        <div class="progress-dot"></div>
-                        <span>Find Advisor</span>
-                    </div>
+                    ${stepsHtml}
                 </div>
             </div>
         </div>
