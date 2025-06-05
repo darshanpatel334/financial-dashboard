@@ -264,7 +264,7 @@
 
         .hero-description {
             color: var(--text-secondary);
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             margin-bottom: 3rem;
             max-width: 700px;
             margin-left: auto;
@@ -272,6 +272,7 @@
             line-height: 1.6;
             position: relative;
             z-index: 2;
+            font-weight: 500;
         }
 
         .hero-cta {
@@ -716,17 +717,30 @@
 
         .problem-header h3 {
             color: var(--text-primary);
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
         }
 
         .problem-header p {
             color: var(--text-secondary);
-            font-size: 1.2rem;
-            max-width: 600px;
+            font-size: 1.4rem;
+            max-width: 700px;
             margin: 0 auto;
             line-height: 1.6;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease 0.2s;
+        }
+
+        .problem-section.animated .problem-header h3,
+        .problem-section.animated .problem-header p {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .problem-content {
@@ -736,6 +750,14 @@
             border: 1px solid #f1f5f9;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             margin-bottom: 2.5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease 0.4s;
+        }
+
+        .problem-section.animated .problem-content {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .problem-title {
@@ -794,6 +816,14 @@
             background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
             border-radius: 12px;
             border: 1px solid #bae6fd;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease 0.6s;
+        }
+
+        .problem-section.animated .solution-box {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .solution-title {
@@ -863,7 +893,7 @@
             }
 
             .hero-description {
-                font-size: 1.1rem;
+                font-size: 1.3rem;
                 line-height: 1.6;
                 margin-bottom: 2.5rem;
             }
@@ -941,11 +971,11 @@
             }
 
             .problem-header h3 {
-                font-size: 1.75rem;
+                font-size: 2.2rem;
             }
 
             .problem-header p {
-                font-size: 1.1rem;
+                font-size: 1.25rem;
                 padding: 0 1rem;
             }
 
@@ -1014,7 +1044,7 @@
             }
 
             .hero-description {
-                font-size: 1rem;
+                font-size: 1.15rem;
                 margin-bottom: 2rem;
             }
 
@@ -1097,11 +1127,11 @@
             }
 
             .problem-header h3 {
-                font-size: 1.5rem;
+                font-size: 1.8rem;
             }
 
             .problem-header p {
-                font-size: 1rem;
+                font-size: 1.1rem;
                 padding: 0;
             }
 
@@ -2089,6 +2119,26 @@
         // Initialize chat widget when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             new ChatWidget();
+            
+            // Initialize scroll-triggered animations
+            const observerOptions = {
+                threshold: 0.3,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe the problem section
+            const problemSection = document.querySelector('.problem-section');
+            if (problemSection) {
+                observer.observe(problemSection);
+            }
         });
     </script>
 </body>
