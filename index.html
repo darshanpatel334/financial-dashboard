@@ -612,7 +612,7 @@
             padding: 6rem 0;
             background: #fafbfc;
             position: relative;
-            margin: 2rem 0;
+            margin: 0.5rem 0 2rem 0;
         }
 
         .features h2 {
@@ -735,6 +735,57 @@
             color: var(--text-secondary);
             font-size: 1.1rem;
             line-height: 1.7;
+        }
+
+        .future-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .future-feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .future-feature-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .future-feature-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .future-feature-content h4 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .future-feature-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
         }
 
         .security-section {
@@ -1144,6 +1195,15 @@
                 padding: 2rem;
             }
 
+            .future-features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .future-feature-item {
+                padding: 1.2rem;
+            }
+
             .problem-section {
                 padding: 2rem;
                 margin: 2rem 0;
@@ -1420,7 +1480,7 @@
         <div class="hero-background">
             <div class="floating-element element-1">💰</div>
             <div class="floating-element element-2">📈</div>
-            <div class="floating-element element-3">💡</div>
+                            <div class="floating-element element-3">💰</div>
             <div class="floating-element element-4">🎯</div>
             <div class="floating-element element-5">📊</div>
             <div class="floating-element element-6">💎</div>
@@ -1555,7 +1615,6 @@
                 
                 <div class="problem-content">
                     <div class="problem-title">
-                        <i class="fas fa-times-circle"></i>
                         <h4>Without a clear picture:</h4>
                     </div>
                     <div class="problem-points">
@@ -1584,14 +1643,13 @@
                 
                 <div class="solution-box">
                     <div class="solution-title">
-                        <i class="fas fa-lightbulb"></i>
                         <h4>Nivezo's Solution</h4>
                     </div>
                     <p>Nivezo solves this gap by putting your entire financial world in one place. Our platform helps you see, simulate, and understand your financial situation—so that better decisions become obvious.</p>
                 </div>
             </div>
 
-            <h2>🔍 What You Can Do with Nivezo</h2>
+            <h2>What You Can Do with Nivezo</h2>
             
             <div class="features-grid">
                 <div class="feature-card">
@@ -1668,19 +1726,29 @@
 
             <!-- Future Features -->
             <div class="highlight-box">
-                <h3>💡 What's Coming Next</h3>
+                <h3>What's Coming Next</h3>
                 <p>We're building even more tools to support your journey:</p>
-                <div style="text-align: left; max-width: 600px; margin: 0 auto;">
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
-                            <span style="position: absolute; left: 0;">🔗</span>
-                            Discover and contact verified SEBI-registered investment advisors
-                        </li>
-                        <li style="padding-left: 1.5rem; position: relative;">
-                            <span style="position: absolute; left: 0;">📊</span>
-                            Portfolio auto-tagging and asset mapping features
-                        </li>
-                    </ul>
+                <div style="text-align: left; max-width: 700px; margin: 2rem auto;">
+                    <div class="future-features-grid">
+                        <div class="future-feature-item">
+                            <div class="future-feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="future-feature-content">
+                                <h4>Advisor Connect</h4>
+                                <p>Discover and contact verified SEBI-registered investment advisors</p>
+                            </div>
+                        </div>
+                        <div class="future-feature-item">
+                            <div class="future-feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="future-feature-content">
+                                <h4>Smart Portfolio Tracking</h4>
+                                <p>Portfolio auto-tagging and asset mapping features</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
