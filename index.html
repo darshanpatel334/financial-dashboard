@@ -61,6 +61,18 @@
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-brand img {
+            height: 40px;
+            width: auto;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover img {
+            transform: scale(1.05);
         }
 
         /* Buttons */
@@ -746,7 +758,9 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
-            <a href="index.html" class="nav-brand" style="text-decoration: none;">Nivezo</a>
+            <a href="index.html" class="nav-brand" style="text-decoration: none;">
+                <img src="assets/images/nivezo-logo.png" alt="Nivezo" style="height: 40px; width: auto;">
+            </a>
             <div class="nav-links">
                 <div class="auth-buttons">
                     <button class="btn btn-secondary btn-login" data-modal="loginModal">Login</button>
