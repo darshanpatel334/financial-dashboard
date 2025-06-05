@@ -700,6 +700,129 @@
             font-weight: 500;
         }
 
+        /* Problem Section Styles */
+        .problem-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+
+        .problem-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .problem-header h3 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .problem-header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .problem-content {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2.5rem;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 2.5rem;
+        }
+
+        .problem-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .problem-title i {
+            color: #ef4444;
+            font-size: 1.2rem;
+        }
+
+        .problem-title h4 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .problem-points {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .problem-point {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .problem-point:hover {
+            background-color: #f8fafc;
+        }
+
+        .problem-point i {
+            color: #ef4444;
+            font-size: 0.5rem;
+            margin-top: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .problem-point span {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .solution-box {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            border-radius: 12px;
+            border: 1px solid #bae6fd;
+        }
+
+        .solution-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .solution-title i {
+            color: #0ea5e9;
+            font-size: 1.3rem;
+        }
+
+        .solution-title h4 {
+            color: #0369a1;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .solution-box p {
+            color: #0c4a6e;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
         /* Enhanced responsive design */
         @media (max-width: 768px) {
             .container {
@@ -813,12 +936,37 @@
             }
 
             .problem-section {
-                padding: 2rem !important;
-                margin: 2rem 0 !important;
+                padding: 2rem;
+                margin: 2rem 0;
             }
 
-            .problem-section > div:last-child {
-                padding: 2rem !important;
+            .problem-header h3 {
+                font-size: 1.75rem;
+            }
+
+            .problem-header p {
+                font-size: 1.1rem;
+                padding: 0 1rem;
+            }
+
+            .problem-content {
+                padding: 2rem;
+            }
+
+            .problem-title h4 {
+                font-size: 1.2rem;
+            }
+
+            .solution-box {
+                padding: 1.5rem;
+            }
+
+            .solution-title h4 {
+                font-size: 1.3rem;
+            }
+
+            .solution-box p {
+                font-size: 1rem;
             }
 
             .floating-element {
@@ -944,19 +1092,56 @@
             }
 
             .problem-section {
-                padding: 1.5rem !important;
+                padding: 1.5rem;
+                margin: 1.5rem 0;
             }
 
-            .problem-section h3 {
-                font-size: 1.5rem !important;
+            .problem-header h3 {
+                font-size: 1.5rem;
             }
 
-            .problem-section p {
-                font-size: 1rem !important;
+            .problem-header p {
+                font-size: 1rem;
+                padding: 0;
             }
 
-            .problem-section > div:last-child {
-                padding: 1.5rem !important;
+            .problem-content {
+                padding: 1.5rem;
+            }
+
+            .problem-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .problem-title h4 {
+                font-size: 1.1rem;
+            }
+
+            .problem-point {
+                padding: 0.5rem;
+            }
+
+            .problem-point span {
+                font-size: 0.95rem;
+            }
+
+            .solution-box {
+                padding: 1.5rem;
+            }
+
+            .solution-title {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .solution-title h4 {
+                font-size: 1.2rem;
+            }
+
+            .solution-box p {
+                font-size: 0.95rem;
             }
 
             .floating-element {
@@ -1149,47 +1334,47 @@
     <section class="features">
         <div class="container">
             <!-- The Real Problem Section -->
-            <div class="problem-section" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 3rem; margin: 4rem 0; text-align: left;">
-                                 <div style="text-align: center; margin-bottom: 2.5rem;">
-                     <h3 style="color: var(--text-primary); font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">The Real Problem</h3>
-                     <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">Most people don't actively track their financials. They rely on scattered notes, outdated spreadsheets, or fragmented apps. This leads to confusion, poor judgment, and financial stress.</p>
+            <div class="problem-section">
+                <div class="problem-header">
+                     <h3>The Real Problem</h3>
+                     <p>Most people don't actively track their financials. They rely on scattered notes, outdated spreadsheets, or fragmented apps. This leads to confusion, poor judgment, and financial stress.</p>
                  </div>
                 
-                <div style="background: #ffffff; border-radius: 12px; padding: 2.5rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
-                    <h4 style="color: var(--text-primary); font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                        <i class="fas fa-times-circle" style="color: #ef4444;"></i>
-                        Without a clear picture:
-                    </h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                            <i class="fas fa-circle" style="color: #ef4444; font-size: 0.5rem; margin-top: 0.5rem;"></i>
-                            <span style="color: var(--text-secondary);">They don't know how much they spend or save</span>
+                <div class="problem-content">
+                    <div class="problem-title">
+                        <i class="fas fa-times-circle"></i>
+                        <h4>Without a clear picture:</h4>
+                    </div>
+                    <div class="problem-points">
+                        <div class="problem-point">
+                            <i class="fas fa-circle"></i>
+                            <span>They don't know how much they spend or save</span>
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                            <i class="fas fa-circle" style="color: #ef4444; font-size: 0.5rem; margin-top: 0.5rem;"></i>
-                            <span style="color: var(--text-secondary);">Investment choices are made based on tips, not analysis</span>
+                        <div class="problem-point">
+                            <i class="fas fa-circle"></i>
+                            <span>Investment choices are made based on tips, not analysis</span>
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                            <i class="fas fa-circle" style="color: #ef4444; font-size: 0.5rem; margin-top: 0.5rem;"></i>
-                            <span style="color: var(--text-secondary);">Financial goals feel abstract and unmeasurable</span>
+                        <div class="problem-point">
+                            <i class="fas fa-circle"></i>
+                            <span>Financial goals feel abstract and unmeasurable</span>
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                            <i class="fas fa-circle" style="color: #ef4444; font-size: 0.5rem; margin-top: 0.5rem;"></i>
-                            <span style="color: var(--text-secondary);">Insurance and risk planning remain neglected</span>
+                        <div class="problem-point">
+                            <i class="fas fa-circle"></i>
+                            <span>Insurance and risk planning remain neglected</span>
                         </div>
-                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                            <i class="fas fa-circle" style="color: #ef4444; font-size: 0.5rem; margin-top: 0.5rem;"></i>
-                            <span style="color: var(--text-secondary);">People don't know who to turn to when decisions matter</span>
+                        <div class="problem-point">
+                            <i class="fas fa-circle"></i>
+                            <span>People don't know who to turn to when decisions matter</span>
                         </div>
                     </div>
                 </div>
                 
-                <div style="text-align: center; margin-top: 2.5rem; padding: 2rem; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-radius: 12px; border: 1px solid #bae6fd;">
-                    <h4 style="color: #0369a1; font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
-                        <i class="fas fa-lightbulb" style="color: #0ea5e9;"></i>
-                        Nivezo's Solution
-                    </h4>
-                    <p style="color: #0c4a6e; font-size: 1.1rem; line-height: 1.6;">Nivezo solves this gap by putting your entire financial world in one place. Our platform helps you see, simulate, and understand your financial situation—so that better decisions become obvious.</p>
+                <div class="solution-box">
+                    <div class="solution-title">
+                        <i class="fas fa-lightbulb"></i>
+                        <h4>Nivezo's Solution</h4>
+                    </div>
+                    <p>Nivezo solves this gap by putting your entire financial world in one place. Our platform helps you see, simulate, and understand your financial situation—so that better decisions become obvious.</p>
                 </div>
             </div>
 
