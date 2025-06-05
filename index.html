@@ -250,7 +250,23 @@
             margin-bottom: 1rem;
             letter-spacing: -0.02em;
             line-height: 1.1;
-            animation: brandPulse 3s ease-in-out infinite alternate;
+            animation: brandPulse 3s ease-in-out infinite alternate, textGlow 4s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .brand-name:hover {
+            transform: scale(1.05) rotate(1deg);
+            filter: drop-shadow(0 0 30px rgba(37, 99, 235, 0.8));
+        }
+
+        @keyframes textGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(37, 99, 235, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(79, 70, 229, 0.8));
+            }
         }
 
         .brand-tagline {
@@ -299,9 +315,12 @@
             padding: 1rem 2.5rem;
             border-radius: 50px;
             box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: 2px solid transparent;
+            cursor: pointer;
         }
 
         .btn-hero::before {
@@ -315,13 +334,43 @@
             transition: left 0.6s;
         }
 
+        .btn-hero::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            border-radius: 50px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: gradientRotate 3s linear infinite;
+        }
+
+        @keyframes gradientRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .btn-hero:hover::before {
             left: 100%;
         }
 
+        .btn-hero:hover::after {
+            opacity: 1;
+        }
+
         .btn-hero:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.4);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-hero:active {
+            transform: translateY(-2px) scale(1.02);
         }
 
         .hero-cta-note {
@@ -348,12 +397,35 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-item:hover::before {
+            left: 100%;
         }
 
         .stat-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+            transform: translateY(-10px) scale(1.05) rotateY(5deg);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .stat-item:nth-child(2):hover {
+            transform: translateY(-10px) scale(1.05) rotateY(-5deg);
         }
 
         .stat-number {
@@ -374,7 +446,7 @@
             font-weight: 500;
         }
 
-        /* Floating Background Elements */
+        /* Interactive Particle System */
         .hero-background {
             position: absolute;
             top: 0;
@@ -383,13 +455,36 @@
             height: 100%;
             pointer-events: none;
             overflow: hidden;
+            background: radial-gradient(circle at 30% 20%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                       radial-gradient(circle at 70% 80%, rgba(79, 70, 229, 0.1) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { 
+                background: radial-gradient(circle at 30% 20%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                           radial-gradient(circle at 70% 80%, rgba(79, 70, 229, 0.1) 0%, transparent 50%);
+            }
+            50% { 
+                background: radial-gradient(circle at 80% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                           radial-gradient(circle at 20% 70%, rgba(79, 70, 229, 0.15) 0%, transparent 50%);
+            }
         }
 
         .floating-element {
             position: absolute;
             font-size: 3rem;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite;
+            opacity: 0.15;
+            animation: floatWild 8s ease-in-out infinite;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .floating-element:hover {
+            opacity: 0.8;
+            transform: scale(1.5) rotate(15deg);
+            filter: drop-shadow(0 0 20px rgba(37, 99, 235, 0.5));
         }
 
         .element-1 {
@@ -439,12 +534,21 @@
             }
         }
 
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) rotate(0deg);
+        @keyframes floatWild {
+            0% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+            25% {
+                transform: translateY(-30px) rotate(90deg) scale(1.1);
             }
             50% {
-                transform: translateY(-20px) rotate(180deg);
+                transform: translateY(-20px) rotate(180deg) scale(0.9);
+            }
+            75% {
+                transform: translateY(-40px) rotate(270deg) scale(1.2);
+            }
+            100% {
+                transform: translateY(0px) rotate(360deg) scale(1);
             }
         }
 
@@ -455,6 +559,52 @@
 
         .dashboard-preview {
             margin: 2rem 0;
+            perspective: 1000px;
+        }
+
+        /* Wild Dashboard Card Effects */
+        .dashboard-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .dashboard-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px) rotateY(5deg) rotateX(5deg);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-card:nth-child(odd):hover {
+            transform: translateY(-10px) rotateY(-5deg) rotateX(5deg);
+        }
+
+        /* Animated Chart Bars */
+        .chart-bar {
+            transition: all 0.3s ease;
+            transform-origin: bottom;
+        }
+
+        .chart-bar:hover {
+            transform: scaleY(1.1);
+            filter: brightness(1.2);
         }
 
         /* Features Section */
@@ -1290,7 +1440,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
                     
                     <!-- Net Worth Card -->
-                    <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 2rem; border-radius: 16px;">
+                    <div class="dashboard-card" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 2rem; border-radius: 16px;">
                         <h3 style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem;">Net Worth</h3>
                         <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">₹25.35L</div>
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1300,7 +1450,7 @@
                     </div>
                     
                     <!-- FF Score Card -->
-                    <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 2rem; border-radius: 16px;">
+                    <div class="dashboard-card" style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 2rem; border-radius: 16px;">
                         <h3 style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem;">Financial Freedom Score</h3>
                         <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">8.2 Years</div>
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1310,7 +1460,7 @@
                     </div>
                     
                     <!-- Monthly Cash Flow -->
-                    <div style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px;">
+                    <div class="dashboard-card" style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px;">
                         <h3 style="font-size: 1rem; color: #6b7280; margin-bottom: 1rem;">Monthly Cash Flow</h3>
                         <div style="margin-bottom: 1.5rem;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
@@ -1330,11 +1480,11 @@
                     </div>
                     
                     <!-- Asset Allocation Pie Chart -->
-                    <div style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px;">
+                    <div class="dashboard-card" style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px;">
                         <h3 style="font-size: 1rem; color: #6b7280; margin-bottom: 1rem;">Asset Allocation</h3>
                         <div style="position: relative; margin-bottom: 1rem;">
                             <!-- Simple pie chart representation -->
-                            <div style="width: 120px; height: 120px; margin: 0 auto; position: relative; border-radius: 50%; background: conic-gradient(#4f46e5 0% 45%, #10b981 45% 75%, #f59e0b 75% 90%, #ef4444 90% 100%);">
+                            <div style="width: 120px; height: 120px; margin: 0 auto; position: relative; border-radius: 50%; background: conic-gradient(#4f46e5 0% 45%, #10b981 45% 75%, #f59e0b 75% 90%, #ef4444 90% 100%); transition: transform 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='rotate(5deg) scale(1.05)'" onmouseout="this.style.transform='rotate(0deg) scale(1)'">
                                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; color: #374151;">Balanced</div>
                             </div>
                         </div>
@@ -1359,16 +1509,16 @@
                     </div>
                     
                     <!-- Growth Chart -->
-                    <div style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px; grid-column: span 2;">
+                    <div class="dashboard-card" style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px; grid-column: span 2;">
                         <h3 style="font-size: 1rem; color: #6b7280; margin-bottom: 1rem;">Wealth Growth Projection</h3>
                         <div style="height: 120px; background: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%); border-radius: 8px; position: relative; display: flex; align-items: end; justify-content: space-between; padding: 1rem;">
                             <!-- Simple bar chart representation -->
-                            <div style="background: #4f46e5; width: 20px; height: 40%; border-radius: 4px 4px 0 0;"></div>
-                            <div style="background: #5b21b6; width: 20px; height: 55%; border-radius: 4px 4px 0 0;"></div>
-                            <div style="background: #7c3aed; width: 20px; height: 70%; border-radius: 4px 4px 0 0;"></div>
-                            <div style="background: #8b5cf6; width: 20px; height: 60%; border-radius: 4px 4px 0 0;"></div>
-                            <div style="background: #a78bfa; width: 20px; height: 85%; border-radius: 4px 4px 0 0;"></div>
-                            <div style="background: #c4b5fd; width: 20px; height: 100%; border-radius: 4px 4px 0 0;"></div>
+                            <div class="chart-bar" style="background: #4f46e5; width: 20px; height: 40%; border-radius: 4px 4px 0 0; cursor: pointer;"></div>
+                            <div class="chart-bar" style="background: #5b21b6; width: 20px; height: 55%; border-radius: 4px 4px 0 0; cursor: pointer;"></div>
+                            <div class="chart-bar" style="background: #7c3aed; width: 20px; height: 70%; border-radius: 4px 4px 0 0; cursor: pointer;"></div>
+                            <div class="chart-bar" style="background: #8b5cf6; width: 20px; height: 60%; border-radius: 4px 4px 0 0; cursor: pointer;"></div>
+                            <div class="chart-bar" style="background: #a78bfa; width: 20px; height: 85%; border-radius: 4px 4px 0 0; cursor: pointer;"></div>
+                            <div class="chart-bar" style="background: #c4b5fd; width: 20px; height: 100%; border-radius: 4px 4px 0 0; cursor: pointer;"></div>
                             <div style="position: absolute; top: 0.5rem; right: 1rem; color: #374151; font-size: 0.85rem; font-weight: 600;">₹1.2Cr by 2034</div>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: #6b7280;">
@@ -2172,6 +2322,47 @@
             if (problemSection) {
                 observer.observe(problemSection);
             }
+
+            // Wild parallax scroll effects
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * -0.5;
+                
+                // Parallax hero background
+                const heroBackground = document.querySelector('.hero-background');
+                if (heroBackground) {
+                    heroBackground.style.transform = `translateY(${rate}px)`;
+                }
+                
+                // Floating elements move at different speeds
+                const floatingElements = document.querySelectorAll('.floating-element');
+                floatingElements.forEach((element, index) => {
+                    const speed = 0.2 + (index * 0.1);
+                    element.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+                });
+                
+                // Add dynamic glow to brand name based on scroll
+                const brandName = document.querySelector('.brand-name');
+                if (brandName && scrolled < 500) {
+                    const glowIntensity = Math.max(20, 40 - (scrolled * 0.04));
+                    brandName.style.filter = `drop-shadow(0 0 ${glowIntensity}px rgba(37, 99, 235, 0.6))`;
+                }
+            });
+
+            // Interactive floating elements
+            document.querySelectorAll('.floating-element').forEach(element => {
+                element.addEventListener('click', function() {
+                    this.style.animation = 'none';
+                    this.style.transform = 'scale(2) rotate(720deg)';
+                    this.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        this.style.animation = 'floatWild 8s ease-in-out infinite';
+                        this.style.transform = '';
+                        this.style.opacity = '0.15';
+                    }, 1000);
+                });
+            });
         });
     </script>
 </body>
