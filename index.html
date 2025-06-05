@@ -772,7 +772,7 @@
                 <button class="btn btn-primary btn-signup btn-hero" data-modal="signupModal" id="startJourneyBtn">
                     <i class="fas fa-rocket"></i> Start My Free Dashboard
                 </button>
-                <p class="hero-cta-note">No credit card required • 5-minute setup</p>
+                
             </div>
             <div class="hero-stats">
                 <div class="stat-item">
@@ -799,18 +799,131 @@
         </div>
     </section>
 
+    <!-- Dashboard Preview Section -->
+    <section class="dashboard-preview" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 6rem 0;">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <h2 style="color: var(--text-primary); font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">Your Complete Financial Dashboard</h2>
+                <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">See your entire financial life in one place with intuitive charts, insights, and actionable recommendations.</p>
+            </div>
+            
+            <!-- Dashboard Mock-up -->
+            <div style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1); max-width: 1200px; margin: 0 auto;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                    
+                    <!-- Net Worth Card -->
+                    <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 2rem; border-radius: 16px;">
+                        <h3 style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem;">Net Worth</h3>
+                        <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">₹25.35L</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem;">+12.8% ↗</span>
+                            <span style="opacity: 0.8; font-size: 0.85rem;">vs last year</span>
+                        </div>
+                    </div>
+                    
+                    <!-- FF Score Card -->
+                    <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 2rem; border-radius: 16px;">
+                        <h3 style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem;">Financial Freedom Score</h3>
+                        <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">8.2 Years</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem;">Good</span>
+                            <span style="opacity: 0.8; font-size: 0.85rem;">Keep saving!</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Monthly Cash Flow -->
+                    <div style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px;">
+                        <h3 style="font-size: 1rem; color: #6b7280; margin-bottom: 1rem;">Monthly Cash Flow</h3>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: #059669;">Income</span>
+                                <span style="font-weight: 600;">₹1.42L</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: #dc2626;">Expenses</span>
+                                <span style="font-weight: 600;">₹89K</span>
+                            </div>
+                            <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e5e7eb;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="font-weight: 600;">Savings</span>
+                                <span style="color: #059669; font-weight: 700;">₹53K</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Asset Allocation Pie Chart -->
+                    <div style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px;">
+                        <h3 style="font-size: 1rem; color: #6b7280; margin-bottom: 1rem;">Asset Allocation</h3>
+                        <div style="position: relative; margin-bottom: 1rem;">
+                            <!-- Simple pie chart representation -->
+                            <div style="width: 120px; height: 120px; margin: 0 auto; position: relative; border-radius: 50%; background: conic-gradient(#4f46e5 0% 45%, #10b981 45% 75%, #f59e0b 75% 90%, #ef4444 90% 100%);">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; color: #374151;">Balanced</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.85rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <div style="width: 12px; height: 12px; background: #4f46e5; border-radius: 2px;"></div>
+                                <span>Equity 45%</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <div style="width: 12px; height: 12px; background: #10b981; border-radius: 2px;"></div>
+                                <span>Debt 30%</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <div style="width: 12px; height: 12px; background: #f59e0b; border-radius: 2px;"></div>
+                                <span>Gold 15%</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 12px; height: 12px; background: #ef4444; border-radius: 2px;"></div>
+                                <span>Cash 10%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Growth Chart -->
+                    <div style="background: white; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 16px; grid-column: span 2;">
+                        <h3 style="font-size: 1rem; color: #6b7280; margin-bottom: 1rem;">Wealth Growth Projection</h3>
+                        <div style="height: 120px; background: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 100%); border-radius: 8px; position: relative; display: flex; align-items: end; justify-content: space-between; padding: 1rem;">
+                            <!-- Simple bar chart representation -->
+                            <div style="background: #4f46e5; width: 20px; height: 40%; border-radius: 4px 4px 0 0;"></div>
+                            <div style="background: #5b21b6; width: 20px; height: 55%; border-radius: 4px 4px 0 0;"></div>
+                            <div style="background: #7c3aed; width: 20px; height: 70%; border-radius: 4px 4px 0 0;"></div>
+                            <div style="background: #8b5cf6; width: 20px; height: 60%; border-radius: 4px 4px 0 0;"></div>
+                            <div style="background: #a78bfa; width: 20px; height: 85%; border-radius: 4px 4px 0 0;"></div>
+                            <div style="background: #c4b5fd; width: 20px; height: 100%; border-radius: 4px 4px 0 0;"></div>
+                            <div style="position: absolute; top: 0.5rem; right: 1rem; color: #374151; font-size: 0.85rem; font-weight: 600;">₹1.2Cr by 2034</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: #6b7280;">
+                            <span>2024</span>
+                            <span>2026</span>
+                            <span>2028</span>
+                            <span>2030</span>
+                            <span>2032</span>
+                            <span>2034</span>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Bottom Action Bar -->
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: center;">
+                    <button class="btn btn-primary btn-signup" data-modal="signupModal" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                        <i class="fas fa-rocket"></i> See Your Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Why Nivezo Section -->
     <section class="features">
         <div class="container">
             <!-- The Real Problem Section -->
             <div class="problem-section" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 3rem; margin: 4rem 0; text-align: left;">
-                <div style="text-align: center; margin-bottom: 2.5rem;">
-                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
-                        <i class="fas fa-exclamation-triangle" style="color: white; font-size: 2rem;"></i>
-                    </div>
-                    <h3 style="color: var(--text-primary); font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">The Real Problem</h3>
-                    <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">Most people don't actively track their financials. They rely on scattered notes, outdated spreadsheets, or fragmented apps. This leads to confusion, poor judgment, and financial stress.</p>
-                </div>
+                                 <div style="text-align: center; margin-bottom: 2.5rem;">
+                     <h3 style="color: var(--text-primary); font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">The Real Problem</h3>
+                     <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">Most people don't actively track their financials. They rely on scattered notes, outdated spreadsheets, or fragmented apps. This leads to confusion, poor judgment, and financial stress.</p>
+                 </div>
                 
                 <div style="background: #ffffff; border-radius: 12px; padding: 2.5rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
                     <h4 style="color: var(--text-primary); font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
