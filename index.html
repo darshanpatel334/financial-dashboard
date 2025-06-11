@@ -264,14 +264,20 @@
             color: var(--primary-color);
         }
 
+        /* Hide the original 'i' and replace with dotless version */
+        .pie-i {
+            font-feature-settings: "kern" 1;
+            text-rendering: optimizeLegibility;
+        }
+
         .pie-i::before {
             content: '';
             position: absolute;
-            top: -12px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             background: conic-gradient(
                 #4F46E5 0% 45%, 
                 #10B981 45% 75%, 
@@ -281,7 +287,21 @@
             border-radius: 50%;
             animation: pieRotate 8s linear infinite;
             z-index: 10;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Create a white overlay to hide the original dot */
+        .pie-i::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            z-index: 9;
         }
 
         @keyframes pieRotate {
@@ -290,18 +310,20 @@
         }
 
         .laptop-dashboard {
-            max-width: 600px;
+            max-width: 800px;
             width: 100%;
             height: auto;
             margin: 2rem auto;
             display: block;
             opacity: 0.9;
             transition: all 0.3s ease;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.1));
         }
 
         .laptop-dashboard:hover {
             opacity: 1;
             transform: scale(1.02);
+            filter: drop-shadow(0 15px 40px rgba(0,0,0,0.15));
         }
 
         .brand-tagline {
@@ -1193,13 +1215,19 @@
             }
 
             .pie-i::before {
-                width: 12px;
-                height: 12px;
-                top: -10px;
+                width: 16px;
+                height: 16px;
+                top: -12px;
+            }
+
+            .pie-i::after {
+                width: 10px;
+                height: 10px;
+                top: -6px;
             }
 
             .laptop-dashboard {
-                max-width: 500px;
+                max-width: 650px;
                 margin: 1.5rem auto;
             }
 
@@ -1379,13 +1407,19 @@
             }
 
             .pie-i::before {
-                width: 10px;
-                height: 10px;
-                top: -8px;
+                width: 14px;
+                height: 14px;
+                top: -10px;
+            }
+
+            .pie-i::after {
+                width: 8px;
+                height: 8px;
+                top: -5px;
             }
 
             .laptop-dashboard {
-                max-width: 400px;
+                max-width: 500px;
                 margin: 1rem auto;
             }
 

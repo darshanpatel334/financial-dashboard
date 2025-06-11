@@ -1,92 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="800" height="500" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Laptop Base -->
-  <ellipse cx="400" cy="485" rx="380" ry="15" fill="#E5E7EB" opacity="0.3"/>
+<svg width="900" height="600" viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Modern Laptop Screen Shadow -->
+  <ellipse cx="450" cy="580" rx="400" ry="20" fill="#E5E7EB" opacity="0.2"/>
   
-  <!-- Laptop Keyboard/Base -->
-  <rect x="100" y="380" width="600" height="120" rx="20" fill="#D1D5DB"/>
-  <rect x="110" y="390" width="580" height="100" rx="15" fill="#F3F4F6"/>
+  <!-- Modern Laptop Screen Outer (Thin Border) -->
+  <rect x="50" y="50" width="800" height="500" rx="20" fill="#1F2937"/>
   
-  <!-- Trackpad -->
-  <rect x="350" y="420" width="100" height="60" rx="8" fill="#E5E7EB"/>
-  
-  <!-- Laptop Screen Outer -->
-  <rect x="150" y="80" width="500" height="320" rx="25" fill="#374151"/>
-  
-  <!-- Laptop Screen Inner -->
-  <rect x="170" y="100" width="460" height="280" rx="15" fill="#1F2937"/>
-  
-  <!-- Dashboard Screen -->
-  <rect x="180" y="110" width="440" height="260" rx="10" fill="#FFFFFF"/>
+  <!-- Modern Laptop Screen Inner -->
+  <rect x="60" y="60" width="780" height="480" rx="15" fill="#FFFFFF"/>
   
   <!-- Dashboard Header -->
-  <rect x="180" y="110" width="440" height="50" rx="10" fill="#F8FAFC"/>
-  <rect x="180" y="150" width="440" height="2" fill="#E5E7EB"/>
+  <rect x="60" y="60" width="780" height="80" rx="15" fill="#F8FAFC"/>
+  <rect x="60" y="130" width="780" height="3" fill="#E5E7EB"/>
   
   <!-- Nivezo Logo in Header -->
-  <text x="200" y="140" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2563EB">Nivezo Dashboard</text>
+  <text x="90" y="110" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2563EB">Nivezo Dashboard</text>
   
   <!-- User Icon -->
-  <circle cx="580" cy="135" r="15" fill="#10B981"/>
-  <text x="573" y="141" font-family="Arial, sans-serif" font-size="12" fill="white">U</text>
+  <circle cx="780" cy="100" r="25" fill="#10B981"/>
+  <text x="770" y="110" font-family="Arial, sans-serif" font-size="18" fill="white">U</text>
   
   <!-- Net Worth Card -->
-  <rect x="200" y="170" width="120" height="80" rx="8" fill="#4F46E5"/>
-  <text x="210" y="190" font-family="Arial, sans-serif" font-size="10" fill="white" opacity="0.8">Net Worth</text>
-  <text x="210" y="210" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">₹25.35L</text>
-  <text x="210" y="230" font-family="Arial, sans-serif" font-size="8" fill="white" opacity="0.7">+12.8% ↗</text>
+  <rect x="100" y="160" width="200" height="120" rx="12" fill="#4F46E5"/>
+  <text x="120" y="185" font-family="Arial, sans-serif" font-size="16" fill="white" opacity="0.8">Net Worth</text>
+  <text x="120" y="220" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">₹25.35L</text>
+  <text x="120" y="250" font-family="Arial, sans-serif" font-size="14" fill="white" opacity="0.7">+12.8% ↗</text>
   
   <!-- FF Score Card -->
-  <rect x="340" y="170" width="120" height="80" rx="8" fill="#10B981"/>
-  <text x="350" y="190" font-family="Arial, sans-serif" font-size="10" fill="white" opacity="0.8">FF Score</text>
-  <text x="350" y="210" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">8.2 Years</text>
-  <text x="350" y="230" font-family="Arial, sans-serif" font-size="8" fill="white" opacity="0.7">Good</text>
+  <rect x="320" y="160" width="200" height="120" rx="12" fill="#10B981"/>
+  <text x="340" y="185" font-family="Arial, sans-serif" font-size="16" fill="white" opacity="0.8">FF Score</text>
+  <text x="340" y="220" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">8.2 Years</text>
+  <text x="340" y="250" font-family="Arial, sans-serif" font-size="14" fill="white" opacity="0.7">Good</text>
   
   <!-- Cash Flow Card -->
-  <rect x="480" y="170" width="120" height="80" rx="8" fill="#FFFFFF" stroke="#E5E7EB"/>
-  <text x="490" y="190" font-family="Arial, sans-serif" font-size="10" fill="#6B7280">Cash Flow</text>
-  <text x="490" y="205" font-family="Arial, sans-serif" font-size="8" fill="#059669">Income: ₹1.42L</text>
-  <text x="490" y="218" font-family="Arial, sans-serif" font-size="8" fill="#DC2626">Expenses: ₹89K</text>
-  <text x="490" y="235" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#059669">Savings: ₹53K</text>
+  <rect x="540" y="160" width="200" height="120" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="2"/>
+  <text x="560" y="185" font-family="Arial, sans-serif" font-size="16" fill="#6B7280">Cash Flow</text>
+  <text x="560" y="205" font-family="Arial, sans-serif" font-size="12" fill="#059669">Income: ₹1.42L</text>
+  <text x="560" y="225" font-family="Arial, sans-serif" font-size="12" fill="#DC2626">Expenses: ₹89K</text>
+  <text x="560" y="250" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#059669">Savings: ₹53K</text>
   
-  <!-- Pie Chart -->
-  <circle cx="260" cy="310" r="35" fill="none" stroke="#F3F4F6" stroke-width="2"/>  
+  <!-- Asset Allocation Pie Chart -->
+  <circle cx="200" cy="380" r="60" fill="none" stroke="#F3F4F6" stroke-width="3"/>  
   <!-- Pie slices -->
-  <path d="M 260 275 A 35 35 0 0 1 295 310 L 260 310 Z" fill="#4F46E5"/>
-  <path d="M 295 310 A 35 35 0 0 1 260 345 L 260 310 Z" fill="#10B981"/>
-  <path d="M 260 345 A 35 35 0 0 1 225 310 L 260 310 Z" fill="#F59E0B"/>
-  <path d="M 225 310 A 35 35 0 0 1 260 275 L 260 310 Z" fill="#EF4444"/>
+  <path d="M 200 320 A 60 60 0 0 1 260 380 L 200 380 Z" fill="#4F46E5"/>
+  <path d="M 260 380 A 60 60 0 0 1 200 440 L 200 380 Z" fill="#10B981"/>
+  <path d="M 200 440 A 60 60 0 0 1 140 380 L 200 380 Z" fill="#F59E0B"/>
+  <path d="M 140 380 A 60 60 0 1 1 200 320 L 200 380 Z" fill="#EF4444"/>
+  
+  <!-- Pie Chart Title -->
+  <text x="200" y="310" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#374151" text-anchor="middle">Asset Allocation</text>
   
   <!-- Pie Chart Legend -->
-  <rect x="310" y="285" width="8" height="8" fill="#4F46E5"/>
-  <text x="325" y="293" font-family="Arial, sans-serif" font-size="8" fill="#374151">Equity 45%</text>
-  <rect x="310" y="300" width="8" height="8" fill="#10B981"/>
-  <text x="325" y="308" font-family="Arial, sans-serif" font-size="8" fill="#374151">Debt 30%</text>
-  <rect x="310" y="315" width="8" height="8" fill="#F59E0B"/>
-  <text x="325" y="323" font-family="Arial, sans-serif" font-size="8" fill="#374151">Gold 15%</text>
-  <rect x="310" y="330" width="8" height="8" fill="#EF4444"/>
-  <text x="325" y="338" font-family="Arial, sans-serif" font-size="8" fill="#374151">Cash 10%</text>
+  <rect x="290" y="330" width="12" height="12" fill="#4F46E5"/>
+  <text x="310" y="342" font-family="Arial, sans-serif" font-size="14" fill="#374151">Equity 45%</text>
+  <rect x="290" y="350" width="12" height="12" fill="#10B981"/>
+  <text x="310" y="362" font-family="Arial, sans-serif" font-size="14" fill="#374151">Debt 30%</text>
+  <rect x="290" y="370" width="12" height="12" fill="#F59E0B"/>
+  <text x="310" y="382" font-family="Arial, sans-serif" font-size="14" fill="#374151">Gold 15%</text>
+  <rect x="290" y="390" width="12" height="12" fill="#EF4444"/>
+  <text x="310" y="402" font-family="Arial, sans-serif" font-size="14" fill="#374151">Cash 10%</text>
+  
+  <!-- Growth Chart -->
+  <text x="500" y="310" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#374151">Growth Projection</text>
   
   <!-- Growth Chart Bars -->
-  <rect x="420" y="320" width="15" height="30" fill="#4F46E5" rx="2"/>
-  <rect x="440" y="310" width="15" height="40" fill="#5B21B6" rx="2"/>
-  <rect x="460" y="300" width="15" height="50" fill="#7C3AED" rx="2"/>
-  <rect x="480" y="305" width="15" height="45" fill="#8B5CF6" rx="2"/>
-  <rect x="500" y="285" width="15" height="65" fill="#A78BFA" rx="2"/>
-  <rect x="520" y="275" width="15" height="75" fill="#C4B5FD" rx="2"/>
+  <rect x="480" y="420" width="25" height="50" fill="#4F46E5" rx="3"/>
+  <rect x="510" y="400" width="25" height="70" fill="#5B21B6" rx="3"/>
+  <rect x="540" y="380" width="25" height="90" fill="#7C3AED" rx="3"/>
+  <rect x="570" y="390" width="25" height="80" fill="#8B5CF6" rx="3"/>
+  <rect x="600" y="360" width="25" height="110" fill="#A78BFA" rx="3"/>
+  <rect x="630" y="340" width="25" height="130" fill="#C4B5FD" rx="3"/>
   
   <!-- Chart baseline -->
-  <line x1="420" y1="355" x2="540" y2="355" stroke="#E5E7EB" stroke-width="1"/>
+  <line x1="480" y1="480" x2="660" y2="480" stroke="#E5E7EB" stroke-width="2"/>
   
-  <!-- Chart title -->
-  <text x="420" y="270" font-family="Arial, sans-serif" font-size="10" fill="#374151">Growth Projection</text>
+  <!-- Chart labels -->
+  <text x="492" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">2024</text>
+  <text x="522" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">2026</text>
+  <text x="552" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">2028</text>
+  <text x="582" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">2030</text>
+  <text x="612" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">2032</text>
+  <text x="642" y="500" font-family="Arial, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle">2034</text>
   
-  <!-- Screen Reflection -->
-  <rect x="180" y="110" width="220" height="260" rx="10" fill="url(#screenGradient)" opacity="0.1"/>
+  <!-- Target projection text -->
+  <text x="600" y="330" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle">₹1.2Cr by 2034</text>
+  
+  <!-- Modern Screen Reflection -->
+  <rect x="60" y="60" width="390" height="480" rx="15" fill="url(#screenGradient)" opacity="0.08"/>
   
   <defs>
     <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:white;stop-opacity:0.3" />
+      <stop offset="0%" style="stop-color:white;stop-opacity:0.4" />
       <stop offset="100%" style="stop-color:white;stop-opacity:0" />
     </linearGradient>
   </defs>
