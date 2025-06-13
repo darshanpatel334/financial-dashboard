@@ -385,6 +385,9 @@
             <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
                 If your net worth grows year after year, it means your wealth is compounding. If it's declining, it's a signal that expenses or debt may be outpacing your income or savings.
             </p>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                <strong>Important:</strong> Try to avoid adding your own house, ornaments, vehicles, or any other assets which you're using on a daily basis and not looking to sell for profit. Focus on investment assets that generate income or can be easily liquidated.
+            </p>
             <div style="background: #e0f2fe; border-radius: 8px; padding: 1rem; border-left: 4px solid var(--primary-color);">
                 <strong style="color: var(--primary-color);">How to go about it:</strong>
                 <span style="color: #0c4a6e;"> Add details about your bank balance, investments, gold, property, and vehicles. Then include your loans and credit dues. This gives you the clearest possible view of your actual financial position.</span>
@@ -620,19 +623,33 @@
         let assetCount = 0;
         let liabilityCount = 0;
 
-        // Check authentication
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('userEmail').textContent = user.email;
-                loadNetWorthData();
-                
-                // Setup navigation system
-                if (typeof setupPageNavigation === 'function') {
-                    setupPageNavigation(2); // 2 = Net Worth page
+        // Initialize page when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    document.getElementById('userEmail').textContent = user.email;
+                    
+                    // Load data with a small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        loadNetWorthData();
+                        calculateTotals();
+                        calculateRecurringTotals();
+                    }, 100);
+                    
+                    // Setup navigation system
+                    if (typeof setupPageNavigation === 'function') {
+                        setupPageNavigation(2); // 2 = Net Worth page
+                    }
+                } else {
+                    window.location.href = 'index.html';
                 }
-            } else {
-                window.location.href = 'index.html';
-            }
+            });
+            
+            // Save data when user is about to leave the page
+            window.addEventListener('beforeunload', function() {
+                saveNetWorthData();
+            });
         });
 
         function showStatus(message, isError = false) {
@@ -799,7 +816,8 @@
             `;
             
             container.appendChild(assetItem);
-            saveNetWorthData();
+            // Immediate save when item is added
+            setTimeout(() => saveNetWorthData(), 100);
         }
 
         function addLiabilityItem() {
@@ -835,13 +853,15 @@
                 </button>
             `;
             container.appendChild(liabilityItem);
-            saveNetWorthData();
+            // Immediate save when liability is added
+            setTimeout(() => saveNetWorthData(), 100);
         }
 
         function removeItem(button) {
             button.closest('.asset-item').remove();
             calculateTotals();
-            saveNetWorthData();
+            // Immediate save when item is removed
+            setTimeout(() => saveNetWorthData(), 100);
         }
 
         function updateWords(input) {
@@ -921,7 +941,7 @@
             setTimeout(() => {
                 saveNetWorthData();
                 calculateAssetIncome();
-            }, 1000);
+            }, 500); // Reduced delay for faster saving
         }
 
         function saveNetWorthData() {
@@ -1020,13 +1040,23 @@
             // Add liquid net worth to totals
             data.totals.liquidNetWorth = liquidAssets - data.totals.totalLiabilities;
 
-            localStorage.setItem('netWorthData', JSON.stringify(data));
+            // Save to localStorage with error handling
+            try {
+                localStorage.setItem('netWorthData', JSON.stringify(data));
+                console.log('Net worth data saved successfully');
+            } catch (error) {
+                console.error('Error saving net worth data:', error);
+                showStatus('Error saving data. Please try again.', true);
+            }
         }
 
         function loadNetWorthData() {
             const savedData = localStorage.getItem('netWorthData');
+            console.log('Loading net worth data:', savedData ? 'Data found' : 'No data found');
             if (savedData) {
-                const data = JSON.parse(savedData);
+                try {
+                    const data = JSON.parse(savedData);
+                    console.log('Parsed data:', data);
                 
                 // Load assets
                 Object.keys(data.assets || {}).forEach(category => {
@@ -1091,6 +1121,10 @@
 
                 calculateTotals();
                 calculateRecurringTotals();
+                } catch (error) {
+                    console.error('Error loading net worth data:', error);
+                    showStatus('Error loading saved data.', true);
+                }
             }
         }
 
