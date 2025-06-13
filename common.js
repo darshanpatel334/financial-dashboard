@@ -1151,9 +1151,9 @@ function setupPageNavigation(currentPageIndex = 1) {
     }).join('');
 
     const navHtml = `
-        <div id="progressNavigation" style="margin-bottom: 2rem; text-align: center;">
+        <div id="progressNavigation" style="margin-bottom: 2rem; text-align: center; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto;">
             <div class="progress-container" style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
-                <div class="progress-dots" style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div class="progress-dots" style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     ${stepsHtml}
                 </div>
             </div>
@@ -1165,7 +1165,7 @@ function setupPageNavigation(currentPageIndex = 1) {
                 align-items: center;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                min-width: 80px;
+                min-width: 75px;
             }
 
             .progress-step:hover {
@@ -1224,10 +1224,10 @@ function setupPageNavigation(currentPageIndex = 1) {
             }
 
             .progress-line {
-                width: 30px;
+                width: 25px;
                 height: 2px;
                 background: #e0e0e0;
-                margin: 0 0.5rem;
+                margin: 0 0.25rem;
                 margin-top: 10px;
             }
 
