@@ -97,6 +97,7 @@
                 <h2 class="section-title">
                     <i class="fas fa-home"></i> Rental Income
                 </h2>
+                <small class="text-secondary">Some values calculated from Net Worth data</small>
             </div>
 
             <div class="category-group">
@@ -104,11 +105,14 @@
                     <span class="category-title">🏠 Property Rental</span>
                     <span class="category-total" id="rentalTotal">₹0</span>
                 </div>
+                <div class="instruction-box">
+                    <p><strong>Auto-calculated:</strong> ₹<span id="autoRentalYield">0</span> from real estate investments</p>
+                </div>
                 <div id="rentalItems">
                     <!-- Rental items will be added here -->
                 </div>
                 <button class="add-item-btn" onclick="addIncomeItem('rental', 'Rental Income')">
-                    <i class="fas fa-plus"></i> Add Rental Income
+                    <i class="fas fa-plus"></i> Add Additional Rental Income
                 </button>
             </div>
         </div>

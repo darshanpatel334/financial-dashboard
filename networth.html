@@ -877,16 +877,21 @@
                     
                     categoryTotal += value;
                     
-                    // All assets contribute to total assets
-                    totalAssets += value;
-                    
                     // Real estate and other assets (like occupied house) are illiquid
                     // Cash and equity/fixed income are liquid
                     if (category !== 'realEstate' && category !== 'otherAssets') {
                         liquidAssets += value;
                     }
                 });
-                document.getElementById(category + 'Total').textContent = `₹${categoryTotal.toLocaleString('en-IN')}`;
+                
+                // Update category total display
+                const categoryTotalElement = document.getElementById(category + 'Total');
+                if (categoryTotalElement) {
+                    categoryTotalElement.textContent = `₹${categoryTotal.toLocaleString('en-IN')}`;
+                }
+                
+                // Add to total assets
+                totalAssets += categoryTotal;
             });
 
             // Calculate liabilities
@@ -912,9 +917,10 @@
                 liquidNetWorthElement.textContent = `₹${liquidNetWorth.toLocaleString('en-IN')}`;
             }
 
-            // Auto-save
+            // Auto-save and recalculate asset income
             setTimeout(() => {
                 saveNetWorthData();
+                calculateAssetIncome();
             }, 1000);
         }
 
@@ -1245,8 +1251,97 @@
             }
         }
 
+        // Calculate and save asset-based income
+        function calculateAssetIncome() {
+            let totalRentalIncome = 0;
+            let totalDividendIncome = 0;
+            let totalInterestIncome = 0;
+            
+            // Calculate rental income from real estate
+            const realEstateItems = document.querySelectorAll('#realEstateItems .asset-item');
+            realEstateItems.forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                const select = item.querySelector('select');
+                const rentalAmount = parseFloat(inputs[4]?.value) || 0;
+                const frequency = select?.value || 'monthly';
+                
+                if (rentalAmount > 0) {
+                    let monthlyRental = 0;
+                    switch(frequency) {
+                        case 'monthly':
+                            monthlyRental = rentalAmount;
+                            break;
+                        case 'quarterly':
+                            monthlyRental = rentalAmount / 3;
+                            break;
+                        case 'semi-annually':
+                            monthlyRental = rentalAmount / 6;
+                            break;
+                        case 'annually':
+                            monthlyRental = rentalAmount / 12;
+                            break;
+                        default:
+                            monthlyRental = rentalAmount;
+                    }
+                    totalRentalIncome += monthlyRental;
+                }
+            });
+            
+            // Calculate dividend income from equity
+            const equityItems = document.querySelectorAll('#equityItems .asset-item');
+            equityItems.forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                const currentValue = parseFloat(inputs[1]?.value) || 0;
+                const dividendYield = parseFloat(inputs[2]?.value) || 0;
+                
+                if (currentValue > 0 && dividendYield > 0) {
+                    const annualDividend = (currentValue * dividendYield) / 100;
+                    totalDividendIncome += annualDividend / 12; // Convert to monthly
+                }
+            });
+            
+            // Calculate interest income from fixed income
+            const fixedIncomeItems = document.querySelectorAll('#fixedIncomeItems .asset-item');
+            fixedIncomeItems.forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                const currentValue = parseFloat(inputs[1]?.value) || 0;
+                const interestRate = parseFloat(inputs[2]?.value) || 0;
+                
+                if (currentValue > 0 && interestRate > 0) {
+                    const annualInterest = (currentValue * interestRate) / 100;
+                    totalInterestIncome += annualInterest / 12; // Convert to monthly
+                }
+            });
+            
+            // Calculate interest income from cash & bank
+            const cashItems = document.querySelectorAll('#cashItems .asset-item');
+            cashItems.forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                const currentValue = parseFloat(inputs[1]?.value) || 0;
+                const interestRate = parseFloat(inputs[2]?.value) || 0;
+                
+                if (currentValue > 0 && interestRate > 0) {
+                    const annualInterest = (currentValue * interestRate) / 100;
+                    totalInterestIncome += annualInterest / 12; // Convert to monthly
+                }
+            });
+            
+            // Save asset income data
+            const assetIncomeData = {
+                rentalIncome: totalRentalIncome * 12, // Store as annual
+                dividendIncome: totalDividendIncome * 12, // Store as annual
+                interestIncome: totalInterestIncome * 12, // Store as annual
+                lastUpdated: Date.now()
+            };
+            
+            localStorage.setItem('assetIncomeData', JSON.stringify(assetIncomeData));
+            
+            return assetIncomeData;
+        }
+
         function goNext() {
             saveNetWorthData();
+            calculateAssetIncome(); // Calculate asset-based income
             showStatus('Net worth data saved successfully!');
             setTimeout(() => {
                 window.location.href = 'income.html';

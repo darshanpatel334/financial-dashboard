@@ -82,37 +82,17 @@ function removeIncomeItem(button) {
 
 // Calculate auto income from net worth data
 function calculateAutoIncomeFromNetWorth() {
-    const netWorthData = Storage.get('netWorthData', {});
-    let autoEquityYield = 0;
-    let autoFixedIncomeYield = 0;
-    let autoRentalYield = 0;
+    // Get asset income data calculated from networth page
+    const assetIncomeData = JSON.parse(localStorage.getItem('assetIncomeData') || '{}');
     
-    if (netWorthData.assets) {
-        // Calculate equity yield
-        if (netWorthData.assets.equity) {
-            netWorthData.assets.equity.forEach(asset => {
-                autoEquityYield += (asset.value * asset.yield) / 100;
-            });
-        }
-        
-        // Calculate fixed income yield
-        if (netWorthData.assets.fixedIncome) {
-            netWorthData.assets.fixedIncome.forEach(asset => {
-                autoFixedIncomeYield += (asset.value * asset.yield) / 100;
-            });
-        }
-        
-        // Calculate real estate yield (rental income)
-        if (netWorthData.assets.realEstate) {
-            netWorthData.assets.realEstate.forEach(asset => {
-                autoRentalYield += (asset.value * asset.yield) / 100;
-            });
-        }
-    }
+    let autoEquityYield = assetIncomeData.dividendIncome || 0;
+    let autoFixedIncomeYield = assetIncomeData.interestIncome || 0;
+    let autoRentalYield = assetIncomeData.rentalIncome || 0;
     
     // Update auto-calculated displays
     document.getElementById('autoEquityYield').textContent = formatNumber(autoEquityYield);
     document.getElementById('autoFixedIncomeYield').textContent = formatNumber(autoFixedIncomeYield);
+    document.getElementById('autoRentalYield').textContent = formatNumber(autoRentalYield);
     
     // Store auto-calculated values for total calculations
     incomeData.autoEquityYield = autoEquityYield;
