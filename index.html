@@ -34,7 +34,7 @@
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 700px;
             margin: 0 auto;
             padding: 0 1rem;
         }
@@ -61,8 +61,8 @@
             font-weight: 800;
             color: var(--primary-color);
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            gap: 0.75rem;
             letter-spacing: -0.02em;
             transition: all 0.3s ease;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -82,21 +82,10 @@
             letter-spacing: 0.02em;
         }
 
-        /* Pie chart for navigation Nivezo */
-        .nav-pie-i {
-            position: relative;
-            display: inline-block;
-            color: var(--primary-color);
-        }
-
-        .nav-pie-i::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 16px;
-            height: 16px;
+        /* Pie chart for navigation - standalone element */
+        .nav-pie-chart {
+            width: 2.5rem;
+            height: 2.5rem;
             background: conic-gradient(
                 #4F46E5 0% 45%, 
                 #10B981 45% 75%, 
@@ -105,22 +94,8 @@
             );
             border-radius: 50%;
             animation: pieRotate 8s linear infinite;
-            z-index: 10;
             box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
-
-        /* Hide the original dot completely */
-        .nav-pie-i::after {
-            content: '';
-            position: absolute;
-            top: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 14px;
-            height: 14px;
-            background: var(--bg-primary);
-            border-radius: 50%;
-            z-index: 9;
+            flex-shrink: 0;
         }
 
         /* Buttons */
@@ -1018,9 +993,6 @@
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s ease;
         }
 
         .problem-header p {
@@ -1030,15 +1002,6 @@
             margin: 0 auto;
             line-height: 1.6;
             font-weight: 500;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s ease 0.2s;
-        }
-
-        .problem-section.animated .problem-header h3,
-        .problem-section.animated .problem-header p {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .problem-content {
@@ -1048,14 +1011,6 @@
             border: 1px solid #f1f5f9;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             margin-bottom: 2.5rem;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease 0.4s;
-        }
-
-        .problem-section.animated .problem-content {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .problem-title {
@@ -1114,14 +1069,6 @@
             background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
             border-radius: 12px;
             border: 1px solid #bae6fd;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease 0.6s;
-        }
-
-        .problem-section.animated .solution-box {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .solution-title {
@@ -1554,8 +1501,11 @@
     <nav class="navbar">
         <div class="container">
             <a href="index.html" class="nav-brand">
-                <div>N<span class="nav-pie-i">i</span>vezo</div>
-                <div class="nav-tagline">Track. Plan. Achieve Financial Freedom</div>
+                <div class="nav-pie-chart"></div>
+                <div>
+                    <div>Nivezo</div>
+                    <div class="nav-tagline">Track. Plan. Achieve Financial Freedom</div>
+                </div>
             </a>
             <div class="nav-links">
                 <div class="auth-buttons">
@@ -2500,25 +2450,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             new ChatWidget();
             
-            // Initialize scroll-triggered animations
-            const observerOptions = {
-                threshold: 0.3,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animated');
-                    }
-                });
-            }, observerOptions);
-
-            // Observe the problem section
-            const problemSection = document.querySelector('.problem-section');
-            if (problemSection) {
-                observer.observe(problemSection);
-            }
+            // Scroll-triggered animations removed for better performance
 
             // Wild parallax scroll effects
             window.addEventListener('scroll', () => {

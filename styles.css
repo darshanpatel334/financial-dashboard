@@ -81,7 +81,7 @@ p {
 /* ===== LAYOUT ===== */
 .container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 700px;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
@@ -115,6 +115,31 @@ p {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+/* Pie chart for navigation - standalone element */
+.nav-pie-chart {
+    width: 1.5rem;
+    height: 1.5rem;
+    background: conic-gradient(
+        #4F46E5 0% 45%, 
+        #10B981 45% 75%, 
+        #F59E0B 75% 90%, 
+        #EF4444 90% 100%
+    );
+    border-radius: 50%;
+    animation: pieRotate 8s linear infinite;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+}
+
+@keyframes pieRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .user-info {
