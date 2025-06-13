@@ -1130,13 +1130,6 @@ function setupPageNavigation(currentPageIndex = 1) {
         return;
     }
     
-    // Check if navigation already exists to avoid duplicates
-    if (document.getElementById('progressNavigation')) {
-        console.log('Navigation already exists, refreshing...');
-        setupNavigationInteractions();
-        return;
-    }
-    
     // Generate navigation steps dynamically
     const stepsHtml = NAVIGATION_STEPS.map((step, index) => {
         const isLast = index === NAVIGATION_STEPS.length - 1;
@@ -1257,47 +1250,122 @@ function setupPageNavigation(currentPageIndex = 1) {
                     margin: 0;
                 }
             }
-
-            @media (max-width: 600px) {
-                #progressNavigation .progress-container {
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                    padding: 1rem 0.5rem;
-                }
-                #progressNavigation .progress-dots {
-                    flex-wrap: nowrap !important;
-                    gap: 0.5rem !important;
-                    min-width: 600px;
-                    width: max-content;
-                }
-                #progressNavigation {
-                    margin-left: -1rem;
-                    margin-right: -1rem;
-                }
-            }
         </style>
     `;
     
-    // Insert navigation at the top of the main content
-    const mainContent = document.querySelector('main') || document.querySelector('.container') || document.body;
-    if (mainContent) {
-        mainContent.insertAdjacentHTML('afterbegin', navHtml);
+    // Check if navigation already exists to avoid duplicates
+    if (document.getElementById('progressNavigation')) {
+        console.log('Navigation already exists, refreshing...');
         setupNavigationInteractions();
+        return;
+    }
+    
+    // Find insertion point - first look for page-header, then h1, then container
+    let insertionPoint = document.querySelector('.page-header');
+    let insertionMethod = 'beforebegin';
+    
+    if (!insertionPoint) {
+        // Look for h1 tag
+        insertionPoint = document.querySelector('h1');
+        insertionMethod = 'beforebegin';
+    }
+    
+    if (!insertionPoint) {
+        // Fall back to container
+        insertionPoint = document.querySelector('.container');
+        insertionMethod = 'afterbegin';
+    }
+    
+    if (insertionPoint) {
+        try {
+            insertionPoint.insertAdjacentHTML(insertionMethod, navHtml);
+            console.log('Navigation inserted successfully at:', insertionPoint.tagName);
+            // Setup click handlers and progress status
+            setupNavigationInteractions();
+        } catch (error) {
+            console.error('Error inserting navigation:', error);
+        }
+    } else {
+        console.error('No suitable insertion point found for navigation');
     }
 }
 
+// Setup navigation interactions and progress updates
 function setupNavigationInteractions() {
+    const progress = getUserProgress();
     const progressSteps = document.querySelectorAll('.progress-step');
     
-    progressSteps.forEach(step => {
+    progressSteps.forEach((step) => {
+        const stepNumber = parseInt(step.getAttribute('data-step'));
+        step.classList.remove('completed');
+        
+        // Mark completed steps
+        if (progress.completedSteps.includes(stepNumber)) {
+            step.classList.add('completed');
+        }
+        
+        // Add click handler for navigation
         step.addEventListener('click', () => {
-            const targetPage = step.getAttribute('data-page');
-            if (targetPage) {
-                window.location.href = targetPage;
+            const page = step.getAttribute('data-page');
+            if (page) {
+                // Allow navigation to completed steps or next available step
+                if (progress.completedSteps.includes(stepNumber) || stepNumber <= progress.currentStep) {
+                    window.location.href = page;
+                } else {
+                    showStatus('Please complete the previous steps first', 'warning');
+                }
             }
         });
     });
 }
 
-// Make sure setupPageNavigation is available globally
+// Refresh navigation status (useful when data changes)
+function refreshNavigationStatus() {
+    const progressSteps = document.querySelectorAll('.progress-step');
+    if (progressSteps.length > 0) {
+        setupNavigationInteractions();
+    }
+}
+
+// Auto-refresh navigation when localStorage changes
+window.addEventListener('storage', (e) => {
+    // Refresh navigation when data changes
+    if (e.key && (e.key.includes('Info') || e.key.includes('Data'))) {
+        setTimeout(refreshNavigationStatus, 100);
+    }
+});
+
+// Also refresh on focus (when returning to tab)
+window.addEventListener('focus', () => {
+    setTimeout(refreshNavigationStatus, 100);
+});
+
+// Helper function to safely setup navigation with proper timing
+function safeSetupNavigation(pageIndex) {
+    console.log('Safe navigation setup called for page:', pageIndex);
+    
+    // Multiple timing strategies to ensure it works
+    if (document.readyState === 'complete') {
+        setupPageNavigation(pageIndex);
+    } else if (document.readyState === 'interactive') {
+        setTimeout(() => setupPageNavigation(pageIndex), 100);
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => setupPageNavigation(pageIndex), 50);
+        });
+    }
+    
+    // Also try after window load as fallback
+    window.addEventListener('load', () => {
+        if (!document.getElementById('progressNavigation')) {
+            console.log('Navigation not found after load, retrying...');
+            setupPageNavigation(pageIndex);
+        }
+    });
+}
+
+// Export navigation functions
 window.setupPageNavigation = setupPageNavigation;
+window.safeSetupNavigation = safeSetupNavigation;
+window.setupNavigationInteractions = setupNavigationInteractions;
+window.refreshNavigationStatus = refreshNavigationStatus; 
