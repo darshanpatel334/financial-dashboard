@@ -697,11 +697,11 @@
                     </div>
                     <div class="form-group">
                         <label>Current Price per Sq Ft (₹)</label>
-                        <input type="number" placeholder="0" onchange="calculateRealEstateValue(this); calculateTotals()">
+                        <input type="number" placeholder="0" onchange="calculateRealEstateValue(this)">
                     </div>
                     <div class="form-group">
                         <label>Total Area (Sq Ft)</label>
-                        <input type="number" placeholder="0" onchange="calculateRealEstateValue(this); calculateTotals()">
+                        <input type="number" placeholder="0" onchange="calculateRealEstateValue(this)">
                     </div>
                     <div class="form-group">
                         <label>Current Value (₹)</label>
@@ -710,11 +710,11 @@
                     </div>
                     <div class="form-group">
                         <label>Monthly Rental (₹)</label>
-                        <input type="number" placeholder="0" onchange="calculateRentalYield(this); calculateTotals()">
+                        <input type="number" placeholder="0" onchange="calculateRentalYield(this)">
                     </div>
                     <div class="form-group">
                         <label>Rental Frequency</label>
-                        <select onchange="calculateRentalYield(this); calculateTotals()">
+                        <select onchange="calculateRentalYield(this)">
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="semi-annually">Semi-Annually</option>
@@ -866,12 +866,12 @@
                     let value = 0;
                     
                     if (category === 'realEstate') {
-                        // For real estate, value is in the 4th input (Current Value)
-                        const inputs = item.querySelectorAll('input[type="number"]');
+                        // For real estate, value is in the 4th input (Current Value) - use all inputs, not just number type
+                        const inputs = item.querySelectorAll('input');
                         value = parseFloat(inputs[3]?.value) || 0;
                     } else {
                         // For other categories, value is in the 2nd input (Current Value)
-                        const inputs = item.querySelectorAll('input[type="number"]');
+                        const inputs = item.querySelectorAll('input');
                         value = parseFloat(inputs[1]?.value) || 0;
                     }
                     
@@ -1212,6 +1212,9 @@
             
             inputs[3].value = currentValue; // Set Current Value
             updateWords(inputs[3]); // Update words display
+            
+            // Trigger totals calculation immediately
+            calculateTotals();
         }
 
         // Calculate rental yield from rental amount and frequency
@@ -1249,6 +1252,9 @@
             } else {
                 inputs[6].value = 0;
             }
+            
+            // Trigger totals calculation
+            calculateTotals();
         }
 
         // Calculate and save asset-based income
