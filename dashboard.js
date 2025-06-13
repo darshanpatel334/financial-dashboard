@@ -7,6 +7,14 @@ let charts = {};
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth().then(() => {
         initCommonElements();
+        
+        // Display user email in navigation
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('userEmail').textContent = user.email;
+            }
+        });
+        
         loadAllData();
         initDashboard();
         
