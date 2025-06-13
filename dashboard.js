@@ -21,9 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mark dashboard as visited for progress tracking
         Storage.set('dashboardVisited', true);
         
-        // Setup navigation system
-        if (typeof setupPageNavigation === 'function') {
-            setupPageNavigation(8); // 8 = Dashboard page
+        // Setup navigation system - use safer timing
+        if (typeof safeSetupNavigation === 'function') {
+            safeSetupNavigation(8); // 8 = Dashboard page
+        } else if (typeof setupPageNavigation === 'function') {
+            setTimeout(() => setupPageNavigation(8), 200);
         }
     });
 });

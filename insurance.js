@@ -16,9 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadInsuranceData();
         calculateTotals();
         
-        // Setup navigation system
-        if (typeof setupPageNavigation === 'function') {
-            setupPageNavigation(6); // 6 = Insurance page
+        // Setup navigation system - use safer timing
+        if (typeof safeSetupNavigation === 'function') {
+            safeSetupNavigation(6); // 6 = Insurance page
+        } else if (typeof setupPageNavigation === 'function') {
+            setTimeout(() => setupPageNavigation(6), 200);
         }
     });
 });

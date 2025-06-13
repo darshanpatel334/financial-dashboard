@@ -14,9 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mark analytics as visited for progress tracking
         Storage.set('analyticsVisited', true);
         
-        // Setup navigation system
-        if (typeof setupPageNavigation === 'function') {
-            setupPageNavigation(9); // 9 = Analytics page
+        // Setup navigation system - use safer timing
+        if (typeof safeSetupNavigation === 'function') {
+            safeSetupNavigation(9); // 9 = Analytics page
+        } else if (typeof setupPageNavigation === 'function') {
+            setTimeout(() => setupPageNavigation(9), 200);
         }
     });
 });

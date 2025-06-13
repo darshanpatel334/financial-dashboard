@@ -14,9 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadExpenseData();
         loadIncomeDataForAnalysis();
         
-        // Setup navigation system
-        if (typeof setupPageNavigation === 'function') {
-            setupPageNavigation(4); // 4 = Expenses page
+        // Setup navigation system - use safer timing
+        if (typeof safeSetupNavigation === 'function') {
+            safeSetupNavigation(4); // 4 = Expenses page
+        } else if (typeof setupPageNavigation === 'function') {
+            setTimeout(() => setupPageNavigation(4), 200);
         }
     });
 });

@@ -16,9 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadIncomeData();
         calculateAutoIncomeFromNetWorth();
         
-        // Setup navigation system
-        if (typeof setupPageNavigation === 'function') {
-            setupPageNavigation(3); // 3 = Income page
+        // Setup navigation system - use safer timing
+        if (typeof safeSetupNavigation === 'function') {
+            safeSetupNavigation(3); // 3 = Income page
+        } else if (typeof setupPageNavigation === 'function') {
+            setTimeout(() => setupPageNavigation(3), 200);
         }
     });
 });

@@ -14,9 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
         initQuestionListeners();
         loadRiskData();
         
-        // Setup navigation system
-        if (typeof setupPageNavigation === 'function') {
-            setupPageNavigation(7); // 7 = Risk Profile page
+        // Setup navigation system - use safer timing
+        if (typeof safeSetupNavigation === 'function') {
+            safeSetupNavigation(7); // 7 = Risk Profile page
+        } else if (typeof setupPageNavigation === 'function') {
+            setTimeout(() => setupPageNavigation(7), 200);
         }
     });
 });

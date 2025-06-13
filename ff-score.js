@@ -16,9 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateFFScore();
         calculateScenarios();
         
-        // Setup navigation system
-        if (typeof setupPageNavigation === 'function') {
-            setupPageNavigation(5); // 5 = FF Score page
+        // Setup navigation system - use safer timing
+        if (typeof safeSetupNavigation === 'function') {
+            safeSetupNavigation(5); // 5 = FF Score page
+        } else if (typeof setupPageNavigation === 'function') {
+            setTimeout(() => setupPageNavigation(5), 200);
         }
     });
 });
