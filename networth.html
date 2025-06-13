@@ -503,6 +503,85 @@
             </div>
         </div>
 
+        <!-- Recurring Investments Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-sync-alt"></i> Recurring Investments & Savings
+                </h2>
+                <small class="text-secondary">Track your regular monthly investments and savings</small>
+            </div>
+
+            <!-- Monthly Recurring Summary -->
+            <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr; margin-bottom: 2rem;">
+                <div class="summary-card assets">
+                    <h3>Total SIP</h3>
+                    <div class="summary-amount positive" id="totalSIP">₹0</div>
+                    <small>Monthly SIP amount</small>
+                </div>
+                <div class="summary-card networth">
+                    <h3>Total RD/FD</h3>
+                    <div class="summary-amount networth" id="totalRD">₹0</div>
+                    <small>Monthly recurring deposits</small>
+                </div>
+                <div class="summary-card liabilities">
+                    <h3>Other Savings</h3>
+                    <div class="summary-amount negative" id="totalOtherSavings">₹0</div>
+                    <small>Monthly other schemes</small>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Monthly</h3>
+                    <div class="summary-amount" id="totalRecurringSavings">₹0</div>
+                    <small>Combined monthly savings</small>
+                </div>
+            </div>
+
+            <!-- Mutual Fund SIP -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">📈 Mutual Fund SIP</span>
+                    <span class="category-total" id="sipTotal">₹0/month</span>
+                </div>
+                <div id="sipItems">
+                    <!-- SIP items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addRecurringItem('sip', 'Mutual Fund SIP')">
+                    <i class="fas fa-plus"></i> Add SIP
+                </button>
+            </div>
+
+            <!-- Recurring FD/RD -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">🏦 Recurring Deposits</span>
+                    <span class="category-total" id="rdTotal">₹0/month</span>
+                </div>
+                <div id="rdItems">
+                    <!-- RD items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addRecurringItem('rd', 'Recurring Deposit')">
+                    <i class="fas fa-plus"></i> Add Recurring Deposit
+                </button>
+            </div>
+
+            <!-- Other Savings Schemes -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">💰 Other Savings Schemes</span>
+                    <span class="category-total" id="otherSavingsTotal">₹0/month</span>
+                </div>
+                <div class="instruction-box">
+                    <p><strong>Examples:</strong> PF, PPF, ELSS, NSC, Life Insurance Premiums, Gold SIP, or any regular investment</p>
+                </div>
+                <div id="otherSavingsItems">
+                    <!-- Other savings items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addRecurringItem('otherSavings', 'Savings Scheme')">
+                    <i class="fas fa-plus"></i> Add Savings Scheme
+                </button>
+            </div>
+        </div>
+
         <!-- Navigation -->
         <div class="navigation">
             <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
@@ -725,10 +804,16 @@
             const data = {
                 assets: {},
                 liabilities: [],
+                recurringInvestments: {
+                    sip: [],
+                    rd: [],
+                    otherSavings: []
+                },
                 totals: {
                     totalAssets: parseFloat(document.getElementById('totalAssets').textContent.replace(/[₹,]/g, '')) || 0,
                     totalLiabilities: parseFloat(document.getElementById('totalLiabilities').textContent.replace(/[₹,]/g, '')) || 0,
-                    netWorth: parseFloat(document.getElementById('netWorth').textContent.replace(/[₹,]/g, '')) || 0
+                    netWorth: parseFloat(document.getElementById('netWorth').textContent.replace(/[₹,]/g, '')) || 0,
+                    totalRecurringSavings: parseFloat(document.getElementById('totalRecurringSavings').textContent.replace(/[₹,]/g, '')) || 0
                 }
             };
 
@@ -773,6 +858,23 @@
                 }
             });
 
+            // Save recurring investments
+            const recurringCategories = ['sip', 'rd', 'otherSavings'];
+            recurringCategories.forEach(category => {
+                const items = document.querySelectorAll(`#${category}Items .asset-item`);
+                items.forEach(item => {
+                    const inputs = item.querySelectorAll('input');
+                    const select = item.querySelector('select');
+                    if (inputs.length >= 2) {
+                        data.recurringInvestments[category].push({
+                            name: inputs[0].value,
+                            amount: parseFloat(inputs[1].value) || 0,
+                            frequency: select.value
+                        });
+                    }
+                });
+            });
+
             // Add liquid net worth to totals
             data.totals.liquidNetWorth = liquidAssets - data.totals.totalLiabilities;
 
@@ -812,12 +914,135 @@
                     updateWords(inputs[0]);
                 });
 
+                // Load recurring investments
+                const recurringData = data.recurringInvestments || {};
+                Object.keys(recurringData).forEach(category => {
+                    if (recurringData[category]) {
+                        recurringData[category].forEach(item => {
+                            const categoryName = category === 'sip' ? 'Mutual Fund SIP' : 
+                                                category === 'rd' ? 'Recurring Deposit' : 'Savings Scheme';
+                            addRecurringItem(category, categoryName);
+                            
+                            const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
+                            const inputs = lastItem.querySelectorAll('input');
+                            const select = lastItem.querySelector('select');
+                            inputs[0].value = item.name || '';
+                            inputs[1].value = item.amount || 0;
+                            select.value = item.frequency || 'monthly';
+                        });
+                    }
+                });
+
                 calculateTotals();
+                calculateRecurringTotals();
             }
         }
 
         function goBack() {
             window.location.href = 'personal-info.html';
+        }
+
+        // Recurring investments functions
+        let recurringCount = 0;
+
+        function addRecurringItem(category, type) {
+            recurringCount++;
+            const container = document.getElementById(category + 'Items');
+            const recurringItem = document.createElement('div');
+            recurringItem.className = 'asset-item';
+            recurringItem.innerHTML = `
+                <div class="form-group">
+                    <label>${type} Name/Scheme</label>
+                    <input type="text" placeholder="Enter scheme name" onchange="calculateRecurringTotals()">
+                </div>
+                <div class="form-group">
+                    <label>Amount (₹)</label>
+                    <input type="number" placeholder="0" onchange="calculateRecurringTotals()">
+                </div>
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select onchange="calculateRecurringTotals()">
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="semi-annually">Semi-Annually</option>
+                        <option value="annually">Annually</option>
+                    </select>
+                </div>
+                <button class="delete-btn" onclick="removeRecurringItem(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            container.appendChild(recurringItem);
+            calculateRecurringTotals();
+            saveNetWorthData();
+        }
+
+        function removeRecurringItem(button) {
+            button.closest('.asset-item').remove();
+            calculateRecurringTotals();
+            saveNetWorthData();
+        }
+
+        function calculateRecurringTotals() {
+            let totalSIP = 0;
+            let totalRD = 0;
+            let totalOtherSavings = 0;
+
+            // Calculate SIP total
+            const sipItems = document.querySelectorAll('#sipItems .asset-item');
+            sipItems.forEach(item => {
+                const amount = parseFloat(item.querySelectorAll('input')[1].value) || 0;
+                const frequency = item.querySelector('select').value;
+                const monthlyAmount = convertToMonthly(amount, frequency);
+                totalSIP += monthlyAmount;
+            });
+
+            // Calculate RD total
+            const rdItems = document.querySelectorAll('#rdItems .asset-item');
+            rdItems.forEach(item => {
+                const amount = parseFloat(item.querySelectorAll('input')[1].value) || 0;
+                const frequency = item.querySelector('select').value;
+                const monthlyAmount = convertToMonthly(amount, frequency);
+                totalRD += monthlyAmount;
+            });
+
+            // Calculate Other Savings total
+            const otherSavingsItems = document.querySelectorAll('#otherSavingsItems .asset-item');
+            otherSavingsItems.forEach(item => {
+                const amount = parseFloat(item.querySelectorAll('input')[1].value) || 0;
+                const frequency = item.querySelector('select').value;
+                const monthlyAmount = convertToMonthly(amount, frequency);
+                totalOtherSavings += monthlyAmount;
+            });
+
+            // Update individual totals
+            document.getElementById('sipTotal').textContent = `₹${totalSIP.toLocaleString('en-IN')}/month`;
+            document.getElementById('rdTotal').textContent = `₹${totalRD.toLocaleString('en-IN')}/month`;
+            document.getElementById('otherSavingsTotal').textContent = `₹${totalOtherSavings.toLocaleString('en-IN')}/month`;
+
+            // Update summary cards
+            document.getElementById('totalSIP').textContent = `₹${totalSIP.toLocaleString('en-IN')}`;
+            document.getElementById('totalRD').textContent = `₹${totalRD.toLocaleString('en-IN')}`;
+            document.getElementById('totalOtherSavings').textContent = `₹${totalOtherSavings.toLocaleString('en-IN')}`;
+
+            // Calculate and update total monthly recurring savings
+            const totalRecurringSavings = totalSIP + totalRD + totalOtherSavings;
+            document.getElementById('totalRecurringSavings').textContent = `₹${totalRecurringSavings.toLocaleString('en-IN')}`;
+
+            // Auto-save
+            setTimeout(() => {
+                saveNetWorthData();
+            }, 1000);
+        }
+
+        function convertToMonthly(amount, frequency) {
+            switch(frequency) {
+                case 'monthly': return amount;
+                case 'quarterly': return amount / 3;
+                case 'semi-annually': return amount / 6;
+                case 'annually': return amount / 12;
+                default: return amount;
+            }
         }
 
         function goNext() {

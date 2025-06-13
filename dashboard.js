@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         loadAllData();
         initDashboard();
+        initHistorical();
         
         // Mark dashboard as visited for progress tracking
         Storage.set('dashboardVisited', true);
@@ -78,6 +79,87 @@ function updateSummaryCards() {
     const ffScoreMeaning = getFFScoreMeaning(ffScore);
     ffScoreElement.style.color = ffScoreMeaning.color;
     document.getElementById('ffScoreStatus').textContent = ffScoreMeaning.level;
+    
+    // Update recurring investments section
+    updateRecurringInvestments();
+}
+
+// Update recurring investments section
+function updateRecurringInvestments() {
+    const netWorthData = dashboardData.netWorth || {};
+    const recurringInvestments = netWorthData.recurringInvestments || {};
+    
+    // Calculate totals for each category
+    let totalSIP = 0;
+    let totalRD = 0;
+    let totalOtherSavings = 0;
+    
+    // SIP totals
+    if (recurringInvestments.sip) {
+        totalSIP = recurringInvestments.sip.reduce((total, investment) => {
+            const amount = investment.amount || 0;
+            const frequency = investment.frequency || 'monthly';
+            return total + convertToMonthly(amount, frequency);
+        }, 0);
+    }
+    
+    // RD totals
+    if (recurringInvestments.rd) {
+        totalRD = recurringInvestments.rd.reduce((total, investment) => {
+            const amount = investment.amount || 0;
+            const frequency = investment.frequency || 'monthly';
+            return total + convertToMonthly(amount, frequency);
+        }, 0);
+    }
+    
+    // Other savings totals
+    if (recurringInvestments.otherSavings) {
+        totalOtherSavings = recurringInvestments.otherSavings.reduce((total, investment) => {
+            const amount = investment.amount || 0;
+            const frequency = investment.frequency || 'monthly';
+            return total + convertToMonthly(amount, frequency);
+        }, 0);
+    }
+    
+    const totalRecurring = totalSIP + totalRD + totalOtherSavings;
+    
+    // Update display elements if they exist
+    const sipElement = document.getElementById('dashboardSIP');
+    const rdElement = document.getElementById('dashboardRD');
+    const otherSavingsElement = document.getElementById('dashboardOtherSavings');
+    const totalRecurringElement = document.getElementById('dashboardTotalRecurring');
+    const disciplineScoreElement = document.getElementById('disciplineScore');
+    const recurringSection = document.getElementById('recurringInvestmentsSection');
+    
+    if (sipElement) sipElement.textContent = formatCurrency(totalSIP);
+    if (rdElement) rdElement.textContent = formatCurrency(totalRD);
+    if (otherSavingsElement) otherSavingsElement.textContent = formatCurrency(totalOtherSavings);
+    if (totalRecurringElement) totalRecurringElement.textContent = formatCurrency(totalRecurring);
+    
+    // Calculate investment discipline score (percentage of income going to regular investments)
+    const monthlyIncome = (dashboardData.income.totals?.annualTotal || 0) / 12;
+    const disciplinePercentage = monthlyIncome > 0 ? (totalRecurring / monthlyIncome) * 100 : 0;
+    
+    if (disciplineScoreElement) {
+        disciplineScoreElement.textContent = Math.round(disciplinePercentage) + '%';
+        // Color code the discipline score
+        if (disciplinePercentage >= 30) {
+            disciplineScoreElement.style.color = 'var(--success-color)';
+        } else if (disciplinePercentage >= 15) {
+            disciplineScoreElement.style.color = 'var(--warning-color)';
+        } else {
+            disciplineScoreElement.style.color = 'var(--danger-color)';
+        }
+    }
+    
+    // Show/hide the recurring investments section based on whether there's data
+    if (recurringSection) {
+        if (totalRecurring > 0) {
+            recurringSection.style.display = 'block';
+        } else {
+            recurringSection.style.display = 'none';
+        }
+    }
 }
 
 // Update health indicators
@@ -1390,5 +1472,372 @@ function getInsightColor(type) {
         case 'warning': return 'var(--warning-color)';
         case 'info': return 'var(--info-color)';
         default: return 'var(--primary-color)';
+    }
+}
+
+// ===== HISTORICAL SNAPSHOTS FUNCTIONALITY =====
+
+// Initialize historical functionality
+function initHistorical() {
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('snapshotDate').value = today;
+    
+    // Load and display existing snapshots
+    loadHistoricalSnapshots();
+}
+
+// Save current financial snapshot
+function saveSnapshot() {
+    const date = document.getElementById('snapshotDate').value;
+    const label = document.getElementById('snapshotLabel').value;
+    
+    if (!date) {
+        showStatus('Please select a date for the snapshot', 'error');
+        return;
+    }
+    
+    // Collect current data
+    const snapshot = {
+        date: date,
+        label: label || `Snapshot ${date}`,
+        timestamp: Date.now(),
+        data: {
+            netWorth: dashboardData.netWorthData?.totals?.netWorth || 0,
+            totalAssets: dashboardData.netWorthData?.totals?.totalAssets || 0,
+            totalLiabilities: dashboardData.netWorthData?.totals?.totalLiabilities || 0,
+            liquidNetWorth: dashboardData.netWorthData?.totals?.liquidNetWorth || 0,
+            totalRecurringSavings: dashboardData.netWorthData?.totals?.totalRecurringSavings || 0,
+            annualIncome: dashboardData.incomeData?.totals?.total || 0,
+            annualExpenses: dashboardData.expensesData?.totals?.total || 0,
+            ffScore: dashboardData.ffScoreData?.ffScore || 0,
+            savingsRate: dashboardData.savingsRate || 0,
+            // Asset breakdown
+            assets: {
+                realEstate: calculateCategoryTotal('realEstate'),
+                equity: calculateCategoryTotal('equity'),
+                fixedIncome: calculateCategoryTotal('fixedIncome'),
+                otherAssets: calculateCategoryTotal('otherAssets')
+            },
+            // Recurring investments breakdown
+            recurringInvestments: {
+                totalSIP: getTotalRecurringByCategory('sip'),
+                totalRD: getTotalRecurringByCategory('rd'),
+                totalOtherSavings: getTotalRecurringByCategory('otherSavings')
+            }
+        }
+    };
+    
+    // Save to localStorage
+    let snapshots = JSON.parse(localStorage.getItem('historicalSnapshots') || '[]');
+    snapshots.push(snapshot);
+    
+    // Keep only last 20 snapshots to avoid storage issues
+    if (snapshots.length > 20) {
+        snapshots = snapshots.slice(-20);
+    }
+    
+    localStorage.setItem('historicalSnapshots', JSON.stringify(snapshots));
+    
+    // Clear form
+    document.getElementById('snapshotLabel').value = '';
+    
+    // Reload display
+    loadHistoricalSnapshots();
+    
+    showStatus('Financial snapshot saved successfully!', 'success');
+}
+
+// Load and display historical snapshots
+function loadHistoricalSnapshots() {
+    const snapshots = JSON.parse(localStorage.getItem('historicalSnapshots') || '[]');
+    const container = document.getElementById('historicalSnapshots');
+    
+    if (snapshots.length === 0) {
+        container.innerHTML = `
+            <div class="card" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📈</div>
+                <h4>No Historical Data Yet</h4>
+                <p>Save your first financial snapshot to start tracking your progress over time.</p>
+            </div>
+        `;
+        document.getElementById('comparisonCharts').style.display = 'none';
+        return;
+    }
+    
+    // Sort snapshots by date
+    snapshots.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    container.innerHTML = `
+        <h3 style="margin-bottom: 1rem;">Saved Snapshots (${snapshots.length})</h3>
+        <div class="grid-3">
+            ${snapshots.map((snapshot, index) => `
+                <div class="card" style="position: relative;">
+                    <button onclick="deleteSnapshot(${index})" style="position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;" title="Delete snapshot">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <div class="card-body">
+                        <h4 style="margin-bottom: 0.5rem;">${snapshot.label}</h4>
+                        <small style="color: var(--text-secondary);">${new Date(snapshot.date).toLocaleDateString()}</small>
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span>Net Worth:</span>
+                                <strong>₹${snapshot.data.netWorth.toLocaleString('en-IN')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span>Income:</span>
+                                <strong>₹${snapshot.data.annualIncome.toLocaleString('en-IN')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span>Expenses:</span>
+                                <strong>₹${snapshot.data.annualExpenses.toLocaleString('en-IN')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span>Monthly SIP:</span>
+                                <strong>₹${snapshot.data.totalRecurringSavings.toLocaleString('en-IN')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>FF Score:</span>
+                                <strong>${snapshot.data.ffScore} years</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        
+        ${snapshots.length >= 2 ? `
+            <div style="margin-top: 2rem;">
+                <h4>Year-over-Year Comparison</h4>
+                ${generateComparisonTable(snapshots)}
+            </div>
+        ` : ''}
+    `;
+    
+    // Show comparison charts if we have multiple snapshots
+    if (snapshots.length >= 2) {
+        createComparisonCharts(snapshots);
+        document.getElementById('comparisonCharts').style.display = 'block';
+    }
+}
+
+// Generate comparison table
+function generateComparisonTable(snapshots) {
+    if (snapshots.length < 2) return '';
+    
+    const latest = snapshots[snapshots.length - 1];
+    const previous = snapshots[snapshots.length - 2];
+    
+    const comparisons = [
+        {
+            metric: 'Net Worth',
+            current: latest.data.netWorth,
+            previous: previous.data.netWorth,
+            format: 'currency'
+        },
+        {
+            metric: 'Annual Income',
+            current: latest.data.annualIncome,
+            previous: previous.data.annualIncome,
+            format: 'currency'
+        },
+        {
+            metric: 'Annual Expenses',
+            current: latest.data.annualExpenses,
+            previous: previous.data.annualExpenses,
+            format: 'currency'
+        },
+        {
+            metric: 'Monthly Recurring Savings',
+            current: latest.data.totalRecurringSavings,
+            previous: previous.data.totalRecurringSavings,
+            format: 'currency'
+        },
+        {
+            metric: 'FF Score',
+            current: latest.data.ffScore,
+            previous: previous.data.ffScore,
+            format: 'number'
+        }
+    ];
+    
+    return `
+        <div class="table-responsive">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                        <th style="padding: 1rem; text-align: left;">Metric</th>
+                        <th style="padding: 1rem; text-align: right;">Previous (${new Date(previous.date).toLocaleDateString()})</th>
+                        <th style="padding: 1rem; text-align: right;">Current (${new Date(latest.date).toLocaleDateString()})</th>
+                        <th style="padding: 1rem; text-align: right;">Change</th>
+                        <th style="padding: 1rem; text-align: right;">% Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${comparisons.map(comp => {
+                        const change = comp.current - comp.previous;
+                        const percentChange = comp.previous !== 0 ? (change / comp.previous) * 100 : 0;
+                        const isPositive = change > 0;
+                        const changeColor = isPositive ? 'var(--success-color)' : 'var(--error-color)';
+                        
+                        return `
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 1rem; font-weight: 500;">${comp.metric}</td>
+                                <td style="padding: 1rem; text-align: right;">
+                                    ${comp.format === 'currency' ? '₹' + comp.previous.toLocaleString('en-IN') : comp.previous}
+                                </td>
+                                <td style="padding: 1rem; text-align: right;">
+                                    ${comp.format === 'currency' ? '₹' + comp.current.toLocaleString('en-IN') : comp.current}
+                                </td>
+                                <td style="padding: 1rem; text-align: right; color: ${changeColor};">
+                                    ${isPositive ? '+' : ''}${comp.format === 'currency' ? '₹' + change.toLocaleString('en-IN') : change}
+                                </td>
+                                <td style="padding: 1rem; text-align: right; color: ${changeColor};">
+                                    ${isPositive ? '+' : ''}${percentChange.toFixed(1)}%
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// Helper functions for calculating category totals
+function calculateCategoryTotal(category) {
+    const netWorthData = dashboardData.netWorthData || {};
+    const assets = netWorthData.assets || {};
+    const categoryAssets = assets[category] || [];
+    return categoryAssets.reduce((total, asset) => total + (asset.value || 0), 0);
+}
+
+function getTotalRecurringByCategory(category) {
+    const netWorthData = dashboardData.netWorthData || {};
+    const recurringInvestments = netWorthData.recurringInvestments || {};
+    const categoryInvestments = recurringInvestments[category] || [];
+    
+    return categoryInvestments.reduce((total, investment) => {
+        const amount = investment.amount || 0;
+        const frequency = investment.frequency || 'monthly';
+        return total + convertToMonthly(amount, frequency);
+    }, 0);
+}
+
+function convertToMonthly(amount, frequency) {
+    switch(frequency) {
+        case 'monthly': return amount;
+        case 'quarterly': return amount / 3;
+        case 'semi-annually': return amount / 6;
+        case 'annually': return amount / 12;
+        default: return amount;
+    }
+}
+
+// Delete a snapshot
+function deleteSnapshot(index) {
+    if (confirm('Are you sure you want to delete this snapshot?')) {
+        let snapshots = JSON.parse(localStorage.getItem('historicalSnapshots') || '[]');
+        snapshots.splice(index, 1);
+        localStorage.setItem('historicalSnapshots', JSON.stringify(snapshots));
+        loadHistoricalSnapshots();
+        showStatus('Snapshot deleted successfully', 'success');
+    }
+}
+
+// Create comparison charts
+function createComparisonCharts(snapshots) {
+    // Net Worth Trend Chart
+    const netWorthCtx = document.getElementById('netWorthTrendChart');
+    if (netWorthCtx) {
+        if (charts.netWorthTrendChart) {
+            charts.netWorthTrendChart.destroy();
+        }
+        
+        charts.netWorthTrendChart = new Chart(netWorthCtx, {
+            type: 'line',
+            data: {
+                labels: snapshots.map(s => new Date(s.date).toLocaleDateString()),
+                datasets: [{
+                    label: 'Net Worth',
+                    data: snapshots.map(s => s.data.netWorth),
+                    borderColor: 'var(--primary-color)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Income vs Expenses Trend Chart
+    const incomeExpenseCtx = document.getElementById('incomeExpenseTrendChart');
+    if (incomeExpenseCtx) {
+        if (charts.incomeExpenseTrendChart) {
+            charts.incomeExpenseTrendChart.destroy();
+        }
+        
+        charts.incomeExpenseTrendChart = new Chart(incomeExpenseCtx, {
+            type: 'line',
+            data: {
+                labels: snapshots.map(s => new Date(s.date).toLocaleDateString()),
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: snapshots.map(s => s.data.annualIncome),
+                        borderColor: 'var(--success-color)',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Expenses',
+                        data: snapshots.map(s => s.data.annualExpenses),
+                        borderColor: 'var(--error-color)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 } 
