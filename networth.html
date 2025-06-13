@@ -438,10 +438,24 @@
                 </button>
             </div>
 
+            <!-- Cash & Bank -->
+            <div class="category-group">
+                <div class="category-header">
+                    <span class="category-title">💰 Cash & Bank</span>
+                    <span class="category-total" id="cashTotal">₹0</span>
+                </div>
+                <div id="cashItems">
+                    <!-- Cash items will be added here -->
+                </div>
+                <button class="add-item-btn" onclick="addAssetItem('cash', 'Cash & Bank')">
+                    <i class="fas fa-plus"></i> Add Cash/Bank Account
+                </button>
+            </div>
+
             <!-- Equity Investments -->
             <div class="category-group">
                 <div class="category-header">
-                    <span class="category-title">📈 Equity Investments</span>
+                    <span class="category-title">📈 Equity Investments (Direct Equity & Equity Mutual Funds)</span>
                     <span class="category-total" id="equityTotal">₹0</span>
                 </div>
                 <div id="equityItems">
@@ -752,7 +766,7 @@
             let liquidAssets = 0;
             
             // Calculate category totals
-            const categories = ['realEstate', 'equity', 'fixedIncome', 'otherAssets'];
+            const categories = ['realEstate', 'cash', 'equity', 'fixedIncome', 'otherAssets'];
             categories.forEach(category => {
                 let categoryTotal = 0;
                 const items = document.querySelectorAll(`#${category}Items .asset-item`);
@@ -764,6 +778,7 @@
                     totalAssets += value;
                     
                     // Real estate and other assets (like occupied house) are illiquid
+                    // Cash and equity/fixed income are liquid
                     if (category !== 'realEstate' && category !== 'otherAssets') {
                         liquidAssets += value;
                     }
@@ -819,10 +834,10 @@
 
             // Calculate liquid assets (excluding real estate and other assets)
             let liquidAssets = 0;
-            const liquidCategories = ['equity', 'fixedIncome'];
+            const liquidCategories = ['cash', 'equity', 'fixedIncome'];
             
             // Save assets by category
-            const categories = ['realEstate', 'equity', 'fixedIncome', 'otherAssets'];
+            const categories = ['realEstate', 'cash', 'equity', 'fixedIncome', 'otherAssets'];
             categories.forEach(category => {
                 data.assets[category] = [];
                 const items = document.querySelectorAll(`#${category}Items .asset-item`);
@@ -890,6 +905,7 @@
                 Object.keys(data.assets || {}).forEach(category => {
                     data.assets[category].forEach(asset => {
                         addAssetItem(category, category === 'realEstate' ? 'Real Estate' : 
+                                   category === 'cash' ? 'Cash & Bank' :
                                    category === 'equity' ? 'Equity' : 
                                    category === 'fixedIncome' ? 'Fixed Income' : 'Other Asset');
                         

@@ -148,28 +148,88 @@
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="grid-2">
-            <!-- Net Worth Breakdown -->
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3><i class="fas fa-chart-pie"></i> Asset Allocation</h3>
+        <!-- Primary Charts Section -->
+        <!-- Asset Allocation Chart -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-pie"></i> Asset Allocation
+                </h2>
+                <div id="assetAllocationChange" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                    <!-- Asset allocation change will be shown here -->
                 </div>
-                <div class="chart-wrapper">
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <div class="chart-wrapper" style="flex: 1; max-width: 400px;">
                     <canvas id="assetChart"></canvas>
                 </div>
-            </div>
-
-            <!-- Income vs Expenses -->
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3><i class="fas fa-chart-bar"></i> Income vs Expenses</h3>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="incomeExpenseChart"></canvas>
+                <div id="assetLegend" style="flex: 1; min-width: 300px;">
+                    <!-- Asset legend with percentages will be populated here -->
                 </div>
             </div>
+        </div>
 
+        <!-- Liability Chart -->
+        <div class="section-card" id="liabilitySection" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i> Liabilities Breakdown
+                </h2>
+                <div id="liabilityChange" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                    <!-- Liability change will be shown here -->
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <div class="chart-wrapper" style="flex: 1; max-width: 400px;">
+                    <canvas id="liabilityChart"></canvas>
+                </div>
+                <div id="liabilityLegend" style="flex: 1; min-width: 300px;">
+                    <!-- Liability legend with percentages will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Income vs Expenses with Savings -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i> Income vs Expenses Analysis
+                </h2>
+                <div id="incomeExpenseChange" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+                    <!-- Income/Expense change will be shown here -->
+                </div>
+            </div>
+            
+            <div class="chart-wrapper">
+                <canvas id="incomeExpenseChart"></canvas>
+            </div>
+            
+            <!-- Savings Analysis -->
+            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
+                <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div style="text-align: center;">
+                        <h4 style="margin: 0; color: var(--success-color);">Monthly Savings</h4>
+                        <div style="font-size: 1.5rem; color: var(--success-color); margin: 0.5rem 0;" id="monthlySavings">₹0</div>
+                        <small style="color: var(--text-secondary);">Income - Expenses</small>
+                    </div>
+                    <div style="text-align: center;">
+                        <h4 style="margin: 0; color: var(--primary-color);">Savings Rate</h4>
+                        <div style="font-size: 1.5rem; color: var(--primary-color); margin: 0.5rem 0;" id="savingsRateDisplay">0%</div>
+                        <small style="color: var(--text-secondary);">Percentage saved</small>
+                    </div>
+                    <div style="text-align: center;">
+                        <h4 style="margin: 0; color: var(--warning-color);">Savings Change</h4>
+                        <div style="font-size: 1.5rem; color: var(--warning-color); margin: 0.5rem 0;" id="savingsChange">-</div>
+                        <small style="color: var(--text-secondary);">vs last snapshot</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Charts Section -->
+        <div class="grid-2">
             <!-- Income Composition -->
             <div class="chart-container">
                 <div class="chart-header">

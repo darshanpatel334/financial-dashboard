@@ -82,6 +82,9 @@ function updateSummaryCards() {
     
     // Update recurring investments section
     updateRecurringInvestments();
+    
+    // Update savings analysis
+    updateSavingsAnalysis();
 }
 
 // Update recurring investments section
@@ -162,6 +165,103 @@ function updateRecurringInvestments() {
     }
 }
 
+// Update savings analysis
+function updateSavingsAnalysis() {
+    const monthlyIncome = (dashboardData.income.totals?.annualTotal || 0) / 12;
+    const monthlyExpenses = (dashboardData.expenses.totals?.annualTotal || 0) / 12;
+    const monthlySavings = monthlyIncome - monthlyExpenses;
+    const savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome) * 100 : 0;
+    
+    // Update savings display elements
+    const monthlySavingsElement = document.getElementById('monthlySavings');
+    const savingsRateDisplayElement = document.getElementById('savingsRateDisplay');
+    const savingsChangeElement = document.getElementById('savingsChange');
+    const incomeExpenseChangeElement = document.getElementById('incomeExpenseChange');
+    
+    if (monthlySavingsElement) {
+        monthlySavingsElement.textContent = formatCurrency(monthlySavings);
+        monthlySavingsElement.style.color = monthlySavings >= 0 ? 'var(--success-color)' : 'var(--error-color)';
+    }
+    
+    if (savingsRateDisplayElement) {
+        savingsRateDisplayElement.textContent = Math.round(savingsRate) + '%';
+        if (savingsRate >= 25) {
+            savingsRateDisplayElement.style.color = 'var(--success-color)';
+        } else if (savingsRate >= 15) {
+            savingsRateDisplayElement.style.color = 'var(--warning-color)';
+        } else {
+            savingsRateDisplayElement.style.color = 'var(--error-color)';
+        }
+    }
+    
+    // Show historical comparison for income/expenses
+    showIncomeExpenseChange(incomeExpenseChangeElement, savingsChangeElement, monthlySavings);
+}
+
+// Show income/expense change from last snapshot
+function showIncomeExpenseChange(incomeExpenseChangeElement, savingsChangeElement, currentMonthlySavings) {
+    const snapshots = JSON.parse(localStorage.getItem('historicalSnapshots') || '[]');
+    
+    if (snapshots.length < 2) {
+        if (incomeExpenseChangeElement) {
+            incomeExpenseChangeElement.innerHTML = '<i class="fas fa-info-circle"></i> Save snapshots to track changes over time';
+        }
+        if (savingsChangeElement) {
+            savingsChangeElement.textContent = '-';
+            savingsChangeElement.style.color = 'var(--text-secondary)';
+        }
+        return;
+    }
+    
+    const latest = snapshots[snapshots.length - 1];
+    const previous = snapshots[snapshots.length - 2];
+    
+    // Income change
+    const currentIncome = latest.data.annualIncome;
+    const previousIncome = previous.data.annualIncome;
+    const incomeChange = currentIncome - previousIncome;
+    const incomePercentChange = previousIncome !== 0 ? (incomeChange / previousIncome) * 100 : 0;
+    
+    // Expense change
+    const currentExpenses = latest.data.annualExpenses;
+    const previousExpenses = previous.data.annualExpenses;
+    const expenseChange = currentExpenses - previousExpenses;
+    const expensePercentChange = previousExpenses !== 0 ? (expenseChange / previousExpenses) * 100 : 0;
+    
+    // Savings change
+    const previousMonthlySavings = (previousIncome - previousExpenses) / 12;
+    const savingsChange = currentMonthlySavings - previousMonthlySavings;
+    const savingsPercentChange = previousMonthlySavings !== 0 ? (savingsChange / Math.abs(previousMonthlySavings)) * 100 : 0;
+    
+    if (incomeExpenseChangeElement) {
+        const incomeIsPositive = incomeChange > 0;
+        const expenseIsPositive = expenseChange > 0;
+        
+        incomeExpenseChangeElement.innerHTML = `
+            Income: <span style="color: ${incomeIsPositive ? 'var(--success-color)' : 'var(--error-color)'};">
+                ${incomeIsPositive ? '+' : ''}${formatCurrency(incomeChange)} (${incomeIsPositive ? '+' : ''}${incomePercentChange.toFixed(1)}%)
+            </span> | 
+            Expenses: <span style="color: ${expenseIsPositive ? 'var(--error-color)' : 'var(--success-color)'};">
+                ${expenseIsPositive ? '+' : ''}${formatCurrency(expenseChange)} (${expenseIsPositive ? '+' : ''}${expensePercentChange.toFixed(1)}%)
+            </span>
+            since ${new Date(previous.date).toLocaleDateString()}
+        `;
+    }
+    
+    if (savingsChangeElement) {
+        const savingsIsPositive = savingsChange > 0;
+        const changeColor = savingsIsPositive ? 'var(--success-color)' : 'var(--error-color)';
+        
+        savingsChangeElement.innerHTML = `
+            <span style="color: ${changeColor};">
+                ${savingsIsPositive ? '+' : ''}${formatCurrency(savingsChange)}
+            </span><br>
+            <small>(${savingsIsPositive ? '+' : ''}${savingsPercentChange.toFixed(1)}%)</small>
+        `;
+        savingsChangeElement.style.color = changeColor;
+    }
+}
+
 // Update health indicators
 function updateHealthIndicators() {
     // Savings Rate
@@ -209,6 +309,7 @@ function colorizeIndicator(elementId, value, lowThreshold, highThreshold) {
 // Create all charts
 function createCharts() {
     createAssetChart();
+    createLiabilityChart();
     createIncomeExpenseChart();
     createIncomeChart();
     createExpenseChart();
@@ -239,6 +340,7 @@ function createAssetChart() {
     
     if (total === 0) {
         ctx.canvas.style.display = 'none';
+        document.getElementById('assetLegend').innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No asset data available</p>';
         return;
     }
     
@@ -267,31 +369,7 @@ function createAssetChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        generateLabels: function(chart) {
-                            const data = chart.data;
-                            if (data.labels.length && data.datasets.length) {
-                                const dataset = data.datasets[0];
-                                const total = dataset.data.reduce((sum, value) => sum + value, 0);
-                                
-                                return data.labels.map((label, i) => {
-                                    const value = dataset.data[i];
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    
-                                    return {
-                                        text: `${label}: ${percentage}%`,
-                                        fillStyle: dataset.backgroundColor[i],
-                                        strokeStyle: dataset.borderColor,
-                                        lineWidth: dataset.borderWidth,
-                                        hidden: isNaN(value) || chart.getDatasetMeta(0).data[i].hidden,
-                                        index: i
-                                    };
-                                });
-                            }
-                            return [];
-                        }
-                    }
+                    display: false // Hide default legend, we'll create custom one
                 },
                 tooltip: {
                     callbacks: {
@@ -305,6 +383,206 @@ function createAssetChart() {
             }
         }
     });
+    
+    // Create custom legend
+    createAssetLegend(labels, data, colors, total);
+    
+    // Show historical comparison
+    showAssetAllocationChange();
+}
+
+// Create custom asset legend
+function createAssetLegend(labels, data, colors, total) {
+    const legendContainer = document.getElementById('assetLegend');
+    
+    let legendHTML = '<h4 style="margin-bottom: 1rem;">Asset Breakdown</h4>';
+    
+    labels.forEach((label, index) => {
+        const value = data[index];
+        const percentage = ((value / total) * 100).toFixed(1);
+        
+        legendHTML += `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; padding: 0.5rem; background: #f8fafc; border-radius: 0.5rem;">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 16px; height: 16px; background: ${colors[index]}; border-radius: 3px; margin-right: 0.75rem;"></div>
+                    <span style="font-weight: 500;">${label}</span>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; color: var(--text-primary);">${formatCurrency(value)}</div>
+                    <small style="color: var(--text-secondary);">${percentage}%</small>
+                </div>
+            </div>
+        `;
+    });
+    
+    legendContainer.innerHTML = legendHTML;
+}
+
+// Show asset allocation change from last snapshot
+function showAssetAllocationChange() {
+    const snapshots = JSON.parse(localStorage.getItem('historicalSnapshots') || '[]');
+    const changeContainer = document.getElementById('assetAllocationChange');
+    
+    if (snapshots.length < 2) {
+        changeContainer.innerHTML = '<i class="fas fa-info-circle"></i> Save snapshots to track changes over time';
+        return;
+    }
+    
+    const latest = snapshots[snapshots.length - 1];
+    const previous = snapshots[snapshots.length - 2];
+    
+    const currentTotal = latest.data.totalAssets;
+    const previousTotal = previous.data.totalAssets;
+    const change = currentTotal - previousTotal;
+    const percentChange = previousTotal !== 0 ? (change / previousTotal) * 100 : 0;
+    
+    const isPositive = change > 0;
+    const changeColor = isPositive ? 'var(--success-color)' : 'var(--error-color)';
+    const changeIcon = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
+    
+    changeContainer.innerHTML = `
+        <i class="fas ${changeIcon}" style="color: ${changeColor};"></i>
+        <span style="color: ${changeColor}; font-weight: 600;">
+            ${isPositive ? '+' : ''}${formatCurrency(change)} (${isPositive ? '+' : ''}${percentChange.toFixed(1)}%)
+        </span>
+        since ${new Date(previous.date).toLocaleDateString()}
+    `;
+}
+
+// Create liability chart
+function createLiabilityChart() {
+    const liabilities = dashboardData.netWorth.liabilities || [];
+    
+    if (liabilities.length === 0) {
+        document.getElementById('liabilitySection').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('liabilitySection').style.display = 'block';
+    
+    const ctx = document.getElementById('liabilityChart').getContext('2d');
+    
+    // Group liabilities by type
+    const liabilityGroups = {};
+    liabilities.forEach(liability => {
+        const type = formatCategoryName(liability.type || 'other');
+        if (!liabilityGroups[type]) {
+            liabilityGroups[type] = 0;
+        }
+        liabilityGroups[type] += liability.amount || 0;
+    });
+    
+    const labels = Object.keys(liabilityGroups);
+    const data = Object.values(liabilityGroups);
+    const total = data.reduce((sum, value) => sum + value, 0);
+    
+    if (total === 0) {
+        document.getElementById('liabilitySection').style.display = 'none';
+        return;
+    }
+    
+    const colors = [
+        chartColors.danger,
+        chartColors.warning,
+        chartColors.info,
+        chartColors.purple,
+        chartColors.primary
+    ];
+    
+    charts.liabilityChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors.slice(0, labels.length),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = formatCurrency(context.raw);
+                            const percentage = ((context.raw / total) * 100).toFixed(1);
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Create custom legend
+    createLiabilityLegend(labels, data, colors, total);
+    
+    // Show historical comparison
+    showLiabilityChange();
+}
+
+// Create custom liability legend
+function createLiabilityLegend(labels, data, colors, total) {
+    const legendContainer = document.getElementById('liabilityLegend');
+    
+    let legendHTML = '<h4 style="margin-bottom: 1rem;">Liability Breakdown</h4>';
+    
+    labels.forEach((label, index) => {
+        const value = data[index];
+        const percentage = ((value / total) * 100).toFixed(1);
+        
+        legendHTML += `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; padding: 0.5rem; background: #fef2f2; border-radius: 0.5rem;">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 16px; height: 16px; background: ${colors[index]}; border-radius: 3px; margin-right: 0.75rem;"></div>
+                    <span style="font-weight: 500;">${label}</span>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-weight: 600; color: var(--text-primary);">${formatCurrency(value)}</div>
+                    <small style="color: var(--text-secondary);">${percentage}%</small>
+                </div>
+            </div>
+        `;
+    });
+    
+    legendContainer.innerHTML = legendHTML;
+}
+
+// Show liability change from last snapshot
+function showLiabilityChange() {
+    const snapshots = JSON.parse(localStorage.getItem('historicalSnapshots') || '[]');
+    const changeContainer = document.getElementById('liabilityChange');
+    
+    if (snapshots.length < 2) {
+        changeContainer.innerHTML = '<i class="fas fa-info-circle"></i> Save snapshots to track changes over time';
+        return;
+    }
+    
+    const latest = snapshots[snapshots.length - 1];
+    const previous = snapshots[snapshots.length - 2];
+    
+    const currentTotal = latest.data.totalLiabilities;
+    const previousTotal = previous.data.totalLiabilities;
+    const change = currentTotal - previousTotal;
+    const percentChange = previousTotal !== 0 ? (change / previousTotal) * 100 : 0;
+    
+    const isPositive = change > 0;
+    const changeColor = isPositive ? 'var(--error-color)' : 'var(--success-color)'; // Reversed for liabilities
+    const changeIcon = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
+    
+    changeContainer.innerHTML = `
+        <i class="fas ${changeIcon}" style="color: ${changeColor};"></i>
+        <span style="color: ${changeColor}; font-weight: 600;">
+            ${isPositive ? '+' : ''}${formatCurrency(change)} (${isPositive ? '+' : ''}${percentChange.toFixed(1)}%)
+        </span>
+        since ${new Date(previous.date).toLocaleDateString()}
+    `;
 }
 
 // Create income vs expense chart
@@ -852,12 +1130,18 @@ function getPriorityColor(priority) {
 // Format category name
 function formatCategoryName(category) {
     const names = {
+        realEstate: 'Real Estate',
+        cash: 'Cash & Bank',
         equity: 'Equity',
         fixedIncome: 'Fixed Income',
-        realEstate: 'Real Estate',
+        otherAssets: 'Other Assets',
         gold: 'Gold',
-        cash: 'Cash',
         crypto: 'Cryptocurrency',
+        home: 'Home Loan',
+        car: 'Car Loan',
+        personal: 'Personal Loan',
+        credit: 'Credit Card',
+        business: 'Business Loan',
         other: 'Other'
     };
     return names[category] || category;
