@@ -81,13 +81,13 @@ p {
 /* ===== LAYOUT ===== */
 .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
 
 .container-wide {
-    max-width: 1200px;
+    max-width: 1100px;
 }
 
 /* ===== NAVIGATION ===== */
@@ -105,12 +105,12 @@ p {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
+    max-width: 1100px;
     padding: 0 1rem;
 }
 
 .nav-brand {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     -webkit-background-clip: text;
@@ -123,8 +123,8 @@ p {
 
 /* Pie chart for navigation - standalone element */
 .nav-pie-chart {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
     background: conic-gradient(
         #4F46E5 0% 45%, 
         #10B981 45% 75%, 
