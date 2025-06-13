@@ -197,6 +197,38 @@ function handleGoogleSignIn() {
         });
 }
 
+// Utility function to get user's display name
+function getUserDisplayName() {
+    // First try to get from stored user data
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+        const parsedData = JSON.parse(userData);
+        if (parsedData.firstName) {
+            return parsedData.firstName;
+        }
+    }
+    
+    // Fallback to personal info
+    const personalInfo = localStorage.getItem('personalInfo');
+    if (personalInfo) {
+        const parsedInfo = JSON.parse(personalInfo);
+        if (parsedInfo.firstName) {
+            return parsedInfo.firstName;
+        }
+    }
+    
+    // Last resort: extract first name from email
+    const currentUser = firebase.auth().currentUser;
+    if (currentUser && currentUser.email) {
+        const emailPart = currentUser.email.split('@')[0];
+        // Try to extract first name from email (before any numbers or dots)
+        const namePart = emailPart.replace(/[0-9]/g, '').split('.')[0];
+        return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    }
+    
+    return 'User';
+}
+
 // Auth state observer
 auth.onAuthStateChanged((user) => {
     const loginBtn = document.querySelector('.btn-login');
@@ -215,7 +247,7 @@ auth.onAuthStateChanged((user) => {
         }
         if (skipBtn) skipBtn.style.display = 'none';
         if (userEmail) {
-            userEmail.textContent = user.email;
+            userEmail.textContent = getUserDisplayName();
             userEmail.style.display = 'block';
         }
     } else {

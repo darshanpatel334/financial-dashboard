@@ -178,7 +178,15 @@ function initUserInfo() {
     firebase.auth().onAuthStateChanged((user) => {
         const userEmailElement = document.getElementById('userEmail');
         if (user && userEmailElement) {
-            userEmailElement.textContent = user.email;
+            // Use the getUserDisplayName function from auth.js
+            if (typeof getUserDisplayName === 'function') {
+                userEmailElement.textContent = getUserDisplayName();
+            } else {
+                // Fallback to extracting first name from email
+                const emailPart = user.email.split('@')[0];
+                const namePart = emailPart.replace(/[0-9]/g, '').split('.')[0];
+                userEmailElement.textContent = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+            }
         }
     });
 }
