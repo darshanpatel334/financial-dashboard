@@ -686,26 +686,118 @@
             const container = document.getElementById(category + 'Items');
             const assetItem = document.createElement('div');
             assetItem.className = 'asset-item';
-            assetItem.innerHTML = `
-                <div class="form-group">
-                    <label>${type} Name</label>
-                    <input type="text" placeholder="Enter name" onchange="calculateTotals()">
-                    <div class="amount-display"></div>
-                </div>
-                <div class="form-group">
-                    <label>Value (₹)</label>
-                    <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)">
-                    <div class="amount-display"></div>
-                </div>
-                <div class="form-group">
-                    <label>Yield (%)</label>
-                    <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
-                    <div class="amount-display"></div>
-                </div>
+            
+            let fieldsHTML = '';
+            
+            if (category === 'realEstate') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label>${type} Name</label>
+                        <input type="text" placeholder="Enter property name" onchange="calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Price per Sq Ft (₹)</label>
+                        <input type="number" placeholder="0" onchange="calculateRealEstateValue(this); calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Area (Sq Ft)</label>
+                        <input type="number" placeholder="0" onchange="calculateRealEstateValue(this); calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Value (₹)</label>
+                        <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)" readonly style="background: #f8fafc;">
+                        <div class="amount-display"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Monthly Rental (₹)</label>
+                        <input type="number" placeholder="0" onchange="calculateRentalYield(this); calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Rental Frequency</label>
+                        <select onchange="calculateRentalYield(this); calculateTotals()">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="semi-annually">Semi-Annually</option>
+                            <option value="annually">Annually</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Annual Yield %</label>
+                        <input type="number" step="0.1" placeholder="0" readonly style="background: #f8fafc;">
+                    </div>
+                `;
+            } else if (category === 'equity') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label>${type} Name</label>
+                        <input type="text" placeholder="Enter equity name" onchange="calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Value (₹)</label>
+                        <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)">
+                        <div class="amount-display"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>% Dividend Yield</label>
+                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
+                    </div>
+                `;
+            } else if (category === 'fixedIncome') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label>${type} Name</label>
+                        <input type="text" placeholder="Enter fixed income name" onchange="calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Value (₹)</label>
+                        <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)">
+                        <div class="amount-display"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>% Annual Interest</label>
+                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
+                    </div>
+                `;
+            } else if (category === 'cash') {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label>${type} Name</label>
+                        <input type="text" placeholder="Enter account name" onchange="calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Value (₹)</label>
+                        <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)">
+                        <div class="amount-display"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>% Annual Interest</label>
+                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
+                    </div>
+                `;
+            } else {
+                fieldsHTML = `
+                    <div class="form-group">
+                        <label>${type} Name</label>
+                        <input type="text" placeholder="Enter asset name" onchange="calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Value (₹)</label>
+                        <input type="number" placeholder="0" onchange="calculateTotals(); updateWords(this)">
+                        <div class="amount-display"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>% Annual Return</label>
+                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
+                    </div>
+                `;
+            }
+            
+            assetItem.innerHTML = fieldsHTML + `
                 <button class="delete-btn" onclick="removeItem(this)">
                     <i class="fas fa-trash"></i>
                 </button>
             `;
+            
             container.appendChild(assetItem);
             saveNetWorthData();
         }
@@ -771,7 +863,18 @@
                 let categoryTotal = 0;
                 const items = document.querySelectorAll(`#${category}Items .asset-item`);
                 items.forEach(item => {
-                    const value = parseFloat(item.querySelector('input[type="number"]').value) || 0;
+                    let value = 0;
+                    
+                    if (category === 'realEstate') {
+                        // For real estate, value is in the 4th input (Current Value)
+                        const inputs = item.querySelectorAll('input[type="number"]');
+                        value = parseFloat(inputs[3]?.value) || 0;
+                    } else {
+                        // For other categories, value is in the 2nd input (Current Value)
+                        const inputs = item.querySelectorAll('input[type="number"]');
+                        value = parseFloat(inputs[1]?.value) || 0;
+                    }
+                    
                     categoryTotal += value;
                     
                     // All assets contribute to total assets
@@ -843,7 +946,25 @@
                 const items = document.querySelectorAll(`#${category}Items .asset-item`);
                 items.forEach(item => {
                     const inputs = item.querySelectorAll('input');
-                    if (inputs.length >= 3) {
+                    const select = item.querySelector('select');
+                    
+                    if (category === 'realEstate' && inputs.length >= 7) {
+                        const assetValue = parseFloat(inputs[3].value) || 0;
+                        data.assets[category].push({
+                            name: inputs[0].value,
+                            pricePerSqFt: parseFloat(inputs[1].value) || 0,
+                            totalArea: parseFloat(inputs[2].value) || 0,
+                            value: assetValue,
+                            rentalAmount: parseFloat(inputs[4].value) || 0,
+                            rentalFrequency: select?.value || 'monthly',
+                            yield: parseFloat(inputs[6].value) || 0
+                        });
+                        
+                        // Add to liquid assets if it's a liquid category
+                        if (liquidCategories.includes(category)) {
+                            liquidAssets += assetValue;
+                        }
+                    } else if (inputs.length >= 3) {
                         const assetValue = parseFloat(inputs[1].value) || 0;
                         data.assets[category].push({
                             name: inputs[0].value,
@@ -911,10 +1032,23 @@
                         
                         const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
                         const inputs = lastItem.querySelectorAll('input');
-                        inputs[0].value = asset.name;
-                        inputs[1].value = asset.value;
-                        inputs[2].value = asset.yield;
-                        updateWords(inputs[1]);
+                        const select = lastItem.querySelector('select');
+                        
+                        if (category === 'realEstate') {
+                            inputs[0].value = asset.name || '';
+                            inputs[1].value = asset.pricePerSqFt || 0;
+                            inputs[2].value = asset.totalArea || 0;
+                            inputs[3].value = asset.value || 0;
+                            inputs[4].value = asset.rentalAmount || 0;
+                            if (select) select.value = asset.rentalFrequency || 'monthly';
+                            inputs[6].value = asset.yield || 0;
+                            updateWords(inputs[3]);
+                        } else {
+                            inputs[0].value = asset.name || '';
+                            inputs[1].value = asset.value || 0;
+                            inputs[2].value = asset.yield || 0;
+                            updateWords(inputs[1]);
+                        }
                     });
                 });
 
@@ -1058,6 +1192,56 @@
                 case 'semi-annually': return amount / 6;
                 case 'annually': return amount / 12;
                 default: return amount;
+            }
+        }
+
+        // Calculate real estate value from price per sq ft and area
+        function calculateRealEstateValue(input) {
+            const assetItem = input.closest('.asset-item');
+            const inputs = assetItem.querySelectorAll('input');
+            
+            const pricePerSqFt = parseFloat(inputs[1].value) || 0; // Current Price per Sq Ft
+            const totalArea = parseFloat(inputs[2].value) || 0;     // Total Area
+            const currentValue = pricePerSqFt * totalArea;
+            
+            inputs[3].value = currentValue; // Set Current Value
+            updateWords(inputs[3]); // Update words display
+        }
+
+        // Calculate rental yield from rental amount and frequency
+        function calculateRentalYield(input) {
+            const assetItem = input.closest('.asset-item');
+            const inputs = assetItem.querySelectorAll('input');
+            const select = assetItem.querySelector('select');
+            
+            const currentValue = parseFloat(inputs[3].value) || 0;  // Current Value
+            const rentalAmount = parseFloat(inputs[4].value) || 0;  // Monthly Rental
+            const frequency = select.value;
+            
+            if (currentValue > 0 && rentalAmount > 0) {
+                let annualRental = 0;
+                
+                switch(frequency) {
+                    case 'monthly':
+                        annualRental = rentalAmount * 12;
+                        break;
+                    case 'quarterly':
+                        annualRental = rentalAmount * 4;
+                        break;
+                    case 'semi-annually':
+                        annualRental = rentalAmount * 2;
+                        break;
+                    case 'annually':
+                        annualRental = rentalAmount;
+                        break;
+                    default:
+                        annualRental = rentalAmount * 12;
+                }
+                
+                const yieldPercentage = (annualRental / currentValue) * 100;
+                inputs[6].value = yieldPercentage.toFixed(2); // Set Annual Yield %
+            } else {
+                inputs[6].value = 0;
             }
         }
 
