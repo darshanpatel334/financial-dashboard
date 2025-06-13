@@ -288,14 +288,10 @@
             z-index: 2;
         }
 
-
-
         @keyframes pieRotate {
             from { transform: translateX(-50%) rotate(0deg); }
             to { transform: translateX(-50%) rotate(360deg); }
         }
-
-
 
         .brand-tagline {
             font-size: 1.5rem;
@@ -1351,43 +1347,43 @@
         }
 
         @media (max-width: 480px) {
-    .container {
-        padding: 0 1rem;
-    }
+            .container {
+                padding: 0 1rem;
+            }
 
-    .nav-brand {
-        font-size: 1.5rem;
-    }
+            .nav-brand {
+                font-size: 1.5rem;
+            }
 
-    .nav-tagline {
-        font-size: 0.6rem;
-    }
+            .nav-tagline {
+                font-size: 0.6rem;
+            }
 
-    .nav-pie-i::before {
-        width: 12px;
-        height: 12px;
-        top: -8px;
-    }
+            .nav-pie-i::before {
+                width: 12px;
+                height: 12px;
+                top: -8px;
+            }
 
-    .nav-pie-i::after {
-        width: 10px;
-        height: 10px;
-        top: -5px;
-    }
-    
-    .security-features {
-        gap: 1.2rem;
-        margin-top: 1.5rem;
-    }
-    
-    .future-features-grid {
-        gap: 1.2rem;
-        margin-top: 1.5rem;
-    }
-    
-    .problem-header {
-        margin-bottom: 2rem;
-    }
+            .nav-pie-i::after {
+                width: 10px;
+                height: 10px;
+                top: -5px;
+            }
+            
+            .security-features {
+                gap: 1.2rem;
+                margin-top: 1.5rem;
+            }
+            
+            .future-features-grid {
+                gap: 1.2rem;
+                margin-top: 1.5rem;
+            }
+            
+            .problem-header {
+                margin-bottom: 2rem;
+            }
 
             .auth-buttons {
                 flex-direction: column;
@@ -1613,6 +1609,715 @@
 </head>
 <body>
     <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                N<span class="nav-pie-i">i</span>vezo
+                <div class="nav-tagline">Your Financial Journey</div>
+            </a>
+            <div class="auth-buttons">
+                <button class="btn btn-secondary" data-modal="loginModal">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button class="btn btn-primary" data-modal="signupModal">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="floating-element element-1">💰</div>
+            <div class="floating-element element-2">📊</div>
+            <div class="floating-element element-3">🎯</div>
+            <div class="floating-element element-4">💎</div>
+            <div class="floating-element element-5">🚀</div>
+            <div class="floating-element element-6">⭐</div>
+        </div>
+        <div class="container">
+            <div class="hero-brand">
+                <h1 class="brand-tagline">Take Control of Your Financial Future</h1>
+            </div>
+            <p class="hero-description">
+                Build wealth, track progress, and achieve financial independence with India's most comprehensive personal finance platform.
+            </p>
+            <p class="hero-subtitle">
+                From net worth tracking to investment planning, get personalized insights and actionable strategies to reach your financial goals faster.
+            </p>
+            <div class="hero-cta">
+                <button id="startJourneyBtn" class="btn btn-hero" data-modal="signupModal">
+                    <i class="fas fa-rocket"></i> Start My Free Dashboard
+                </button>
+                <p class="hero-cta-note">✨ No credit card required • Get started in 2 minutes</p>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Users Trust Us</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">₹500Cr+</span>
+                    <span class="stat-label">Assets Tracked</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section class="dashboard-preview">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-primary);">Your Complete Financial Dashboard</h2>
+            <p style="text-align: center; font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 3rem; max-width: 800px; margin-left: auto; margin-right: auto;">Track everything from net worth to investment performance in one beautiful, intuitive interface.</p>
+            
+            <div style="background: #ffffff; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1); overflow: hidden; border: 1px solid #e2e8f0;">
+                <div style="padding: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <!-- Sample Dashboard Cards -->
+                    <div class="dashboard-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 16px;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.2rem; opacity: 0.9;">Net Worth</h3>
+                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">₹45.2L</div>
+                        <div style="opacity: 0.8;">↗️ +12.5% this year</div>
+                    </div>
+                    
+                    <div class="dashboard-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 16px;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.2rem; opacity: 0.9;">Monthly Savings</h3>
+                        <div style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">₹85K</div>
+                        <div style="opacity: 0.8;">🎯 Goal: ₹1L/month</div>
+                    </div>
+                    
+                    <div class="dashboard-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 2rem; border-radius: 16px; grid-column: span 2;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.2rem; opacity: 0.9;">Investment Portfolio</h3>
+                        <div style="display: flex; gap: 2rem; align-items: center;">
+                            <div>
+                                <div style="font-size: 2rem; font-weight: 800;">₹32.8L</div>
+                                <div style="opacity: 0.8;">Total Investments</div>
+                            </div>
+                            <div style="flex: 1; height: 100px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: end; padding: 1rem; gap: 0.5rem;">
+                                <div class="chart-bar" style="background: rgba(255,255,255,0.8); width: 20px; height: 60%; border-radius: 4px;"></div>
+                                <div class="chart-bar" style="background: rgba(255,255,255,0.8); width: 20px; height: 80%; border-radius: 4px;"></div>
+                                <div class="chart-bar" style="background: rgba(255,255,255,0.8); width: 20px; height: 45%; border-radius: 4px;"></div>
+                                <div class="chart-bar" style="background: rgba(255,255,255,0.8); width: 20px; height: 90%; border-radius: 4px;"></div>
+                                <div class="chart-bar" style="background: rgba(255,255,255,0.8); width: 20px; height: 70%; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2>Everything You Need for Financial Success</h2>
+            <p class="features-intro">Comprehensive tools and insights to help you build wealth and achieve financial independence.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Net Worth Tracking</h3>
+                    <p>Monitor your complete financial picture with automatic asset and liability tracking.</p>
+                    <ul>
+                        <li>Real-time portfolio updates</li>
+                        <li>Asset allocation analysis</li>
+                        <li>Growth trend visualization</li>
+                        <li>Goal progress tracking</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Financial Freedom Score</h3>
+                    <p>Get your personalized FF Score and roadmap to financial independence.</p>
+                    <ul>
+                        <li>Comprehensive financial health assessment</li>
+                        <li>Personalized improvement recommendations</li>
+                        <li>Progress tracking over time</li>
+                        <li>Benchmark against peers</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Risk Assessment</h3>
+                    <p>Understand your risk profile and optimize your investment strategy.</p>
+                    <ul>
+                        <li>Scientific risk profiling</li>
+                        <li>Asset allocation recommendations</li>
+                        <li>Insurance gap analysis</li>
+                        <li>Emergency fund planning</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Advanced Analytics</h3>
+                    <p>Deep insights into your financial patterns and optimization opportunities.</p>
+                    <ul>
+                        <li>Spending pattern analysis</li>
+                        <li>Investment performance tracking</li>
+                        <li>Tax optimization suggestions</li>
+                        <li>Retirement planning projections</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>🚀 Coming Soon: AI-Powered Financial Advisor</h3>
+                <p>Get personalized financial advice powered by advanced AI that understands Indian markets, tax laws, and investment opportunities.</p>
+                
+                <div class="future-features-grid">
+                    <div class="future-feature-item">
+                        <div class="future-feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="future-feature-content">
+                            <h4>Smart Investment Recommendations</h4>
+                            <p>AI-driven suggestions based on your goals, risk profile, and market conditions.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="future-feature-item">
+                        <div class="future-feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="future-feature-content">
+                            <h4>Predictive Financial Planning</h4>
+                            <p>Forecast your financial future with machine learning models.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="future-feature-item">
+                        <div class="future-feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="future-feature-content">
+                            <h4>24/7 Financial Assistant</h4>
+                            <p>Get instant answers to your financial questions anytime.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="future-feature-item">
+                        <div class="future-feature-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="future-feature-content">
+                            <h4>Personalized Insights</h4>
+                            <p>Discover hidden patterns and opportunities in your finances.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem-section">
+        <div class="container">
+            <div class="problem-header">
+                <h3>Why Most People Struggle with Money</h3>
+                <p>Traditional financial planning is broken. Here's what's wrong and how we fix it.</p>
+            </div>
+            
+            <div class="problem-content">
+                <div class="problem-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>The Problems with Traditional Financial Planning</h4>
+                </div>
+                
+                <div class="problem-points">
+                    <div class="problem-point">
+                        <i class="fas fa-circle"></i>
+                        <span><strong>Scattered Information:</strong> Your financial data is spread across multiple banks, apps, and spreadsheets, making it impossible to see the big picture.</span>
+                    </div>
+                    
+                    <div class="problem-point">
+                        <i class="fas fa-circle"></i>
+                        <span><strong>Generic Advice:</strong> Most financial advisors give cookie-cutter recommendations that don't account for your unique situation and goals.</span>
+                    </div>
+                    
+                    <div class="problem-point">
+                        <i class="fas fa-circle"></i>
+                        <span><strong>Lack of Progress Tracking:</strong> Without clear metrics and regular monitoring, it's easy to drift away from your financial goals.</span>
+                    </div>
+                    
+                    <div class="problem-point">
+                        <i class="fas fa-circle"></i>
+                        <span><strong>Complex Jargon:</strong> Financial planning is often explained in complex terms that make it intimidating and hard to understand.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="solution-box">
+                <div class="solution-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>Our Solution: Unified, Personalized, Simple</h4>
+                </div>
+                <p>Nivezo brings all your financial data together in one place, provides personalized insights based on your unique situation, and presents everything in simple, actionable terms. Take control of your financial future today.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section class="security-section">
+        <div class="container">
+            <h3><i class="fas fa-lock"></i> Bank-Level Security & Privacy</h3>
+            <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem;">Your financial data is protected with the same security standards used by major banks.</p>
+            
+            <div class="security-features">
+                <div class="security-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>256-bit SSL Encryption</span>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Zero Data Sharing</span>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-server"></i>
+                    <span>Secure Cloud Storage</span>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-eye-slash"></i>
+                    <span>Privacy by Design</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Transform Your Financial Future?</h2>
+            <p>Join thousands of Indians who are already building wealth with Nivezo.</p>
+            <button class="btn btn-primary" data-modal="signupModal">
+                <i class="fas fa-rocket"></i> Start Your Free Dashboard
+            </button>
+        </div>
+    </section>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer-note">
+        <div class="container">
+            <p><strong>Disclaimer:</strong> Nivezo provides educational content and tools for financial planning. This is not personalized financial advice. Please consult with a qualified financial advisor for investment decisions. Past performance does not guarantee future results.</p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Welcome Back</h2>
+            
+            <button id="googleSignInBtn" class="btn-google">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KPHBhdGggZD0iTTE3LjY0IDkuMjA0NTQ1NDVjMC0uNjM5NzI3MjctLjA1NzI3MjczLTEuMjUyMjcyNzMtLjE2MzYzNjM2LTEuODQwOTA5MDlIOXY0LjQ2MzYzNjM2aDQuODQ0MDkwOTFjLS4yMDQ1NDU0NSAxLjEyNS0uODI5NTQ1NDUgMi4wNzk1NDU0NS0xLjc2MTM2MzY0IDIuNzE1OTA5MDl2Mi4yNTgxODE4Mmg0LjE1MjI3MjczYzEuNjY4MTgxODItMS4yNTIyNzI3MyAyLjYzNDA5MDkxLTMuMDk1NDU0NTUgMi42MzQwOTA5MS01LjI5NTQ1NDU1eiIgZmlsbD0iIzQyODVGNCIvPgo8cGF0aCBkPSJNOSAxOGMxLjYyIDAgMi45NzI3MjcyNy0uNTM0MDkwOTEgMy45NjgxODE4Mi0xLjQ0NTQ1NDU1bC00LjE1MjI3MjczLTIuMjU4MTgxODJjLS44NzI3MjcyNy41ODYzNjM2NC0xLjk5MDkwOTA5LjkzNDA5MDkxLTMuODE1OTA5MDkuOTM0MDkwOTEtMi45MzQwOTA5MSAwLTUuNDIyNzI3MjctMS45NzI3MjcyNy02LjMxMzYzNjM2LTQuNjI3MjcyNzNILTEuNTY4MTgxODJ2Mi4zMzQwOTA5MUM0LjQ0MzE4MTgyIDE2LjE5NTQ1NDU1IDYuNjE1OTA5MDkgMTggOSAxOHoiIGZpbGw9IiMzNEE4NTMiLz4KPHA+PC9wPgo8L2c+Cjwvc3ZnPgo=" alt="Google">
+                Continue with Google
+            </button>
+            
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                Don't have an account? <a href="#" data-modal="signupModal" style="color: var(--primary-color);">Sign up</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Start Your Journey</h2>
+            
+            <button id="googleSignUpBtn" class="btn-google">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KPHA+PC9wPgo8L2c+Cjwvc3ZnPgo=" alt="Google">
+                Continue with Google
+            </button>
+            
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                Already have an account? <a href="#" data-modal="loginModal" style="color: var(--primary-color);">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status" class="status-message" style="display: none;"></div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
+    <script src="auth.js"></script>
+    <script src="common.js"></script>
+
+    <script>
+        // Initialize Firebase and setup page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize common elements
+            if (typeof initCommonElements === 'function') {
+                initCommonElements();
+            }
+            
+            // Add smart journey navigation
+            function setupSmartNavigation() {
+                const startJourneyBtn = document.getElementById('startJourneyBtn');
+                
+                // Add click handler that checks auth state immediately
+                startJourneyBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Immediate auth check
+                    const currentUser = firebase.auth().currentUser;
+                    if (currentUser) {
+                        // User is signed in - go to personal info
+                        console.log('User signed in, redirecting to personal-info page');
+                        window.location.href = 'personal-info.html';
+                    } else {
+                        // User not signed in - show signup modal
+                        console.log('User not signed in, showing signup modal');
+                        document.getElementById('signupModal').style.display = 'block';
+                    }
+                });
+                
+                // Update button text based on auth state (for visual feedback)
+                firebase.auth().onAuthStateChanged((user) => {
+                    if (user) {
+                        startJourneyBtn.innerHTML = '<i class="fas fa-play"></i> Continue Your Journey';
+                        startJourneyBtn.removeAttribute('data-modal');
+                    } else {
+                        startJourneyBtn.innerHTML = '<i class="fas fa-rocket"></i> Start My Free Dashboard';
+                        startJourneyBtn.setAttribute('data-modal', 'signupModal');
+                    }
+                });
+            }
+            
+            // Setup smart navigation
+            setupSmartNavigation();
+            
+            // Setup modals and forms
+            const modals = document.querySelectorAll('.modal');
+            const modalTriggers = document.querySelectorAll('[data-modal]');
+            const closeButtons = document.querySelectorAll('.close');
+
+            // Setup modal triggers
+            modalTriggers.forEach((trigger) => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const modalId = trigger.getAttribute('data-modal');
+                    modals.forEach(modal => modal.style.display = 'none');
+                    const targetModal = document.getElementById(modalId);
+                    if (targetModal) {
+                        targetModal.style.display = 'block';
+                    }
+                });
+            });
+
+            // Setup close buttons
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.closest('.modal').style.display = 'none';
+                });
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                modals.forEach(modal => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+            // Setup form handlers
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            if (signupForm) {
+                signupForm.addEventListener('submit', handleSignUp);
+            }
+            
+            // Setup Google Sign-In button handlers
+            const googleSignInBtn = document.getElementById('googleSignInBtn');
+            const googleSignUpBtn = document.getElementById('googleSignUpBtn');
+            
+            if (googleSignInBtn) {
+                googleSignInBtn.addEventListener('click', handleGoogleSignIn);
+            }
+            
+            if (googleSignUpBtn) {
+                googleSignUpBtn.addEventListener('click', handleGoogleSignIn);
+            }
+        });
+    </script>
+
+    <!-- Floating Chat Widget -->
+    <div id="chatWidget">
+        <!-- Chat Button -->
+        <div id="chatButton" class="chat-button">
+            <i class="fas fa-comments"></i>
+        </div>
+
+        <!-- Chat Window -->
+        <div id="chatWindow" class="chat-window">
+            <div class="chat-header">
+                <h4>💬 Ask Nivezo AI</h4>
+                <button id="closeChatBtn" class="close-chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <strong>Hi! 👋</strong><br>
+                        I'm your financial assistant. Ask me anything about saving, investing, taxes, or personal finance in India!
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Ask me anything about saving, tax, goals, or money..." maxlength="500">
+                <button id="sendChatBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Widget Styles -->
+    <style>
+        #chatWidget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(33, 150, 243, 0.4);
+        }
+
+        .chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .close-chat {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .close-chat:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .bot-message .message-content {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px 16px 16px 4px;
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            border-radius: 16px 16px 4px 16px;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #2196F3;
+        }
+
+        .chat-input-area button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .chat-input-area button:hover {
+            background: #1976D2;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px 16px 16px 4px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #64748b;
+            border-radius: 50%;
+            animation: typingDot 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingDot {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
 
     <!-- Chat Widget JavaScript -->
     <script>

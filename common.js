@@ -1130,6 +1130,13 @@ function setupPageNavigation(currentPageIndex = 1) {
         return;
     }
     
+    // Check if navigation already exists to avoid duplicates
+    if (document.getElementById('progressNavigation')) {
+        console.log('Navigation already exists, refreshing...');
+        setupNavigationInteractions();
+        return;
+    }
+    
     // Generate navigation steps dynamically
     const stepsHtml = NAVIGATION_STEPS.map((step, index) => {
         const isLast = index === NAVIGATION_STEPS.length - 1;
@@ -1270,10 +1277,27 @@ function setupPageNavigation(currentPageIndex = 1) {
             }
         </style>
     `;
-    // Check if navigation already exists to avoid duplicates
-    if (document.getElementById('progressNavigation')) {
-        console.log('Navigation already exists, refreshing...');
+    
+    // Insert navigation at the top of the main content
+    const mainContent = document.querySelector('main') || document.querySelector('.container') || document.body;
+    if (mainContent) {
+        mainContent.insertAdjacentHTML('afterbegin', navHtml);
         setupNavigationInteractions();
-        return;
     }
 }
+
+function setupNavigationInteractions() {
+    const progressSteps = document.querySelectorAll('.progress-step');
+    
+    progressSteps.forEach(step => {
+        step.addEventListener('click', () => {
+            const targetPage = step.getAttribute('data-page');
+            if (targetPage) {
+                window.location.href = targetPage;
+            }
+        });
+    });
+}
+
+// Make sure setupPageNavigation is available globally
+window.setupPageNavigation = setupPageNavigation;
