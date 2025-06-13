@@ -239,174 +239,238 @@
     }
 
     /* Mobile responsiveness */
-    @media (max-width: 480px) {
+    @media (max-width: 768px) {
         .chat-window {
             width: calc(100vw - 40px);
-            height: 70vh;
+            height: 60vh;
             bottom: 80px;
             right: 20px;
             left: 20px;
+            max-width: none;
         }
 
         #chatWidget {
             right: 20px;
             bottom: 20px;
         }
+
+        .chat-button {
+            padding: 0.5rem 1rem;
+            height: 50px;
+            min-width: 50px;
+        }
+
+        .chat-button-text {
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .chat-window {
+            width: calc(100vw - 20px);
+            height: 70vh;
+            bottom: 70px;
+            right: 10px;
+            left: 10px;
+        }
+
+        #chatWidget {
+            right: 10px;
+            bottom: 10px;
+        }
+
+        .chat-button {
+            padding: 0.5rem 0.75rem;
+            height: 45px;
+            min-width: 45px;
+        }
+
+        .chat-button-text {
+            display: none;
+        }
+
+        .chat-messages {
+            padding: 0.75rem;
+        }
+
+        .chat-input-area {
+            padding: 0.75rem;
+        }
     }
 </style>
 
 <!-- Chat Widget JavaScript -->
 <script>
-    class ChatWidget {
-        constructor() {
-            this.isOpen = false;
-            this.isLoading = false;
-            this.chatButton = document.getElementById('chatButton');
-            this.chatWindow = document.getElementById('chatWindow');
-            this.chatMessages = document.getElementById('chatMessages');
-            this.chatInput = document.getElementById('chatInput');
-            this.sendChatBtn = document.getElementById('sendChatBtn');
-            this.closeChatBtn = document.getElementById('closeChatBtn');
-
-            this.init();
-        }
-
-        init() {
-            // Event listeners
-            this.chatButton.addEventListener('click', () => this.toggleChat());
-            this.closeChatBtn.addEventListener('click', () => this.closeChat());
-            this.sendChatBtn.addEventListener('click', () => this.sendMessage());
+    // Ensure the script runs after the DOM elements are available
+    (function() {
+        function initializeChatWidget() {
+            // Check if elements exist before initializing
+            const chatButton = document.getElementById('chatButton');
+            const chatWindow = document.getElementById('chatWindow');
             
-            this.chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    this.sendMessage();
-                }
-            });
-
-            // Close chat when clicking outside
-            document.addEventListener('click', (e) => {
-                if (this.isOpen && !document.getElementById('chatWidget').contains(e.target)) {
-                    this.closeChat();
-                }
-            });
-        }
-
-        toggleChat() {
-            if (this.isOpen) {
-                this.closeChat();
-            } else {
-                this.openChat();
+            if (!chatButton || !chatWindow) {
+                console.log('Chat widget elements not found, retrying...');
+                setTimeout(initializeChatWidget, 100);
+                return;
             }
+
+            // Initialize the chat widget
+            new ChatWidget();
         }
 
-        openChat() {
-            this.isOpen = true;
-            this.chatWindow.style.display = 'flex';
-            this.chatInput.focus();
-        }
+        class ChatWidget {
+            constructor() {
+                this.isOpen = false;
+                this.isLoading = false;
+                this.chatButton = document.getElementById('chatButton');
+                this.chatWindow = document.getElementById('chatWindow');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.chatInput = document.getElementById('chatInput');
+                this.sendChatBtn = document.getElementById('sendChatBtn');
+                this.closeChatBtn = document.getElementById('closeChatBtn');
 
-        closeChat() {
-            this.isOpen = false;
-            this.chatWindow.style.display = 'none';
-        }
+                this.init();
+            }
 
-        async sendMessage() {
-            const message = this.chatInput.value.trim();
-            if (!message || this.isLoading) return;
-
-            // Add user message to chat
-            this.addMessage(message, 'user');
-            this.chatInput.value = '';
-
-            // Show typing indicator
-            this.showTypingIndicator();
-
-            try {
-                this.isLoading = true;
-                this.sendChatBtn.disabled = true;
-
-                // Send message to our Netlify function
-                const response = await fetch('/.netlify/functions/askgpt', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message })
+            init() {
+                // Event listeners
+                this.chatButton.addEventListener('click', () => this.toggleChat());
+                this.closeChatBtn.addEventListener('click', () => this.closeChat());
+                this.sendChatBtn.addEventListener('click', () => this.sendMessage());
+                
+                this.chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
                 });
 
-                const data = await response.json();
+                // Close chat when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (this.isOpen && !document.getElementById('chatWidget').contains(e.target)) {
+                        this.closeChat();
+                    }
+                });
+            }
 
-                if (response.ok && data.reply) {
-                    this.addMessage(data.reply, 'bot');
+            toggleChat() {
+                if (this.isOpen) {
+                    this.closeChat();
                 } else {
+                    this.openChat();
+                }
+            }
+
+            openChat() {
+                this.isOpen = true;
+                this.chatWindow.style.display = 'flex';
+                this.chatInput.focus();
+            }
+
+            closeChat() {
+                this.isOpen = false;
+                this.chatWindow.style.display = 'none';
+            }
+
+            async sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message || this.isLoading) return;
+
+                // Add user message to chat
+                this.addMessage(message, 'user');
+                this.chatInput.value = '';
+
+                // Show typing indicator
+                this.showTypingIndicator();
+
+                try {
+                    this.isLoading = true;
+                    this.sendChatBtn.disabled = true;
+
+                    // Send message to our Netlify function
+                    const response = await fetch('/.netlify/functions/askgpt', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.reply) {
+                        this.addMessage(data.reply, 'bot');
+                    } else {
+                        this.addMessage(
+                            data.error || 'Sorry, I encountered an error. Please try again.',
+                            'bot'
+                        );
+                    }
+                } catch (error) {
+                    console.error('Chat error:', error);
                     this.addMessage(
-                        data.error || 'Sorry, I encountered an error. Please try again.',
+                        'Sorry, I\'m having trouble connecting. Please check your internet and try again.',
                         'bot'
                     );
+                } finally {
+                    this.hideTypingIndicator();
+                    this.isLoading = false;
+                    this.sendChatBtn.disabled = false;
                 }
-            } catch (error) {
-                console.error('Chat error:', error);
-                this.addMessage(
-                    'Sorry, I\'m having trouble connecting. Please check your internet and try again.',
-                    'bot'
-                );
-            } finally {
-                this.hideTypingIndicator();
-                this.isLoading = false;
-                this.sendChatBtn.disabled = false;
+            }
+
+            addMessage(content, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}-message`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.innerHTML = content.replace(/\n/g, '<br>');
+                
+                messageDiv.appendChild(messageContent);
+                this.chatMessages.appendChild(messageDiv);
+                
+                this.scrollToBottom();
+            }
+
+            showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot-message';
+                typingDiv.id = 'typing-indicator';
+                
+                const typingContent = document.createElement('div');
+                typingContent.className = 'typing-indicator';
+                typingContent.innerHTML = `
+                    <span>AI is typing</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                
+                typingDiv.appendChild(typingContent);
+                this.chatMessages.appendChild(typingDiv);
+                this.scrollToBottom();
+            }
+
+            hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
             }
         }
 
-        addMessage(content, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}-message`;
-            
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
-            messageContent.innerHTML = content.replace(/\n/g, '<br>');
-            
-            messageDiv.appendChild(messageContent);
-            this.chatMessages.appendChild(messageDiv);
-            
-            this.scrollToBottom();
+        // Initialize when DOM is ready or immediately if already ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeChatWidget);
+        } else {
+            initializeChatWidget();
         }
-
-        showTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot-message';
-            typingDiv.id = 'typing-indicator';
-            
-            const typingContent = document.createElement('div');
-            typingContent.className = 'typing-indicator';
-            typingContent.innerHTML = `
-                <span>AI is typing</span>
-                <div class="typing-dots">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            `;
-            
-            typingDiv.appendChild(typingContent);
-            this.chatMessages.appendChild(typingDiv);
-            this.scrollToBottom();
-        }
-
-        hideTypingIndicator() {
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) {
-                typingIndicator.remove();
-            }
-        }
-
-        scrollToBottom() {
-            this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-        }
-    }
-
-    // Initialize chat widget when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-        new ChatWidget();
-    });
+    })();
 </script> 

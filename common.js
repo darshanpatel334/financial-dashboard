@@ -1247,15 +1247,40 @@ function setupPageNavigation(currentPageIndex = 1) {
             }
 
             @media (max-width: 768px) {
+                .progress-container {
+                    padding: 1rem;
+                }
+
                 .progress-dots {
                     flex-direction: column;
-                    gap: 1rem;
+                    gap: 0.75rem;
+                    align-items: center;
+                }
+
+                .progress-step {
+                    min-width: 120px;
+                    flex-direction: row;
+                    gap: 0.75rem;
+                    align-items: center;
+                    justify-content: flex-start;
+                    text-align: left;
+                }
+
+                .progress-dot {
+                    margin-bottom: 0;
+                    flex-shrink: 0;
+                }
+
+                .progress-step span {
+                    font-size: 0.85rem;
+                    text-align: left;
                 }
 
                 .progress-line {
                     width: 2px;
-                    height: 20px;
+                    height: 15px;
                     margin: 0;
+                    align-self: center;
                 }
             }
         </style>
