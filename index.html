@@ -1684,7 +1684,7 @@
                 
                 <div class="problem-content">
                     <div class="problem-title">
-                        <h4>Without a clear picture:</h4>
+                        <h4>Without a tool like Nivezo:</h4>
                     </div>
                     <div class="problem-cards-grid">
                         <div class="problem-card">
@@ -1825,6 +1825,15 @@
                             <div class="future-feature-content">
                                 <h4>Smart Portfolio Tracking</h4>
                                 <p>Portfolio auto-tagging and asset mapping features</p>
+                            </div>
+                        </div>
+                        <div class="future-feature-item">
+                            <div class="future-feature-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="future-feature-content">
+                                <h4>Ask Nivezo AI</h4>
+                                <p>Get instant answers to your financial questions with our AI assistant</p>
                             </div>
                         </div>
                     </div>
@@ -2050,6 +2059,7 @@
         <!-- Chat Button -->
         <div id="chatButton" class="chat-button">
             <i class="fas fa-comments"></i>
+            <span class="chat-button-text">Ask Nivezo AI</span>
         </div>
 
         <!-- Chat Window -->
@@ -2090,18 +2100,26 @@
         }
 
         .chat-button {
-            width: 60px;
-            height: 60px;
             background: linear-gradient(135deg, #2196F3, #1976D2);
-            border-radius: 50%;
+            border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 0.5rem;
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
             transition: all 0.3s ease;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            padding: 0.75rem 1.25rem;
+            min-width: 60px;
+            height: 60px;
+        }
+
+        .chat-button-text {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
         .chat-button:hover {

@@ -633,5 +633,15 @@
             });
         });
     </script>
+    
+    <!-- Include Chat Widget -->
+    <script>
+        fetch('chat-widget.html')
+            .then(response => response.text())
+            .then(html => {
+                document.body.insertAdjacentHTML('beforeend', html);
+            })
+            .catch(error => console.log('Chat widget not available'));
+    </script>
 </body>
 </html> 
