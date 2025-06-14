@@ -556,6 +556,7 @@ function createIncomeSourcesChart() {
                             case 'half-yearly':
                                 annualAmount = item.amount * 2;
                                 break;
+                            case 'annual':
                             case 'yearly':
                                 annualAmount = item.amount;
                                 break;

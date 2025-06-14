@@ -230,6 +230,15 @@ function loadIncomeData() {
     const savedData = Storage.get('incomeData', {});
     
     if (savedData.income) {
+        // Clear existing items first to prevent duplication
+        const categories = ['salary', 'rental', 'dividend', 'interest', 'otherIncome'];
+        categories.forEach(category => {
+            const container = document.getElementById(category + 'Items');
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+        
         // Load income items
         Object.keys(savedData.income).forEach(category => {
             savedData.income[category].forEach(income => {
