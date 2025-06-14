@@ -1186,8 +1186,12 @@ function setupPageNavigation(currentPageIndex = 1) {
     }).join('');
 
     const navHtml = `
-        <div id="progressNavigation" style="margin-top: 3rem; margin-bottom: 2rem; text-align: center; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 2rem 1rem; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 16px; border: 1px solid #cbd5e1;">
-            <div class="progress-container" style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
+        <div id="progressNavigation" style="margin-top: 3rem; margin-bottom: 2rem; text-align: center; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 2rem 1rem;">
+            <h3 style="color: var(--text-primary); margin-bottom: 2rem; font-size: 1.5rem; font-weight: 600; text-align: center;">
+                <i class="fas fa-map" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+                Navigation Map
+            </h3>
+            <div class="progress-container" style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border: 1px solid #e2e8f0;">
                 <div class="progress-dots" style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     ${stepsHtml}
                 </div>
