@@ -38,8 +38,8 @@
                     <i class="fas fa-user"></i> Personal Information
                 </h2>
             </div>
-            <div id="personalInfoSummary">
-                <!-- Personal info will be loaded here -->
+            <div id="personalInfoDisplay">
+                <div class="loading-message">Loading personal information...</div>
             </div>
         </div>
 
@@ -47,22 +47,22 @@
         <div class="summary-grid">
             <div class="summary-card assets">
                 <h3>Net Worth</h3>
-                <div class="summary-amount positive" id="dashboardNetWorth">₹0</div>
+                <div class="summary-amount positive" id="netWorthValue">₹0</div>
                 <small>Total assets minus liabilities</small>
             </div>
             <div class="summary-card networth">
                 <h3>Annual Income</h3>
-                <div class="summary-amount networth" id="dashboardIncome">₹0</div>
+                <div class="summary-amount networth" id="annualIncomeValue">₹0</div>
                 <small>Total yearly income</small>
             </div>
             <div class="summary-card liabilities">
                 <h3>Annual Expenses</h3>
-                <div class="summary-amount negative" id="dashboardExpenses">₹0</div>
+                <div class="summary-amount negative" id="annualExpensesValue">₹0</div>
                 <small>Total yearly expenses</small>
             </div>
             <div class="summary-card ff-score">
                 <h3>FF Score</h3>
-                <div class="summary-amount ff-score" id="dashboardFFScore">0</div>
+                <div class="summary-amount ff-score" id="ffScoreValue">0</div>
                 <small id="ffScoreStatus">Financial Freedom Years</small>
             </div>
         </div>
@@ -78,21 +78,21 @@
                 <div class="chart-container">
                     <h4>Assets Distribution</h4>
                     <div class="chart-wrapper">
-                        <canvas id="assetChart"></canvas>
+                        <canvas id="assetsChart"></canvas>
                     </div>
-                    <div id="assetLegend" class="chart-legend"></div>
+                    <div id="assetsLegend" class="chart-legend"></div>
                 </div>
                 <div class="chart-container">
                     <h4>Liabilities Distribution</h4>
                     <div class="chart-wrapper">
-                        <canvas id="liabilityChart"></canvas>
+                        <canvas id="liabilitiesChart"></canvas>
                     </div>
-                    <div id="liabilityLegend" class="chart-legend"></div>
+                    <div id="liabilitiesLegend" class="chart-legend"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Income & Expense Analysis -->
+        <!-- Income & Expense Breakdown -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
@@ -103,13 +103,13 @@
                 <div class="chart-container">
                     <h4>Income Sources</h4>
                     <div class="chart-wrapper">
-                        <canvas id="incomeChart"></canvas>
+                        <canvas id="incomeSourcesChart"></canvas>
                     </div>
                 </div>
                 <div class="chart-container">
                     <h4>Expense Categories</h4>
                     <div class="chart-wrapper">
-                        <canvas id="expenseChart"></canvas>
+                        <canvas id="expenseCategoriesChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -124,28 +124,28 @@
             </div>
             <div class="chart-container">
                 <div class="chart-wrapper" style="height: 300px;">
-                    <canvas id="incomeExpenseChart"></canvas>
+                    <canvas id="incomeVsExpenseChart"></canvas>
                 </div>
             </div>
             <div class="grid-3" style="margin-top: 2rem;">
                 <div class="card">
                     <div class="card-body text-center">
                         <h4>Monthly Savings</h4>
-                        <div class="score-number positive" id="monthlySavings">₹0</div>
+                        <div class="score-number positive" id="monthlySavingsValue">₹0</div>
                         <p class="text-secondary">Income - Expenses</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body text-center">
                         <h4>Savings Rate</h4>
-                        <div class="score-number" id="savingsRate">0%</div>
+                        <div class="score-number" id="savingsRateValue">0%</div>
                         <p class="text-secondary">Percentage saved</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body text-center">
                         <h4>Expense Ratio</h4>
-                        <div class="score-number" id="expenseRatio">0%</div>
+                        <div class="score-number" id="expenseRatioValue">0%</div>
                         <p class="text-secondary">Expenses vs Income</p>
                     </div>
                 </div>
@@ -229,7 +229,7 @@
                 <h2 class="section-title">
                     <i class="fas fa-history"></i> Historical Snapshots & Comparison
                 </h2>
-                <button class="btn btn-primary" onclick="saveSnapshot()">
+                <button class="btn btn-primary" onclick="saveCurrentSnapshot()">
                     <i class="fas fa-camera"></i> Save Current Snapshot
                 </button>
             </div>
@@ -239,7 +239,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h4>Total Snapshots</h4>
-                            <div class="score-number" id="totalSnapshots">0</div>
+                            <div class="score-number" id="totalSnapshotsCount">0</div>
                             <p class="text-secondary">Saved over time</p>
                         </div>
                     </div>
@@ -252,12 +252,8 @@
                     </div>
                 </div>
                 
-                <div id="snapshotComparison">
+                <div id="snapshotComparisonTable">
                     <!-- Comparison table will be loaded here -->
-                </div>
-                
-                <div id="quarterlyRecommendations" style="margin-top: 2rem;">
-                    <!-- Quarterly recommendations will be loaded here -->
                 </div>
             </div>
         </div>
@@ -269,7 +265,7 @@
                     <i class="fas fa-tasks"></i> Priority Action Items
                 </h2>
             </div>
-            <div id="actionItems">
+            <div id="actionItemsList">
                 <!-- Action items will be loaded here -->
             </div>
         </div>
@@ -285,7 +281,7 @@
                 <p class="text-secondary" style="margin-bottom: 1.5rem;">
                     Generate a comprehensive PDF report with all your financial data and analysis
                 </p>
-                <button class="btn btn-primary btn-lg" onclick="downloadReport()">
+                <button class="btn btn-primary btn-lg" onclick="downloadComprehensiveReport()">
                     <i class="fas fa-file-pdf"></i> Download Comprehensive Report
                 </button>
             </div>
@@ -318,20 +314,39 @@
         // Initialize Firebase integration
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Load all data from Firestore
-                const allData = await fetchAllFormData();
-                if (allData && Object.keys(allData).length > 0) {
-                    // Store data in localStorage for dashboard to use
-                    Object.keys(allData).forEach(key => {
-                        if (allData[key]) {
-                            localStorage.setItem(key, JSON.stringify(allData[key]));
+                console.log('User authenticated, loading Firestore data...');
+                try {
+                    // Load all data from Firestore
+                    const allData = await fetchAllFormData();
+                    if (allData && Object.keys(allData).length > 0) {
+                        console.log('Firestore data loaded:', allData);
+                        // Store data in localStorage for dashboard to use
+                        Object.keys(allData).forEach(key => {
+                            if (allData[key]) {
+                                localStorage.setItem(key, JSON.stringify(allData[key]));
+                            }
+                        });
+                        
+                        // Refresh dashboard after data is loaded
+                        if (typeof window.initializeDashboard === 'function') {
+                            setTimeout(() => window.initializeDashboard(), 500);
                         }
-                    });
-                    
-                    // Refresh dashboard
-                    if (typeof window.initDashboard === 'function') {
-                        setTimeout(() => window.initDashboard(), 500);
+                    } else {
+                        console.log('No Firestore data found, using localStorage');
+                        if (typeof window.initializeDashboard === 'function') {
+                            window.initializeDashboard();
+                        }
                     }
+                } catch (error) {
+                    console.error('Error loading Firestore data:', error);
+                    if (typeof window.initializeDashboard === 'function') {
+                        window.initializeDashboard();
+                    }
+                }
+            } else {
+                console.log('User not authenticated, using localStorage only');
+                if (typeof window.initializeDashboard === 'function') {
+                    window.initializeDashboard();
                 }
             }
         });
