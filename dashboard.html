@@ -8,6 +8,312 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Compact Financial Health Analytics */
+        .compact-section {
+            padding: 1.5rem;
+        }
+        
+        .health-grid-compact {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .health-indicator-compact {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .health-indicator-compact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .indicator-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .indicator-icon i {
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .indicator-content {
+            flex: 1;
+        }
+        
+        .indicator-label {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+        
+        .indicator-value {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar-mini {
+            width: 100%;
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-mini .progress-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Chart Legend with Percentages */
+        .chart-legend-with-percentages {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .legend-item-with-percentage {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .legend-item-with-percentage:hover {
+            background: #f1f5f9;
+            transform: translateX(4px);
+        }
+        
+        .legend-item-with-percentage:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .legend-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .legend-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .legend-values {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .legend-amount {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.9rem;
+        }
+        
+        .legend-percentage {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.1rem;
+        }
+        
+        /* Snapshot Comparison Styles */
+        .snapshot-comparison {
+            margin-bottom: 2rem;
+        }
+        
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .comparison-header h4 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comparison-header p {
+            color: #64748b;
+            margin: 0;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .comparison-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .comparison-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-current {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+        }
+        
+        .metric-change {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .metric-change.positive {
+            color: #059669;
+        }
+        
+        .metric-change.negative {
+            color: #dc2626;
+        }
+        
+        .metric-change.neutral {
+            color: #6b7280;
+        }
+        
+        .change-icon {
+            font-size: 1rem;
+        }
+        
+        .change-percentage {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .snapshot-single {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            border: 1px solid #bae6fd;
+        }
+        
+        .snapshot-single h4 {
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .snapshot-single p {
+            color: #0284c7;
+            margin: 0;
+        }
+        
+        .historical-table {
+            margin-top: 2rem;
+        }
+        
+        .historical-table h4 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #d1d5db;
+        }
+        
+        .comparison-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .health-grid-compact {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .health-indicator-compact {
+                padding: 0.75rem;
+            }
+            
+            .indicator-icon {
+                width: 35px;
+                height: 35px;
+                margin-right: 0.75rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -153,71 +459,71 @@
         </div>
 
         <!-- Financial Health Analytics -->
-        <div class="section-card">
+        <div class="section-card compact-section">
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-heartbeat"></i> Financial Health Analytics
                 </h2>
             </div>
-            <div class="grid-3">
-                <div class="health-indicator">
-                    <div class="indicator-header">
-                        <i class="fas fa-piggy-bank"></i>
-                        <span>Savings Rate</span>
-                    </div>
-                    <div class="indicator-value" id="healthSavingsRate">0%</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="healthSavingsRateBar"></div>
-                    </div>
-                </div>
-                <div class="health-indicator">
-                    <div class="indicator-header">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Emergency Fund</span>
-                    </div>
-                    <div class="indicator-value" id="healthEmergencyFund">0 months</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="healthEmergencyFundBar"></div>
+            <div class="health-grid-compact">
+                <div class="health-indicator-compact">
+                    <div class="indicator-icon"><i class="fas fa-piggy-bank"></i></div>
+                    <div class="indicator-content">
+                        <span class="indicator-label">Savings Rate</span>
+                        <span class="indicator-value" id="healthSavingsRate">0%</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" id="healthSavingsRateBar"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="health-indicator">
-                    <div class="indicator-header">
-                        <i class="fas fa-umbrella"></i>
-                        <span>Life Insurance</span>
-                    </div>
-                    <div class="indicator-value" id="healthLifeInsurance">0x</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="healthLifeInsuranceBar"></div>
-                    </div>
-                </div>
-                <div class="health-indicator">
-                    <div class="indicator-header">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Investment Rate</span>
-                    </div>
-                    <div class="indicator-value" id="healthInvestmentRate">0%</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="healthInvestmentRateBar"></div>
+                <div class="health-indicator-compact">
+                    <div class="indicator-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="indicator-content">
+                        <span class="indicator-label">Emergency Fund</span>
+                        <span class="indicator-value" id="healthEmergencyFund">0 months</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" id="healthEmergencyFundBar"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="health-indicator">
-                    <div class="indicator-header">
-                        <i class="fas fa-credit-card"></i>
-                        <span>Debt-to-Income</span>
-                    </div>
-                    <div class="indicator-value" id="healthDebtToIncome">0%</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="healthDebtToIncomeBar"></div>
+                <div class="health-indicator-compact">
+                    <div class="indicator-icon"><i class="fas fa-umbrella"></i></div>
+                    <div class="indicator-content">
+                        <span class="indicator-label">Life Insurance</span>
+                        <span class="indicator-value" id="healthLifeInsurance">0x</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" id="healthLifeInsuranceBar"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="health-indicator">
-                    <div class="indicator-header">
-                        <i class="fas fa-balance-scale"></i>
-                        <span>Risk Profile</span>
+                <div class="health-indicator-compact">
+                    <div class="indicator-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="indicator-content">
+                        <span class="indicator-label">Investment Rate</span>
+                        <span class="indicator-value" id="healthInvestmentRate">0%</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" id="healthInvestmentRateBar"></div>
+                        </div>
                     </div>
-                    <div class="indicator-value" id="healthRiskProfile">Not Set</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="healthRiskProfileBar"></div>
+                </div>
+                <div class="health-indicator-compact">
+                    <div class="indicator-icon"><i class="fas fa-credit-card"></i></div>
+                    <div class="indicator-content">
+                        <span class="indicator-label">Debt-to-Income</span>
+                        <span class="indicator-value" id="healthDebtToIncome">0%</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" id="healthDebtToIncomeBar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="health-indicator-compact">
+                    <div class="indicator-icon"><i class="fas fa-balance-scale"></i></div>
+                    <div class="indicator-content">
+                        <span class="indicator-label">Risk Profile</span>
+                        <span class="indicator-value" id="healthRiskProfile">Not Set</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" id="healthRiskProfileBar"></div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -218,19 +218,47 @@ function calculateAnnualIncome() {
     
     let total = 0;
     
-    // Check different possible structures
+    // Use totals if available (most accurate)
+    if (incomeData.totals && incomeData.totals.annualTotal) {
+        return incomeData.totals.annualTotal;
+    }
+    
+    // Calculate from income categories
     if (incomeData.income && typeof incomeData.income === 'object') {
-        Object.values(incomeData.income).forEach(item => {
-            if (item && typeof item.amount === 'number') {
-                total += item.amount * 12; // Convert monthly to annual
+        Object.keys(incomeData.income).forEach(category => {
+            if (Array.isArray(incomeData.income[category])) {
+                incomeData.income[category].forEach(item => {
+                    if (item && typeof item.amount === 'number' && item.frequency) {
+                        let annualAmount = item.amount;
+                        // Convert to annual based on frequency
+                        switch (item.frequency) {
+                            case 'monthly':
+                                annualAmount = item.amount * 12;
+                                break;
+                            case 'quarterly':
+                                annualAmount = item.amount * 4;
+                                break;
+                            case 'half-yearly':
+                                annualAmount = item.amount * 2;
+                                break;
+                            case 'yearly':
+                                annualAmount = item.amount;
+                                break;
+                            default:
+                                annualAmount = item.amount * 12; // Default to monthly
+                        }
+                        total += annualAmount;
+                    }
+                });
             }
         });
-    } else if (incomeData.sources) {
-        Object.values(incomeData.sources).forEach(source => {
-            if (source && typeof source.amount === 'number') {
-                total += source.amount * 12;
-            }
-        });
+    }
+    
+    // Add auto-calculated income
+    if (incomeData.autoCalculated) {
+        total += (incomeData.autoCalculated.equityYield || 0);
+        total += (incomeData.autoCalculated.fixedIncomeYield || 0);
+        total += (incomeData.autoCalculated.rentalYield || 0);
     }
     
     return total;
@@ -240,15 +268,28 @@ function calculateAnnualExpenses() {
     const expenseData = dashboardData.expenseData;
     if (!expenseData) return 0;
     
+    // Use totals if available (most accurate)
+    if (expenseData.totals && expenseData.totals.annualTotal) {
+        return expenseData.totals.annualTotal;
+    }
+    
     let total = 0;
     
-    // Check different possible structures
+    // Calculate from expense categories
     if (expenseData.expenses && typeof expenseData.expenses === 'object') {
-        Object.values(expenseData.expenses).forEach(category => {
-            if (typeof category === 'object') {
-                Object.values(category).forEach(item => {
+        Object.keys(expenseData.expenses).forEach(category => {
+            if (Array.isArray(expenseData.expenses[category])) {
+                expenseData.expenses[category].forEach(item => {
                     if (item && typeof item.amount === 'number') {
-                        total += item.amount * 12; // Convert monthly to annual
+                        if (category === 'monthlyRecurring') {
+                            total += item.amount * 12;
+                        } else if (category === 'annualRecurring') {
+                            total += item.amount;
+                        } else if (category === 'bigExpenses') {
+                            // Big expenses are typically annual or amortized
+                            const years = item.replacementYears || 1;
+                            total += item.amount / years;
+                        }
                     }
                 });
             }
@@ -403,26 +444,76 @@ function createIncomeSourcesChart() {
     if (!ctx) return;
     
     const incomeData = dashboardData.incomeData;
-    if (!incomeData) return;
+    if (!incomeData || !incomeData.income) {
+        ctx.parentElement.innerHTML = '<div class="no-data-message">No income data available</div>';
+        return;
+    }
     
     const data = [];
     const labels = [];
-    const colors = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0'];
+    const colors = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4'];
     
-    if (incomeData.income) {
-        Object.keys(incomeData.income).forEach(source => {
-            const item = incomeData.income[source];
-            if (item && typeof item.amount === 'number' && item.amount > 0) {
-                labels.push(source.charAt(0).toUpperCase() + source.slice(1));
-                data.push(item.amount);
+    // Calculate totals for each income category
+    const categoryTotals = {};
+    Object.keys(incomeData.income).forEach(category => {
+        if (Array.isArray(incomeData.income[category])) {
+            let categoryTotal = 0;
+            incomeData.income[category].forEach(item => {
+                if (item && typeof item.amount === 'number') {
+                    let annualAmount = item.amount;
+                    // Convert to annual based on frequency
+                    switch (item.frequency) {
+                        case 'monthly':
+                            annualAmount = item.amount * 12;
+                            break;
+                        case 'quarterly':
+                            annualAmount = item.amount * 4;
+                            break;
+                        case 'half-yearly':
+                            annualAmount = item.amount * 2;
+                            break;
+                        case 'yearly':
+                            annualAmount = item.amount;
+                            break;
+                        default:
+                            annualAmount = item.amount * 12;
+                    }
+                    categoryTotal += annualAmount;
+                }
+            });
+            if (categoryTotal > 0) {
+                categoryTotals[category] = categoryTotal;
             }
-        });
+        }
+    });
+    
+    // Add auto-calculated income
+    if (incomeData.autoCalculated) {
+        if (incomeData.autoCalculated.equityYield > 0) {
+            categoryTotals['equityYield'] = incomeData.autoCalculated.equityYield;
+        }
+        if (incomeData.autoCalculated.fixedIncomeYield > 0) {
+            categoryTotals['fixedIncomeYield'] = incomeData.autoCalculated.fixedIncomeYield;
+        }
+        if (incomeData.autoCalculated.rentalYield > 0) {
+            categoryTotals['rentalYield'] = incomeData.autoCalculated.rentalYield;
+        }
     }
+    
+    // Prepare chart data
+    Object.keys(categoryTotals).forEach(category => {
+        const categoryName = getCategoryDisplayName(category);
+        labels.push(categoryName);
+        data.push(categoryTotals[category]);
+    });
     
     if (data.length === 0) {
         ctx.parentElement.innerHTML = '<div class="no-data-message">No income data available</div>';
         return;
     }
+    
+    // Calculate total for percentages
+    const total = data.reduce((sum, value) => sum + value, 0);
     
     if (charts.incomeSourcesChart) {
         charts.incomeSourcesChart.destroy();
@@ -444,11 +535,22 @@ function createIncomeSourcesChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
     });
+    
+    // Create custom legend with percentages
+    createChartLegendWithPercentages('incomeSourcesChart', labels, colors.slice(0, data.length), data, total);
 }
 
 function createExpenseCategoriesChart() {
@@ -456,34 +558,52 @@ function createExpenseCategoriesChart() {
     if (!ctx) return;
     
     const expenseData = dashboardData.expenseData;
-    if (!expenseData) return;
+    if (!expenseData || !expenseData.expenses) {
+        ctx.parentElement.innerHTML = '<div class="no-data-message">No expense data available</div>';
+        return;
+    }
     
     const data = [];
     const labels = [];
     const colors = ['#F44336', '#FF5722', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5'];
     
-    if (expenseData.expenses) {
-        Object.keys(expenseData.expenses).forEach(category => {
+    // Calculate totals for each expense category
+    const categoryTotals = {};
+    Object.keys(expenseData.expenses).forEach(category => {
+        if (Array.isArray(expenseData.expenses[category])) {
             let categoryTotal = 0;
-            if (typeof expenseData.expenses[category] === 'object') {
-                Object.values(expenseData.expenses[category]).forEach(item => {
-                    if (item && typeof item.amount === 'number') {
+            expenseData.expenses[category].forEach(item => {
+                if (item && typeof item.amount === 'number') {
+                    if (category === 'monthlyRecurring') {
+                        categoryTotal += item.amount * 12;
+                    } else if (category === 'annualRecurring') {
                         categoryTotal += item.amount;
+                    } else if (category === 'bigExpenses') {
+                        const years = item.replacementYears || 1;
+                        categoryTotal += item.amount / years;
                     }
-                });
-            }
-            
+                }
+            });
             if (categoryTotal > 0) {
-                labels.push(category.charAt(0).toUpperCase() + category.slice(1));
-                data.push(categoryTotal);
+                categoryTotals[category] = categoryTotal;
             }
-        });
-    }
+        }
+    });
+    
+    // Prepare chart data
+    Object.keys(categoryTotals).forEach(category => {
+        const categoryName = getExpenseCategoryDisplayName(category);
+        labels.push(categoryName);
+        data.push(categoryTotals[category]);
+    });
     
     if (data.length === 0) {
         ctx.parentElement.innerHTML = '<div class="no-data-message">No expense data available</div>';
         return;
     }
+    
+    // Calculate total for percentages
+    const total = data.reduce((sum, value) => sum + value, 0);
     
     if (charts.expenseCategoriesChart) {
         charts.expenseCategoriesChart.destroy();
@@ -505,11 +625,22 @@ function createExpenseCategoriesChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
     });
+    
+    // Create custom legend with percentages
+    createChartLegendWithPercentages('expenseCategoriesChart', labels, colors.slice(0, data.length), data, total);
 }
 
 function displayIncomeVsExpenseAnalysis() {
@@ -752,48 +883,136 @@ function createSnapshotComparisonTable(snapshots) {
     if (snapshots.length === 0) return;
     
     const container = document.getElementById('snapshotComparisonTable');
-    const recentSnapshots = snapshots.slice(-5).reverse(); // Show last 5 snapshots
     
-    let tableHTML = `
-        <div class="table-responsive">
-            <table class="comparison-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Net Worth</th>
-                        <th>Annual Income</th>
-                        <th>Annual Expenses</th>
-                        <th>Savings Rate</th>
-                        <th>FF Score</th>
-                    </tr>
-                </thead>
-                <tbody>
+    if (snapshots.length === 1) {
+        container.innerHTML = `
+            <div class="snapshot-single">
+                <h4>First Snapshot Saved!</h4>
+                <p>Save more snapshots to see comparison and progress tracking.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Get current and previous snapshot for comparison
+    const currentSnapshot = snapshots[snapshots.length - 1];
+    const previousSnapshot = snapshots[snapshots.length - 2];
+    
+    // Create comparison cards
+    let comparisonHTML = `
+        <div class="snapshot-comparison">
+            <div class="comparison-header">
+                <h4>Progress Comparison</h4>
+                <p>Current vs Previous Snapshot</p>
+            </div>
+            <div class="comparison-grid">
+    `;
+    
+    const metrics = [
+        { key: 'netWorth', label: 'Net Worth', format: 'currency' },
+        { key: 'annualIncome', label: 'Annual Income', format: 'currency' },
+        { key: 'annualExpenses', label: 'Annual Expenses', format: 'currency' },
+        { key: 'monthlySavings', label: 'Monthly Savings', format: 'currency' },
+        { key: 'savingsRate', label: 'Savings Rate', format: 'percentage' },
+        { key: 'emergencyFund', label: 'Emergency Fund', format: 'months' },
+        { key: 'lifeInsuranceCoverage', label: 'Life Insurance', format: 'multiplier' },
+        { key: 'ffScore', label: 'FF Score', format: 'number' }
+    ];
+    
+    metrics.forEach(metric => {
+        const currentValue = currentSnapshot[metric.key] || 0;
+        const previousValue = previousSnapshot[metric.key] || 0;
+        const change = currentValue - previousValue;
+        const percentageChange = previousValue !== 0 ? ((change / previousValue) * 100) : 0;
+        
+        const isPositive = change > 0;
+        const isNegative = change < 0;
+        const changeClass = isPositive ? 'positive' : isNegative ? 'negative' : 'neutral';
+        const changeIcon = isPositive ? '↗' : isNegative ? '↘' : '→';
+        
+        let formattedCurrent, formattedChange;
+        switch (metric.format) {
+            case 'currency':
+                formattedCurrent = formatCurrency(currentValue);
+                formattedChange = formatCurrency(Math.abs(change));
+                break;
+            case 'percentage':
+                formattedCurrent = currentValue.toFixed(1) + '%';
+                formattedChange = Math.abs(change).toFixed(1) + '%';
+                break;
+            case 'months':
+                formattedCurrent = currentValue.toFixed(1) + ' months';
+                formattedChange = Math.abs(change).toFixed(1) + ' months';
+                break;
+            case 'multiplier':
+                formattedCurrent = currentValue.toFixed(1) + 'x';
+                formattedChange = Math.abs(change).toFixed(1) + 'x';
+                break;
+            default:
+                formattedCurrent = currentValue.toFixed(0);
+                formattedChange = Math.abs(change).toFixed(0);
+        }
+        
+        comparisonHTML += `
+            <div class="comparison-card">
+                <div class="metric-label">${metric.label}</div>
+                <div class="metric-current">${formattedCurrent}</div>
+                <div class="metric-change ${changeClass}">
+                    <span class="change-icon">${changeIcon}</span>
+                    <span class="change-amount">${formattedChange}</span>
+                    <span class="change-percentage">(${Math.abs(percentageChange).toFixed(1)}%)</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    comparisonHTML += `
+            </div>
+        </div>
+    `;
+    
+    // Add historical table for all snapshots
+    const recentSnapshots = snapshots.slice(-5).reverse();
+    comparisonHTML += `
+        <div class="historical-table">
+            <h4>Historical Snapshots</h4>
+            <div class="table-responsive">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Net Worth</th>
+                            <th>Income</th>
+                            <th>Expenses</th>
+                            <th>Savings Rate</th>
+                            <th>FF Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
     `;
     
     recentSnapshots.forEach(snapshot => {
         const date = new Date(snapshot.date).toLocaleDateString();
-        const savingsRate = snapshot.annualIncome > 0 ? 
-            (((snapshot.annualIncome - snapshot.annualExpenses) / snapshot.annualIncome) * 100).toFixed(1) : 0;
-        
-        tableHTML += `
+        comparisonHTML += `
             <tr>
                 <td>${date}</td>
-                <td>${formatCurrency(snapshot.netWorth)}</td>
-                <td>${formatCurrency(snapshot.annualIncome)}</td>
-                <td>${formatCurrency(snapshot.annualExpenses)}</td>
-                <td>${savingsRate}%</td>
+                <td>${formatCurrency(snapshot.netWorth || 0)}</td>
+                <td>${formatCurrency(snapshot.annualIncome || 0)}</td>
+                <td>${formatCurrency(snapshot.annualExpenses || 0)}</td>
+                <td>${(snapshot.savingsRate || 0).toFixed(1)}%</td>
                 <td>${snapshot.ffScore || 0}</td>
             </tr>
         `;
     });
     
-    tableHTML += `
-                </tbody>
-            </table>
+    comparisonHTML += `
+                    </tbody>
+                </table>
+            </div>
         </div>
     `;
     
-    container.innerHTML = tableHTML;
+    container.innerHTML = comparisonHTML;
 }
 
 function displayActionItems() {
@@ -909,6 +1128,57 @@ function createChartLegend(containerId, labels, colors, data) {
     container.innerHTML = html;
 }
 
+function createChartLegendWithPercentages(chartId, labels, colors, data, total) {
+    const chartContainer = document.getElementById(chartId).parentElement;
+    const existingLegend = chartContainer.querySelector('.chart-legend-with-percentages');
+    if (existingLegend) {
+        existingLegend.remove();
+    }
+    
+    let html = '<div class="chart-legend-with-percentages">';
+    labels.forEach((label, index) => {
+        const percentage = ((data[index] / total) * 100).toFixed(1);
+        html += `
+            <div class="legend-item-with-percentage">
+                <div class="legend-color" style="background-color: ${colors[index]}"></div>
+                <div class="legend-content">
+                    <span class="legend-label">${label}</span>
+                    <div class="legend-values">
+                        <span class="legend-amount">${formatCurrency(data[index])}</span>
+                        <span class="legend-percentage">${percentage}%</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    chartContainer.insertAdjacentHTML('beforeend', html);
+}
+
+function getCategoryDisplayName(category) {
+    const displayNames = {
+        'salary': 'Salary/Pension',
+        'rental': 'Rental Income',
+        'dividend': 'Dividend Income',
+        'interest': 'Interest Income',
+        'otherIncome': 'Other Income',
+        'equityYield': 'Equity Yield',
+        'fixedIncomeYield': 'Fixed Income Yield',
+        'rentalYield': 'Rental Yield'
+    };
+    return displayNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
+}
+
+function getExpenseCategoryDisplayName(category) {
+    const displayNames = {
+        'monthlyRecurring': 'Monthly Recurring',
+        'annualRecurring': 'Annual Recurring',
+        'bigExpenses': 'Big Expenses'
+    };
+    return displayNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
+}
+
 function showStatus(message, type = 'info') {
     const statusDiv = document.getElementById('status');
     if (statusDiv) {
@@ -925,14 +1195,26 @@ function showStatus(message, type = 'info') {
 // Snapshot functionality with Firestore integration
 async function saveCurrentSnapshot() {
     try {
+        const netWorth = calculateNetWorth();
+        const annualIncome = calculateAnnualIncome();
+        const annualExpenses = calculateAnnualExpenses();
+        const savingsRate = annualIncome > 0 ? (((annualIncome - annualExpenses) / annualIncome) * 100) : 0;
+        const emergencyFund = calculateEmergencyFund();
+        const lifeInsurance = calculateLifeInsuranceCoverage();
+        
         const snapshot = {
             date: new Date().toISOString(),
-            netWorth: calculateNetWorth(),
-            annualIncome: calculateAnnualIncome(),
-            annualExpenses: calculateAnnualExpenses(),
+            netWorth: netWorth,
+            annualIncome: annualIncome,
+            annualExpenses: annualExpenses,
+            monthlySavings: (annualIncome - annualExpenses) / 12,
+            savingsRate: savingsRate,
             ffScore: dashboardData.ffScoreData?.ffScore || 0,
-            savingsRate: calculateAnnualIncome() > 0 ? 
-                (((calculateAnnualIncome() - calculateAnnualExpenses()) / calculateAnnualIncome()) * 100) : 0
+            emergencyFund: emergencyFund,
+            lifeInsuranceCoverage: lifeInsurance,
+            investmentRate: calculateInvestmentRate(),
+            debtToIncomeRatio: calculateDebtToIncomeRatio(),
+            riskProfile: dashboardData.riskProfileData?.riskLevel || 'Not Set'
         };
         
         const snapshots = dashboardData.financialSnapshots || [];
