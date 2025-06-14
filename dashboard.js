@@ -792,7 +792,7 @@ function createIncomeChart() {
     const ctx = document.getElementById('incomeChart').getContext('2d');
     
     // Try multiple data structure possibilities
-    const incomeData = dashboardData.income?.sources || dashboardData.income?.categories || {};
+    const incomeData = dashboardData.income?.income || dashboardData.income?.sources || dashboardData.income?.categories || {};
     const data = [];
     const labels = [];
     
@@ -801,7 +801,9 @@ function createIncomeChart() {
     Object.keys(incomeData).forEach(category => {
         if (Array.isArray(incomeData[category])) {
             const monthlyTotal = incomeData[category].reduce((sum, item) => {
-                return sum + (item.monthlyAmount || item.amount || 0);
+                const amount = item.amount || 0;
+                const frequency = item.frequency || 'monthly';
+                return sum + convertToMonthly(amount, frequency);
             }, 0);
             
             if (monthlyTotal > 0) {
@@ -889,7 +891,7 @@ function createExpenseChart() {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     
     // Try multiple data structure possibilities
-    const expenseData = dashboardData.expenses?.categories || dashboardData.expenses?.sources || {};
+    const expenseData = dashboardData.expenses?.expenses || dashboardData.expenses?.categories || dashboardData.expenses?.sources || {};
     const data = [];
     const labels = [];
     
@@ -898,7 +900,9 @@ function createExpenseChart() {
     Object.keys(expenseData).forEach(category => {
         if (Array.isArray(expenseData[category])) {
             const monthlyTotal = expenseData[category].reduce((sum, item) => {
-                return sum + (item.monthlyAmount || item.amount || 0);
+                const amount = item.amount || 0;
+                const frequency = item.frequency || 'monthly';
+                return sum + convertToMonthly(amount, frequency);
             }, 0);
             
             if (monthlyTotal > 0) {
@@ -1299,6 +1303,7 @@ function getPriorityColor(priority) {
 // Format category name
 function formatCategoryName(category) {
     const names = {
+        // Asset categories
         realEstate: 'Real Estate',
         cash: 'Cash & Bank',
         equity: 'Equity',
@@ -1306,14 +1311,25 @@ function formatCategoryName(category) {
         otherAssets: 'Other Assets',
         gold: 'Gold',
         crypto: 'Cryptocurrency',
+        // Liability categories
         home: 'Home Loan',
         car: 'Car Loan',
         personal: 'Personal Loan',
         credit: 'Credit Card',
         business: 'Business Loan',
-        other: 'Other'
+        other: 'Other',
+        // Income categories
+        salary: 'Salary & Pension',
+        rental: 'Rental Income',
+        dividend: 'Dividend Income',
+        interest: 'Interest Income',
+        otherIncome: 'Other Income',
+        // Expense categories
+        monthlyRecurring: 'Monthly Recurring',
+        annualRecurring: 'Annual Recurring',
+        bigExpenses: 'Big Expenses'
     };
-    return names[category] || category;
+    return names[category] || category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 }
 
 // Download report functionality - Beautiful PDF with all data
