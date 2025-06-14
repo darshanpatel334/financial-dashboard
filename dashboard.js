@@ -105,43 +105,29 @@ function displayPersonalInfo() {
     }
     
     container.innerHTML = `
-        <div class="personal-info-grid">
-            <div class="info-item">
+        <div class="personal-info-grid compact-info-grid">
+            <div class="info-item compact-info-item">
                 <i class="fas fa-user"></i>
                 <div>
                     <strong>Name:</strong>
                     <span>${personalInfo.name || personalInfo.fullName || 'Not provided'}</span>
                 </div>
             </div>
-            <div class="info-item">
+            <div class="info-item compact-info-item">
                 <i class="fas fa-envelope"></i>
                 <div>
                     <strong>Email:</strong>
                     <span>${personalInfo.email || 'Not provided'}</span>
                 </div>
             </div>
-            <div class="info-item">
+            <div class="info-item compact-info-item">
                 <i class="fas fa-phone"></i>
                 <div>
                     <strong>Phone:</strong>
                     <span>${personalInfo.phone || personalInfo.phoneNumber || 'Not provided'}</span>
                 </div>
             </div>
-            <div class="info-item">
-                <i class="fas fa-calendar"></i>
-                <div>
-                    <strong>Age:</strong>
-                    <span>${personalInfo.age || 'Not provided'}</span>
-                </div>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <div>
-                    <strong>City:</strong>
-                    <span>${personalInfo.city || 'Not provided'}</span>
-                </div>
-            </div>
-            <div class="info-item">
+            <div class="info-item compact-info-item">
                 <i class="fas fa-briefcase"></i>
                 <div>
                     <strong>Occupation:</strong>
@@ -1031,13 +1017,15 @@ function createSnapshotComparisonTable(snapshots) {
                             <th>Expenses</th>
                             <th>Savings Rate</th>
                             <th>FF Score</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
     `;
     
-    recentSnapshots.forEach(snapshot => {
+    recentSnapshots.forEach((snapshot, index) => {
         const date = new Date(snapshot.date).toLocaleDateString();
+        const snapshotIndex = snapshots.length - 1 - index; // Get original index
         comparisonHTML += `
             <tr>
                 <td>${date}</td>
@@ -1046,6 +1034,13 @@ function createSnapshotComparisonTable(snapshots) {
                 <td>${formatCurrency(snapshot.annualExpenses || 0)}</td>
                 <td>${(snapshot.savingsRate || 0).toFixed(1)}%</td>
                 <td>${snapshot.ffScore || 0}</td>
+                <td>
+                    <div class="snapshot-actions">
+                        <button class="delete-snapshot-btn" onclick="deleteSnapshot(${snapshotIndex})" title="Delete this snapshot">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
             </tr>
         `;
     });
@@ -1058,6 +1053,12 @@ function createSnapshotComparisonTable(snapshots) {
     `;
     
     container.innerHTML = comparisonHTML;
+    
+    // Show net worth progress chart if we have multiple snapshots
+    if (snapshots.length >= 2) {
+        createNetWorthProgressChart(snapshots);
+        document.getElementById('networthProgressSection').style.display = 'block';
+    }
 }
 
 function displayActionItems() {
@@ -1539,10 +1540,139 @@ async function saveDataWithSync(key, data) {
     }
 }
 
+// Delete snapshot functionality
+async function deleteSnapshot(index) {
+    if (!confirm('Are you sure you want to delete this snapshot? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const snapshots = dashboardData.financialSnapshots || [];
+        
+        if (index >= 0 && index < snapshots.length) {
+            snapshots.splice(index, 1);
+            
+            // Update dashboardData
+            dashboardData.financialSnapshots = snapshots;
+            
+            // Save to localStorage
+            localStorage.setItem('financialSnapshots', JSON.stringify(snapshots));
+            
+            // Save to Firestore if user is authenticated
+            try {
+                const { saveFormData } = await import('./firestoreService.js');
+                await saveFormData('dashboard', { financialSnapshots: snapshots });
+                console.log('Snapshot deleted from Firestore');
+            } catch (firestoreError) {
+                console.log('Firestore delete failed, using localStorage only:', firestoreError);
+            }
+            
+            showStatus('Snapshot deleted successfully!', 'success');
+            displayHistoricalSnapshots(); // Refresh the display
+        }
+    } catch (error) {
+        console.error('Error deleting snapshot:', error);
+        showStatus('Error deleting snapshot', 'error');
+    }
+}
+
+// Net Worth Progress Chart
+function createNetWorthProgressChart(snapshots) {
+    const ctx = document.getElementById('networthProgressChart');
+    if (!ctx || snapshots.length < 2) return;
+    
+    // Prepare data for the chart
+    const labels = snapshots.map(snapshot => {
+        const date = new Date(snapshot.date);
+        return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+    });
+    
+    const networthData = snapshots.map(snapshot => snapshot.netWorth || 0);
+    
+    // Destroy existing chart if it exists
+    if (charts.networthProgressChart) {
+        charts.networthProgressChart.destroy();
+    }
+    
+    charts.networthProgressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Net Worth',
+                data: networthData,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Net Worth: ${formatCurrency(context.parsed.y)}`;
+                        },
+                        title: function(context) {
+                            const snapshotIndex = context[0].dataIndex;
+                            const snapshot = snapshots[snapshotIndex];
+                            const date = new Date(snapshot.date);
+                            return date.toLocaleDateString('en-IN', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            });
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#6b7280'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    },
+                    ticks: {
+                        color: '#6b7280',
+                        callback: function(value) {
+                            return formatCurrency(value);
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
 // Make functions globally available
 window.saveCurrentSnapshot = saveCurrentSnapshot;
 window.downloadComprehensiveReport = downloadComprehensiveReport;
 window.goBack = goBack;
 window.goNext = goNext;
 window.syncDataToFirestore = syncDataToFirestore;
-window.saveDataWithSync = saveDataWithSync; 
+window.saveDataWithSync = saveDataWithSync;
+window.deleteSnapshot = deleteSnapshot; 

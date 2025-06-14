@@ -234,6 +234,134 @@
             font-size: 0.75rem;
             opacity: 0.8;
         }
+
+        /* Compact Section Styles */
+        .compact-section {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .compact-section .section-header {
+            margin-bottom: 1rem;
+        }
+
+        .compact-section .section-title {
+            font-size: 1.25rem;
+        }
+
+        .compact-info {
+            padding: 0.75rem;
+        }
+
+        .compact-info .info-grid {
+            gap: 0.75rem;
+        }
+
+        .compact-info .info-item {
+            padding: 0.5rem;
+        }
+
+        .compact-chart {
+            padding: 0.75rem;
+        }
+
+        .compact-chart h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .compact-cards .card {
+            margin-bottom: 0.75rem;
+        }
+
+        .compact-card {
+            padding: 0.75rem;
+        }
+
+        .compact-card .card-body {
+            padding: 0.75rem;
+        }
+
+        .compact-card h5 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .compact-score {
+            font-size: 1.25rem !important;
+        }
+
+        .compact-card small {
+            font-size: 0.75rem;
+        }
+
+        .compact-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .compact-info-item {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .compact-info-item i {
+            font-size: 0.9rem;
+        }
+
+        /* Net Worth Progress Chart */
+        .networth-progress-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .networth-progress-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .networth-progress-header h4 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .networth-progress-header p {
+            color: #64748b;
+            margin: 0;
+        }
+
+        .progress-chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        /* Delete Snapshot Button */
+        .delete-snapshot-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .delete-snapshot-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .snapshot-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
         
         .snapshot-single {
             text-align: center;
@@ -337,14 +465,14 @@
             <p>Your complete financial overview and analysis</p>
         </div>
 
-        <!-- Personal Information Section -->
-        <div class="section-card">
+        <!-- Personal Information Section - Compact -->
+        <div class="section-card compact-section">
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-user"></i> Personal Information
                 </h2>
             </div>
-            <div id="personalInfoDisplay">
+            <div id="personalInfoDisplay" class="compact-info">
                 <div class="loading-message">Loading personal information...</div>
             </div>
         </div>
@@ -398,23 +526,23 @@
             </div>
         </div>
 
-        <!-- Income & Expense Breakdown -->
-        <div class="section-card">
+        <!-- Income & Expense Breakdown - Compact -->
+        <div class="section-card compact-section">
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-chart-pie"></i> Income & Expense Breakdown
                 </h2>
             </div>
             <div class="grid-2">
-                <div class="chart-container">
+                <div class="chart-container compact-chart">
                     <h4>Income Sources</h4>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 200px;">
                         <canvas id="incomeSourcesChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-container">
+                <div class="chart-container compact-chart">
                     <h4>Expense Categories</h4>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" style="height: 200px;">
                         <canvas id="expenseCategoriesChart"></canvas>
                     </div>
                 </div>
@@ -433,26 +561,26 @@
                     <canvas id="incomeVsExpenseChart"></canvas>
                 </div>
             </div>
-            <div class="grid-3" style="margin-top: 2rem;">
-                <div class="card">
+            <div class="grid-3 compact-cards" style="margin-top: 1rem;">
+                <div class="card compact-card">
                     <div class="card-body text-center">
-                        <h4>Monthly Savings</h4>
-                        <div class="score-number positive" id="monthlySavingsValue">₹0</div>
-                        <p class="text-secondary">Income - Expenses</p>
+                        <h5>Monthly Savings</h5>
+                        <div class="score-number positive compact-score" id="monthlySavingsValue">₹0</div>
+                        <small class="text-secondary">Income - Expenses</small>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card compact-card">
                     <div class="card-body text-center">
-                        <h4>Savings Rate</h4>
-                        <div class="score-number" id="savingsRateValue">0%</div>
-                        <p class="text-secondary">Percentage saved</p>
+                        <h5>Savings Rate</h5>
+                        <div class="score-number compact-score" id="savingsRateValue">0%</div>
+                        <small class="text-secondary">Percentage saved</small>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card compact-card">
                     <div class="card-body text-center">
-                        <h4>Expense Ratio</h4>
-                        <div class="score-number" id="expenseRatioValue">0%</div>
-                        <p class="text-secondary">Expenses vs Income</p>
+                        <h5>Expense Ratio</h5>
+                        <div class="score-number compact-score" id="expenseRatioValue">0%</div>
+                        <small class="text-secondary">Expenses vs Income</small>
                     </div>
                 </div>
             </div>
@@ -541,25 +669,36 @@
             </div>
             
             <div id="historicalContent">
-                <div class="grid-2" style="margin-bottom: 2rem;">
-                    <div class="card">
+                <div class="grid-2 compact-cards" style="margin-bottom: 1.5rem;">
+                    <div class="card compact-card">
                         <div class="card-body">
-                            <h4>Total Snapshots</h4>
-                            <div class="score-number" id="totalSnapshotsCount">0</div>
-                            <p class="text-secondary">Saved over time</p>
+                            <h5>Total Snapshots</h5>
+                            <div class="score-number compact-score" id="totalSnapshotsCount">0</div>
+                            <small class="text-secondary">Saved over time</small>
                         </div>
                     </div>
-                    <div class="card">
+                    <div class="card compact-card">
                         <div class="card-body">
-                            <h4>Latest Snapshot</h4>
-                            <div class="score-number" id="latestSnapshotDate">Never</div>
-                            <p class="text-secondary">Last saved</p>
+                            <h5>Latest Snapshot</h5>
+                            <div class="score-number compact-score" id="latestSnapshotDate">Never</div>
+                            <small class="text-secondary">Last saved</small>
                         </div>
                     </div>
                 </div>
                 
                 <div id="snapshotComparisonTable">
                     <!-- Comparison table will be loaded here -->
+                </div>
+                
+                <!-- Net Worth Progress Chart -->
+                <div id="networthProgressSection" class="networth-progress-section" style="display: none;">
+                    <div class="networth-progress-header">
+                        <h4><i class="fas fa-chart-line"></i> Net Worth Progress</h4>
+                        <p>Track your net worth growth over time</p>
+                    </div>
+                    <div class="progress-chart-container">
+                        <canvas id="networthProgressChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
