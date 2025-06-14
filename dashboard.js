@@ -60,11 +60,74 @@ function loadAllData() {
 // Initialize dashboard
 function initDashboard() {
     loadAllData();
+    updatePersonalInfoDisplay();
     updateSummaryCards();
     updateHealthIndicators();
     createCharts();
     generateActionItems();
     displayInvestmentInsights();
+}
+
+// Update personal information display
+function updatePersonalInfoDisplay() {
+    const personalInfo = dashboardData.personal || {};
+    const personalInfoContainer = document.getElementById('personalInfoSummary');
+    
+    if (!personalInfoContainer) return;
+    
+    const age = personalInfo.age || calculateAge(personalInfo.dateOfBirth) || 'Not specified';
+    const dependents = personalInfo.dependents || [];
+    const maritalStatus = personalInfo.maritalStatus || 'Not specified';
+    
+    personalInfoContainer.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold;">
+                ${personalInfo.firstName ? personalInfo.firstName.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div>
+                <h3 style="margin: 0; color: var(--text-primary);">${personalInfo.firstName || 'User'} ${personalInfo.lastName || ''}</h3>
+                <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary);">${personalInfo.email || 'No email provided'}</p>
+            </div>
+        </div>
+        
+        <div style="padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-user-circle"></i> Demographics
+            </h4>
+            <div style="display: grid; gap: 0.5rem;">
+                <div><strong>Age:</strong> ${age} years</div>
+                <div><strong>Marital Status:</strong> ${formatCategoryName(maritalStatus)}</div>
+            </div>
+        </div>
+        
+        <div style="padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-users"></i> Dependents (${dependents.length})
+            </h4>
+            ${dependents.length > 0 ? 
+                dependents.map(dep => `
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
+                        <span><strong>${dep.name}</strong></span>
+                        <span>${dep.age} years (${formatCategoryName(dep.relation)})</span>
+                    </div>
+                `).join('') :
+                '<div style="color: var(--text-secondary); font-style: italic;">No dependents listed</div>'
+            }
+        </div>
+    `;
+}
+
+// Calculate age from date of birth
+function calculateAge(dateOfBirth) {
+    if (!dateOfBirth) return null;
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
 }
 
 // Update summary cards
@@ -278,25 +341,62 @@ function updateHealthIndicators() {
     // Savings Rate
     const annualIncome = dashboardData.income.totals?.annualTotal || 0;
     const annualExpenses = dashboardData.expenses.totals?.annualTotal || 0;
+    const monthlyIncome = annualIncome / 12;
+    const monthlyExpenses = annualExpenses / 12;
     const savingsRate = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
     
     document.getElementById('savingsRateIndicator').textContent = Math.round(savingsRate) + '%';
     updateProgressBar('savingsRateProgress', savingsRate, 100);
     colorizeIndicator('savingsRateIndicator', savingsRate, 10, 25);
     
+    // Emergency Fund calculation (liquid assets / monthly expenses)
+    const netWorth = dashboardData.netWorth || {};
+    const cashAssets = (netWorth.assets?.cash || []).reduce((total, asset) => total + (asset.value || 0), 0);
+    const emergencyFundMonths = monthlyExpenses > 0 ? cashAssets / monthlyExpenses : 0;
+    
+    document.getElementById('emergencyFundIndicator').textContent = Math.round(emergencyFundMonths) + ' months';
+    
     // Life Insurance Ratio
-    const lifeInsuranceRatio = dashboardData.insurance.analysis?.lifeInsuranceRatio || 0;
+    const lifeInsuranceRatio = dashboardData.insurance?.analysis?.lifeInsuranceRatio || 0;
     document.getElementById('lifeInsuranceIndicator').textContent = lifeInsuranceRatio.toFixed(1) + 'x';
-    updateProgressBar('lifeInsuranceProgress', Math.min(lifeInsuranceRatio * 6.67, 100), 100); // 15x = 100%
     colorizeIndicator('lifeInsuranceIndicator', lifeInsuranceRatio, 5, 10);
     
     // Risk Profile
-    const riskProfile = dashboardData.riskProfile.riskProfile || 'Not Assessed';
+    const riskProfile = dashboardData.riskProfile?.riskProfile || dashboardData.riskProfile?.category || 'Not Assessed';
     document.getElementById('riskProfileIndicator').textContent = riskProfile;
     
-    // Asset Growth Rate
-    const assetGrowthRate = dashboardData.ffScore.assetGrowthRate || 0;
-    document.getElementById('assetGrowthIndicator').textContent = assetGrowthRate + '%';
+    // Debt-to-Income ratio
+    const totalLiabilities = netWorth.totals?.totalLiabilities || 0;
+    const debtToIncomeRatio = annualIncome > 0 ? (totalLiabilities / annualIncome) * 100 : 0;
+    document.getElementById('debtToIncomeIndicator').textContent = Math.round(debtToIncomeRatio) + '%';
+    
+    // Investment Rate (recurring investments / income)
+    const recurringInvestments = netWorth.recurringInvestments || {};
+    const totalRecurringMonthly = (recurringInvestments.sip || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0) +
+                                 (recurringInvestments.rd || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0) +
+                                 (recurringInvestments.otherSavings || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0);
+    const investmentRate = monthlyIncome > 0 ? (totalRecurringMonthly / monthlyIncome) * 100 : 0;
+    document.getElementById('investmentRateIndicator').textContent = Math.round(investmentRate) + '%';
+    
+    // Color coding for indicators
+    colorizeIndicator('emergencyFundIndicator', emergencyFundMonths, 3, 6);
+    colorizeIndicatorReverse('debtToIncomeIndicator', debtToIncomeRatio, 20, 40); // Reverse - lower is better
+    colorizeIndicator('investmentRateIndicator', investmentRate, 15, 25);
+    
+    // Update emergency fund status
+    const emergencyStatus = document.getElementById('emergencyFundStatus');
+    if (emergencyStatus) {
+        if (emergencyFundMonths >= 6) {
+            emergencyStatus.textContent = 'Excellent coverage';
+            emergencyStatus.style.color = 'var(--success-color)';
+        } else if (emergencyFundMonths >= 3) {
+            emergencyStatus.textContent = 'Good coverage';
+            emergencyStatus.style.color = 'var(--warning-color)';
+        } else {
+            emergencyStatus.textContent = 'Needs improvement';
+            emergencyStatus.style.color = 'var(--error-color)';
+        }
+    }
 }
 
 // Update progress bar
@@ -311,6 +411,18 @@ function colorizeIndicator(elementId, value, lowThreshold, highThreshold) {
     if (value >= highThreshold) {
         element.style.color = 'var(--success-color)';
     } else if (value >= lowThreshold) {
+        element.style.color = 'var(--warning-color)';
+    } else {
+        element.style.color = 'var(--danger-color)';
+    }
+}
+
+// Colorize indicator in reverse (lower values are better)
+function colorizeIndicatorReverse(elementId, value, lowThreshold, highThreshold) {
+    const element = document.getElementById(elementId);
+    if (value <= lowThreshold) {
+        element.style.color = 'var(--success-color)';
+    } else if (value <= highThreshold) {
         element.style.color = 'var(--warning-color)';
     } else {
         element.style.color = 'var(--danger-color)';
@@ -596,50 +708,79 @@ function showLiabilityChange() {
     `;
 }
 
-// Create income vs expense chart
+// Create income vs expense chart (horizontal bar)
 function createIncomeExpenseChart() {
     const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
     
     const monthlyIncome = (dashboardData.income.totals?.annualTotal || 0) / 12;
     const monthlyExpenses = (dashboardData.expenses.totals?.annualTotal || 0) / 12;
+    const monthlySavings = monthlyIncome - monthlyExpenses;
     
     charts.incomeExpenseChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Monthly Flow'],
+            labels: ['Income', 'Expenses', 'Savings'],
             datasets: [{
-                label: 'Income',
-                data: [monthlyIncome],
-                backgroundColor: chartColors.success,
-                borderWidth: 0
-            }, {
-                label: 'Expenses',
-                data: [monthlyExpenses],
-                backgroundColor: chartColors.danger,
-                borderWidth: 0
-            }, {
-                label: 'Savings',
-                data: [monthlyIncome - monthlyExpenses],
-                backgroundColor: chartColors.primary,
-                borderWidth: 0
+                data: [monthlyIncome, monthlyExpenses, monthlySavings],
+                backgroundColor: [
+                    chartColors.success,
+                    chartColors.danger,
+                    monthlySavings >= 0 ? chartColors.primary : chartColors.warning
+                ],
+                borderWidth: 0,
+                borderRadius: 8,
+                borderSkipped: false
             }]
         },
         options: {
+            indexAxis: 'y', // This makes it horizontal
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
                             return '₹' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    },
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 14,
+                            weight: 'bold'
                         }
                     }
                 }
             },
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.x;
+                            const percentage = monthlyIncome > 0 ? ((value / monthlyIncome) * 100).toFixed(1) + '%' : '0%';
+                            return `${context.label}: ${formatCurrency(value)} (${percentage})`;
+                        }
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 10,
+                    top: 10,
+                    bottom: 10
                 }
             }
         }
@@ -1798,20 +1939,21 @@ function saveSnapshot() {
         label: label || `Snapshot ${date}`,
         timestamp: Date.now(),
         data: {
-            netWorth: dashboardData.netWorthData?.totals?.netWorth || 0,
-            totalAssets: dashboardData.netWorthData?.totals?.totalAssets || 0,
-            totalLiabilities: dashboardData.netWorthData?.totals?.totalLiabilities || 0,
-            liquidNetWorth: dashboardData.netWorthData?.totals?.liquidNetWorth || 0,
-            totalRecurringSavings: dashboardData.netWorthData?.totals?.totalRecurringSavings || 0,
-            annualIncome: dashboardData.incomeData?.totals?.total || 0,
-            annualExpenses: dashboardData.expensesData?.totals?.total || 0,
-            ffScore: dashboardData.ffScoreData?.ffScore || 0,
-            savingsRate: dashboardData.savingsRate || 0,
+            netWorth: dashboardData.netWorth?.totals?.netWorth || 0,
+            totalAssets: dashboardData.netWorth?.totals?.totalAssets || 0,
+            totalLiabilities: dashboardData.netWorth?.totals?.totalLiabilities || 0,
+            liquidNetWorth: dashboardData.netWorth?.totals?.liquidNetWorth || 0,
+            totalRecurringSavings: calculateTotalRecurringInvestments(),
+            annualIncome: dashboardData.income?.totals?.annualTotal || 0,
+            annualExpenses: dashboardData.expenses?.totals?.annualTotal || 0,
+            ffScore: dashboardData.ffScore?.currentScore || dashboardData.ffScore?.score || 0,
+            savingsRate: calculateCurrentSavingsRate(),
             // Asset breakdown
             assets: {
                 realEstate: calculateCategoryTotal('realEstate'),
-                equity: calculateCategoryTotal('equity'),
+                equity: calculateCategoryTotal('equity'),  
                 fixedIncome: calculateCategoryTotal('fixedIncome'),
+                cash: calculateCategoryTotal('cash'),
                 otherAssets: calculateCategoryTotal('otherAssets')
             },
             // Recurring investments breakdown
@@ -2001,14 +2143,14 @@ function generateComparisonTable(snapshots) {
 
 // Helper functions for calculating category totals
 function calculateCategoryTotal(category) {
-    const netWorthData = dashboardData.netWorthData || {};
+    const netWorthData = dashboardData.netWorth || {};
     const assets = netWorthData.assets || {};
     const categoryAssets = assets[category] || [];
     return categoryAssets.reduce((total, asset) => total + (asset.value || 0), 0);
 }
 
 function getTotalRecurringByCategory(category) {
-    const netWorthData = dashboardData.netWorthData || {};
+    const netWorthData = dashboardData.netWorth || {};
     const recurringInvestments = netWorthData.recurringInvestments || {};
     const categoryInvestments = recurringInvestments[category] || [];
     
@@ -2017,6 +2159,31 @@ function getTotalRecurringByCategory(category) {
         const frequency = investment.frequency || 'monthly';
         return total + convertToMonthly(amount, frequency);
     }, 0);
+}
+
+// Calculate total recurring investments
+function calculateTotalRecurringInvestments() {
+    const recurringInvestments = dashboardData.netWorth?.recurringInvestments || {};
+    let total = 0;
+    
+    if (recurringInvestments.sip) {
+        total += recurringInvestments.sip.reduce((sum, inv) => sum + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0);
+    }
+    if (recurringInvestments.rd) {
+        total += recurringInvestments.rd.reduce((sum, inv) => sum + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0);
+    }
+    if (recurringInvestments.otherSavings) {
+        total += recurringInvestments.otherSavings.reduce((sum, inv) => sum + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0);
+    }
+    
+    return total;
+}
+
+// Calculate current savings rate
+function calculateCurrentSavingsRate() {
+    const annualIncome = dashboardData.income?.totals?.annualTotal || 0;
+    const annualExpenses = dashboardData.expenses?.totals?.annualTotal || 0;
+    return annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
 }
 
 function convertToMonthly(amount, frequency) {

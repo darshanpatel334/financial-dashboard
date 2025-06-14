@@ -35,6 +35,18 @@
             </button>
         </div>
 
+        <!-- Personal Information Summary -->
+        <div class="section-card" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); margin-bottom: 2rem;">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user"></i> Personal Information
+                </h2>
+            </div>
+            <div id="personalInfoSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; padding: 1rem;">
+                <!-- Personal info will be populated here -->
+            </div>
+        </div>
+
         <!-- Key Metrics Summary -->
         <div class="summary-grid">
             <div class="summary-card networth">
@@ -107,49 +119,7 @@
             </div>
         </div>
 
-        <!-- Financial Health Indicators -->
-        <div class="section-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-heartbeat"></i> Financial Health Indicators
-                </h2>
-            </div>
-            
-            <div class="grid-4">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4>Savings Rate</h4>
-                        <div class="score-number" id="savingsRateIndicator">0%</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="savingsRateProgress"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4>Life Insurance Ratio</h4>
-                        <div class="score-number" id="lifeInsuranceIndicator">0x</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="lifeInsuranceProgress"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4>Risk Profile</h4>
-                        <div class="score-number" id="riskProfileIndicator">-</div>
-                        <small id="riskProfileSubtext">Investment approach</small>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h4>Asset Growth Rate</h4>
-                        <div class="score-number" id="assetGrowthIndicator">0%</div>
-                        <small>Expected annual returns</small>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Primary Charts Section -->
         <!-- Asset Allocation Chart -->
@@ -169,6 +139,50 @@
                 </div>
                 <div id="assetLegend" style="flex: 1; min-width: 300px;">
                     <!-- Asset legend with percentages will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Health Indicators (Compact) -->
+        <div class="section-card" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);">
+            <div class="section-header">
+                <h2 class="section-title" style="font-size: 1.5rem;">
+                    <i class="fas fa-heartbeat"></i> Financial Health Analytics
+                </h2>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Savings Rate</h4>
+                    <div class="score-number" id="savingsRateIndicator" style="font-size: 1.5rem;">0%</div>
+                    <div class="progress-bar" style="height: 6px;">
+                        <div class="progress-fill" id="savingsRateProgress"></div>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Emergency Fund</h4>
+                    <div class="score-number" id="emergencyFundIndicator" style="font-size: 1.5rem;">0 months</div>
+                    <small id="emergencyFundStatus" style="color: var(--text-secondary);">Monthly expenses covered</small>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Life Insurance</h4>
+                    <div class="score-number" id="lifeInsuranceIndicator" style="font-size: 1.5rem;">0x</div>
+                    <small style="color: var(--text-secondary);">Income multiple</small>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Risk Profile</h4>
+                    <div class="score-number" id="riskProfileIndicator" style="font-size: 1.5rem;">-</div>
+                    <small id="riskProfileSubtext" style="color: var(--text-secondary);">Investment approach</small>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Debt-to-Income</h4>
+                    <div class="score-number" id="debtToIncomeIndicator" style="font-size: 1.5rem;">0%</div>
+                    <small style="color: var(--text-secondary);">Total debt ratio</small>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Investment Rate</h4>
+                    <div class="score-number" id="investmentRateIndicator" style="font-size: 1.5rem;">0%</div>
+                    <small style="color: var(--text-secondary);">Income invested regularly</small>
                 </div>
             </div>
         </div>
@@ -254,35 +268,7 @@
             </div>
         </div>
 
-        <!-- Recommended Asset Allocation vs Current -->
-        <div class="section-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-balance-scale"></i> Asset Allocation Analysis
-                </h2>
-            </div>
-            
-            <div class="grid-2">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h4>Current Allocation</h4>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="currentAllocationChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h4>Recommended Allocation</h4>
-                        <small>Based on your risk profile</small>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="recommendedAllocationChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Investment Insights -->
         <div class="section-card" id="investmentInsightsSection">
@@ -336,20 +322,24 @@
             </div>
             
             <!-- Save Snapshot Button -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; text-align: center;">
+            <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 2px solid #cbd5e1; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; text-align: center;">
                 <h3 style="color: var(--text-primary); margin-bottom: 1rem;">
                     <i class="fas fa-camera"></i> Save Current Financial Snapshot
                 </h3>
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    Save your current financial data to compare progress over time. You can save multiple snapshots throughout the year.
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">
+                    Save your current financial data to compare progress over time. You can save multiple snapshots throughout the year. 
+                    <strong>Try to save snapshot once in quarter or year for better comparison.</strong>
                 </p>
-                <div style="margin-bottom: 1rem;">
-                    <input type="date" id="snapshotDate" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; margin-right: 1rem;" />
-                    <input type="text" id="snapshotLabel" placeholder="Add label (e.g., Year End 2024)" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; margin-right: 1rem;" />
+                <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <input type="date" id="snapshotDate" style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem;" />
+                    <input type="text" id="snapshotLabel" placeholder="Add label (e.g., Q4 2024)" style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; min-width: 200px;" />
                 </div>
-                <button class="btn btn-primary" onclick="saveSnapshot()">
-                    <i class="fas fa-save"></i> Save Snapshot
+                <button class="btn btn-primary" onclick="saveSnapshot()" style="padding: 0.75rem 2rem; font-size: 1rem;">
+                    <i class="fas fa-save"></i> Save Financial Snapshot
                 </button>
+                <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                    💡 Recommended: Save snapshots quarterly (Mar, Jun, Sep, Dec) or annually for meaningful comparisons
+                </div>
             </div>
 
             <!-- Historical Snapshots List -->
