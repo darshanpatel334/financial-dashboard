@@ -250,6 +250,15 @@
     </script>
     <script src="expenses.js"></script>
     
+    <script>
+        // Setup navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof setupPageNavigation === 'function') {
+                setupPageNavigation(4); // 4 = Expenses page
+            }
+        });
+    </script>
+    
     <!-- Include Chat Widget -->
     <script>
         fetch('chat-widget.html')

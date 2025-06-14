@@ -1151,7 +1151,7 @@ function setupPageNavigation(currentPageIndex = 1) {
     }).join('');
 
     const navHtml = `
-        <div id="progressNavigation" style="margin-bottom: 2rem; text-align: center; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto;">
+        <div id="progressNavigation" style="margin-top: 3rem; margin-bottom: 2rem; text-align: center; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 2rem 1rem; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 16px; border: 1px solid #cbd5e1;">
             <div class="progress-container" style="background: rgba(255, 255, 255, 0.95); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin-bottom: 2rem;">
                 <div class="progress-dots" style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                     ${stepsHtml}
@@ -1293,20 +1293,20 @@ function setupPageNavigation(currentPageIndex = 1) {
         return;
     }
     
-    // Find insertion point - first look for page-header, then h1, then container
-    let insertionPoint = document.querySelector('.page-header');
+    // Find insertion point - look for navigation section, then container, then body
+    let insertionPoint = document.querySelector('.navigation');
     let insertionMethod = 'beforebegin';
     
     if (!insertionPoint) {
-        // Look for h1 tag
-        insertionPoint = document.querySelector('h1');
-        insertionMethod = 'beforebegin';
+        // Look for container and insert at the end
+        insertionPoint = document.querySelector('.container');
+        insertionMethod = 'beforeend';
     }
     
     if (!insertionPoint) {
-        // Fall back to container
-        insertionPoint = document.querySelector('.container');
-        insertionMethod = 'afterbegin';
+        // Fall back to body
+        insertionPoint = document.body;
+        insertionMethod = 'beforeend';
     }
     
     if (insertionPoint) {

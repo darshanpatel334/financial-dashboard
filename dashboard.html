@@ -400,6 +400,15 @@
     </script>
     <script src="dashboard.js"></script>
     
+    <script>
+        // Setup navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof setupPageNavigation === 'function') {
+                setupPageNavigation(8); // 8 = Dashboard page
+            }
+        });
+    </script>
+    
     <!-- Include Chat Widget -->
     <script>
         fetch('chat-widget.html')

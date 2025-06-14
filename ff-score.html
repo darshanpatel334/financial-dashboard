@@ -258,6 +258,15 @@
     </script>
     <script src="ff-score.js"></script>
     
+    <script>
+        // Setup navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof setupPageNavigation === 'function') {
+                setupPageNavigation(7); // 7 = FF Score page
+            }
+        });
+    </script>
+    
     <!-- Include Chat Widget -->
     <script>
         fetch('chat-widget.html')

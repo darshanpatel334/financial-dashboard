@@ -245,6 +245,15 @@
     </script>
     <script src="income.js"></script>
     
+    <script>
+        // Setup navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof setupPageNavigation === 'function') {
+                setupPageNavigation(3); // 3 = Income page
+            }
+        });
+    </script>
+    
     <!-- Include Chat Widget -->
     <script>
         fetch('chat-widget.html')

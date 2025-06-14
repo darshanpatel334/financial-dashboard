@@ -267,6 +267,15 @@
     </script>
     <script src="insurance.js"></script>
     
+    <script>
+        // Setup navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof setupPageNavigation === 'function') {
+                setupPageNavigation(5); // 5 = Insurance page
+            }
+        });
+    </script>
+    
     <!-- Include Chat Widget -->
     <script>
         fetch('chat-widget.html')

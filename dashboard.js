@@ -55,6 +55,7 @@ function loadAllData() {
     };
     
     console.log('Dashboard data loaded:', dashboardData); // Debug log
+    console.log('Available storage keys:', Object.keys(localStorage)); // Debug log
 }
 
 // Initialize dashboard
