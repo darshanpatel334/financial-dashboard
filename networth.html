@@ -1437,6 +1437,24 @@
                 window.location.href = 'income.html';
             }, 1500);
         }
+
+        // Expose all functions globally for onclick handlers
+        window.addAssetItem = addAssetItem;
+        window.addLiabilityItem = addLiabilityItem;
+        window.addRecurringItem = addRecurringItem;
+        window.removeItem = removeItem;
+        window.removeRecurringItem = removeRecurringItem;
+        window.calculateTotals = calculateTotals;
+        window.calculateRecurringTotals = calculateRecurringTotals;
+        window.calculateRealEstateValue = calculateRealEstateValue;
+        window.calculateRentalYield = calculateRentalYield;
+        window.updateWords = updateWords;
+        window.goBack = goBack;
+        window.goNext = goNext;
+        window.showStatus = showStatus;
+        window.numberToWords = numberToWords;
+        window.convertToMonthly = convertToMonthly;
+        window.calculateAssetIncome = calculateAssetIncome;
     </script>
     
     <!-- Include Chat Widget -->
