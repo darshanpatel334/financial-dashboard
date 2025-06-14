@@ -120,10 +120,45 @@ const Storage = {
     set: function(key, value) {
         try {
             localStorage.setItem(key, JSON.stringify(value));
+            
+            // Also sync to Firestore if available
+            this.syncToFirestore(key, value);
+            
             return true;
         } catch (e) {
             console.error('Error saving to localStorage:', e);
             return false;
+        }
+    },
+    
+    // Firestore sync helper
+    syncToFirestore: async function(key, value) {
+        try {
+            // Only sync if user is authenticated and firestoreService is available
+            if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                const { saveFormData } = await import('./firestoreService.js');
+                
+                // Map localStorage keys to Firestore page names
+                const keyToPageMap = {
+                    'personalInfo': 'personal-info',
+                    'netWorthData': 'networth',
+                    'incomeData': 'income',
+                    'expenseData': 'expenses',
+                    'insuranceData': 'insurance',
+                    'riskProfileData': 'risk-profile',
+                    'ffScoreData': 'ff-score',
+                    'analyticsVisited': 'analytics'
+                };
+                
+                const pageName = keyToPageMap[key];
+                if (pageName) {
+                    await saveFormData(pageName, value);
+                    console.log(`Auto-synced ${key} to Firestore`);
+                }
+            }
+        } catch (error) {
+            // Fail silently for Firestore sync - localStorage is primary
+            console.log(`Firestore sync failed for ${key}:`, error);
         }
     },
     

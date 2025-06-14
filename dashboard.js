@@ -11,12 +11,12 @@ document.addEventListener('DOMContentLoaded', function() {
 // Make initializeDashboard globally available
 window.initializeDashboard = initializeDashboard;
 
-function initializeDashboard() {
+async function initializeDashboard() {
     console.log('Initializing dashboard...');
     
     try {
-        // Load all data from localStorage with correct keys
-        loadAllData();
+        // Load all data from localStorage and sync with Firestore
+        await loadAllData();
         
         // Display all sections
         displayPersonalInfo();
@@ -35,10 +35,10 @@ function initializeDashboard() {
     }
 }
 
-function loadAllData() {
-    console.log('Loading data from localStorage...');
+async function loadAllData() {
+    console.log('Loading data from localStorage and Firestore...');
     
-    // Load data with exact keys used by other pages
+    // First load from localStorage
     dashboardData = {
         personalInfo: getStorageData('personalInfo'),
         netWorthData: getStorageData('netWorthData'),
@@ -47,8 +47,34 @@ function loadAllData() {
         insuranceData: getStorageData('insuranceData'),
         riskProfileData: getStorageData('riskProfileData'),
         ffScoreData: getStorageData('ffScoreData'),
-        userData: getStorageData('userData')
+        userData: getStorageData('userData'),
+        financialSnapshots: getStorageData('financialSnapshots')
     };
+    
+    // Try to sync with Firestore data if available
+    try {
+        const { fetchAllFormData } = await import('./firestoreService.js');
+        const firestoreData = await fetchAllFormData();
+        
+        if (firestoreData && Object.keys(firestoreData).length > 0) {
+            console.log('Syncing with Firestore data:', firestoreData);
+            
+            // Update localStorage with Firestore data if it's newer or missing locally
+            Object.keys(firestoreData).forEach(key => {
+                if (firestoreData[key]) {
+                    // Update dashboardData
+                    dashboardData[key] = firestoreData[key];
+                    
+                    // Update localStorage to keep them in sync
+                    localStorage.setItem(key, JSON.stringify(firestoreData[key]));
+                }
+            });
+            
+            console.log('Data synced with Firestore');
+        }
+    } catch (error) {
+        console.log('Firestore sync failed, using localStorage only:', error);
+    }
     
     console.log('Loaded dashboard data:', dashboardData);
 }
@@ -704,7 +730,8 @@ function updateProgressBar(barId, value, target, isReverse = false) {
 function displayHistoricalSnapshots() {
     console.log('Displaying historical snapshots...');
     
-    const snapshots = getStorageData('financialSnapshots') || [];
+    // Use snapshots from dashboardData (which includes Firestore sync)
+    const snapshots = dashboardData.financialSnapshots || [];
     
     document.getElementById('totalSnapshotsCount').textContent = snapshots.length;
     
@@ -895,8 +922,8 @@ function showStatus(message, type = 'info') {
     }
 }
 
-// Snapshot functionality
-function saveCurrentSnapshot() {
+// Snapshot functionality with Firestore integration
+async function saveCurrentSnapshot() {
     try {
         const snapshot = {
             date: new Date().toISOString(),
@@ -908,10 +935,23 @@ function saveCurrentSnapshot() {
                 (((calculateAnnualIncome() - calculateAnnualExpenses()) / calculateAnnualIncome()) * 100) : 0
         };
         
-        const snapshots = getStorageData('financialSnapshots') || [];
+        const snapshots = dashboardData.financialSnapshots || [];
         snapshots.push(snapshot);
         
+        // Update dashboardData
+        dashboardData.financialSnapshots = snapshots;
+        
+        // Save to localStorage
         localStorage.setItem('financialSnapshots', JSON.stringify(snapshots));
+        
+        // Save to Firestore if user is authenticated
+        try {
+            const { saveFormData } = await import('./firestoreService.js');
+            await saveFormData('dashboard', { financialSnapshots: snapshots });
+            console.log('Snapshot saved to Firestore');
+        } catch (firestoreError) {
+            console.log('Firestore save failed, using localStorage only:', firestoreError);
+        }
         
         showStatus('Financial snapshot saved successfully!', 'success');
         displayHistoricalSnapshots(); // Refresh the display
@@ -1118,8 +1158,58 @@ function downloadComprehensiveReport() {
     }
 }
 
+// Data synchronization helper
+async function syncDataToFirestore(key, data) {
+    try {
+        const { saveFormData } = await import('./firestoreService.js');
+        
+        // Map localStorage keys to Firestore page names
+        const keyToPageMap = {
+            'personalInfo': 'personal-info',
+            'netWorthData': 'networth',
+            'incomeData': 'income',
+            'expenseData': 'expenses',
+            'insuranceData': 'insurance',
+            'riskProfileData': 'risk-profile',
+            'ffScoreData': 'ff-score',
+            'financialSnapshots': 'dashboard'
+        };
+        
+        const pageName = keyToPageMap[key] || 'dashboard';
+        const dataToSave = key === 'financialSnapshots' ? { financialSnapshots: data } : data;
+        
+        await saveFormData(pageName, dataToSave);
+        console.log(`Data synced to Firestore for ${key}`);
+        return true;
+    } catch (error) {
+        console.error(`Failed to sync ${key} to Firestore:`, error);
+        return false;
+    }
+}
+
+// Enhanced data saving function
+async function saveDataWithSync(key, data) {
+    try {
+        // Save to localStorage
+        localStorage.setItem(key, JSON.stringify(data));
+        
+        // Update dashboardData
+        dashboardData[key] = data;
+        
+        // Sync to Firestore
+        await syncDataToFirestore(key, data);
+        
+        return true;
+    } catch (error) {
+        console.error(`Error saving data for ${key}:`, error);
+        return false;
+    }
+}
+
 // Make functions globally available
 window.saveCurrentSnapshot = saveCurrentSnapshot;
 window.downloadComprehensiveReport = downloadComprehensiveReport;
 window.goBack = goBack;
-window.goNext = goNext; 
+window.goNext = goNext;
+window.syncDataToFirestore = syncDataToFirestore;
+window.saveDataWithSync = saveDataWithSync; 

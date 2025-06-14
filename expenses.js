@@ -549,14 +549,25 @@ function updateGoalsTimeline(goals) {
 }
 
 // Save goals data
-function saveGoalsData(goals) {
+async function saveGoalsData(goals) {
     const existingData = Storage.get('expenseData', {});
     existingData.financialGoals = goals;
     existingData.goalsTotals = {
         totalCurrentValue: goals.reduce((sum, goal) => sum + goal.currentAmount, 0),
         totalFutureValue: goals.reduce((sum, goal) => sum + goal.futureAmount, 0)
     };
+    
+    // Save to localStorage and auto-sync to Firestore via Storage.set
     Storage.set('expenseData', existingData);
+    
+    // Additional explicit Firestore sync for financial goals
+    try {
+        const { saveFormData } = await import('./firestoreService.js');
+        await saveFormData('expenses', existingData);
+        console.log('Financial goals explicitly synced to Firestore');
+    } catch (error) {
+        console.log('Explicit Firestore sync failed for financial goals:', error);
+    }
 }
 
 // Load goals data
