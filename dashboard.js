@@ -65,7 +65,6 @@ function initDashboard() {
     updateHealthIndicators();
     createCharts();
     generateActionItems();
-    displayInvestmentInsights();
 }
 
 // Update personal information display
@@ -791,14 +790,17 @@ function createIncomeExpenseChart() {
 function createIncomeChart() {
     const ctx = document.getElementById('incomeChart').getContext('2d');
     
-    const incomeData = dashboardData.income.sources || {};
+    // Try multiple data structure possibilities
+    const incomeData = dashboardData.income?.sources || dashboardData.income?.categories || {};
     const data = [];
     const labels = [];
+    
+    console.log('Income data structure:', incomeData); // Debug log
     
     Object.keys(incomeData).forEach(category => {
         if (Array.isArray(incomeData[category])) {
             const monthlyTotal = incomeData[category].reduce((sum, item) => {
-                return sum + (item.monthlyAmount || 0);
+                return sum + (item.monthlyAmount || item.amount || 0);
             }, 0);
             
             if (monthlyTotal > 0) {
@@ -811,7 +813,9 @@ function createIncomeChart() {
     const total = data.reduce((sum, value) => sum + value, 0);
     
     if (total === 0) {
-        ctx.canvas.style.display = 'none';
+        // Show message instead of hiding
+        const chartContainer = ctx.canvas.parentElement;
+        chartContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);"><i class="fas fa-chart-pie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i><p>No income data available</p></div>';
         return;
     }
     
@@ -883,14 +887,17 @@ function createIncomeChart() {
 function createExpenseChart() {
     const ctx = document.getElementById('expenseChart').getContext('2d');
     
-    const expenseData = dashboardData.expenses.categories || {};
+    // Try multiple data structure possibilities
+    const expenseData = dashboardData.expenses?.categories || dashboardData.expenses?.sources || {};
     const data = [];
     const labels = [];
+    
+    console.log('Expense data structure:', expenseData); // Debug log
     
     Object.keys(expenseData).forEach(category => {
         if (Array.isArray(expenseData[category])) {
             const monthlyTotal = expenseData[category].reduce((sum, item) => {
-                return sum + (item.monthlyAmount || 0);
+                return sum + (item.monthlyAmount || item.amount || 0);
             }, 0);
             
             if (monthlyTotal > 0) {
@@ -903,7 +910,9 @@ function createExpenseChart() {
     const total = data.reduce((sum, value) => sum + value, 0);
     
     if (total === 0) {
-        ctx.canvas.style.display = 'none';
+        // Show message instead of hiding
+        const chartContainer = ctx.canvas.parentElement;
+        chartContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);"><i class="fas fa-chart-pie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i><p>No expense data available</p></div>';
         return;
     }
     
@@ -1112,18 +1121,25 @@ function getAllocationChartOptions() {
 function createTimelineChart() {
     const ctx = document.getElementById('timelineChart').getContext('2d');
     
-    const currentNetWorth = dashboardData.netWorth.totals?.totalNetWorth || 0;
-    const annualExpenses = dashboardData.expenses.totals?.annualTotal || 0;
-    const growthRate = dashboardData.ffScore.assetGrowthRate || 8;
-    const inflationRate = dashboardData.ffScore.inflationRate || 6;
+    const currentNetWorth = dashboardData.netWorth?.totals?.netWorth || 0;
+    const annualExpenses = dashboardData.expenses?.totals?.annualTotal || 0;
+    const growthRate = dashboardData.ffScore?.assetGrowthRate || 8;
+    const inflationRate = dashboardData.ffScore?.inflationRate || 6;
+    
+    // If no data available, show message
+    if (currentNetWorth === 0 && annualExpenses === 0) {
+        const chartContainer = ctx.canvas.parentElement;
+        chartContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);"><i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i><p>Complete your financial data to see timeline projection</p></div>';
+        return;
+    }
     
     // Project net worth over 30 years
     const years = [];
     const projectedNetWorth = [];
     const projectedExpenses = [];
     
-    let netWorth = currentNetWorth;
-    let expenses = annualExpenses;
+    let netWorth = Math.max(currentNetWorth, 100000); // Minimum starting point
+    let expenses = Math.max(annualExpenses, 300000); // Minimum expenses assumption
     
     for (let i = 0; i <= 30; i++) {
         years.push(new Date().getFullYear() + i);
@@ -1307,7 +1323,7 @@ async function downloadReport() {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         
-        // Get all data from localStorage
+        // Get all data using correct keys
         const allData = {
             personalInfo: Storage.get('personalInfo', {}),
             netWorth: Storage.get('netWorthData', {}),
@@ -1315,89 +1331,133 @@ async function downloadReport() {
             expenses: Storage.get('expenseData', {}),
             ffScore: Storage.get('ffScoreData', {}),
             insurance: Storage.get('insuranceData', {}),
-            riskProfile: Storage.get('riskData', {})
+            riskProfile: Storage.get('riskProfileData', {})
         };
         
         const user = firebase.auth().currentUser;
         const currentDate = new Date().toLocaleDateString('en-IN');
+        const currentTime = new Date().toLocaleTimeString('en-IN');
         
         // Page dimensions
         const pageWidth = 210;
         const pageHeight = 297;
-        const margin = 20;
+        const margin = 15;
         const contentWidth = pageWidth - (2 * margin);
         
         let yPosition = margin;
         
-        // Header with logo and title
+        // Modern Header with gradient effect
         pdf.setFillColor(37, 99, 235); // Primary blue
-        pdf.rect(0, 0, pageWidth, 40, 'F');
+        pdf.rect(0, 0, pageWidth, 50, 'F');
+        
+        // Add subtle gradient effect with lighter blue
+        pdf.setFillColor(59, 130, 246);
+        pdf.rect(0, 35, pageWidth, 15, 'F');
         
         pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(24);
+        pdf.setFontSize(28);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('Nivezo', margin, 25);
+        pdf.text('NIVEZO', margin, 25);
         
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Personal Financial Report', margin, 40);
+        
+        // Add report metadata in header
+        pdf.setFontSize(10);
+        pdf.text(`Generated: ${currentDate} at ${currentTime}`, pageWidth - margin - 60, 25);
+        pdf.text(`For: ${user?.email || 'User'}`, pageWidth - margin - 60, 35);
+        
+        yPosition = 65;
+        
+        // Personal Information Card
+        pdf.setFillColor(248, 250, 252); // Light gray background
+        pdf.rect(margin, yPosition, contentWidth, 35, 'F');
+        pdf.setDrawColor(226, 232, 240);
+        pdf.rect(margin, yPosition, contentWidth, 35, 'S');
+        
+        yPosition += 8;
+        pdf.setTextColor(37, 99, 235);
         pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text('Comprehensive Financial Report', margin, 35);
-        
-        yPosition = 55;
-        
-        // User info section
-        pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('Report Details', margin, yPosition);
-        yPosition += 10;
+        pdf.text('👤 Personal Information', margin + 5, yPosition);
         
+        yPosition += 8;
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(`Generated for: ${user?.email || 'User'}`, margin, yPosition);
-        yPosition += 6;
-        pdf.text(`Generated on: ${currentDate}`, margin, yPosition);
-        yPosition += 6;
-        pdf.text(`Name: ${allData.personalInfo.fullName || 'Not provided'}`, margin, yPosition);
-        yPosition += 6;
-        pdf.text(`Age: ${allData.personalInfo.age || 'Not provided'} years`, margin, yPosition);
+        
+        const personalName = allData.personalInfo.firstName ? 
+            `${allData.personalInfo.firstName} ${allData.personalInfo.lastName || ''}`.trim() : 
+            'Not provided';
+        const personalAge = allData.personalInfo.age || calculateAge(allData.personalInfo.dateOfBirth) || 'Not provided';
+        const dependentsCount = allData.personalInfo.dependents ? allData.personalInfo.dependents.length : 0;
+        
+        pdf.text(`Name: ${personalName}`, margin + 5, yPosition);
+        pdf.text(`Age: ${personalAge} years`, margin + 100, yPosition);
+        yPosition += 5;
+        pdf.text(`Email: ${user?.email || 'Not provided'}`, margin + 5, yPosition);
+        pdf.text(`Dependents: ${dependentsCount}`, margin + 100, yPosition);
+        yPosition += 5;
+        pdf.text(`Marital Status: ${allData.personalInfo.maritalStatus || 'Not provided'}`, margin + 5, yPosition);
+        
         yPosition += 15;
         
-        // Executive Summary
+        // Executive Summary with better formatting
+        pdf.setFillColor(37, 99, 235);
+        pdf.rect(margin, yPosition, contentWidth, 8, 'F');
+        pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(16);
         pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(37, 99, 235);
-        pdf.text('Executive Summary', margin, yPosition);
-        yPosition += 12;
+        pdf.text('📊 FINANCIAL OVERVIEW', margin + 5, yPosition + 6);
         
-        // Summary cards
-        const netWorth = allData.netWorth.totals?.totalNetWorth || 0;
+        yPosition += 15;
+        
+        // Key metrics in a professional table format
+        const netWorth = allData.netWorth.totals?.netWorth || 0;
         const annualIncome = allData.income.totals?.annualTotal || 0;
         const annualExpenses = allData.expenses.totals?.annualTotal || 0;
-        const ffScore = allData.ffScore.currentScore || 0;
-        const riskProfile = allData.riskProfile.riskProfile || 'Not Assessed';
+        const ffScore = allData.ffScore.currentScore || allData.ffScore.score || 0;
+        const riskProfile = allData.riskProfile.riskProfile || allData.riskProfile.category || 'Not Assessed';
+        const savingsRate = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome * 100).toFixed(1) : 0;
         
-        pdf.setTextColor(0, 0, 0);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(11);
-        
-        // Create summary table
-        const summaryData = [
-            ['Net Worth', formatCurrency(netWorth)],
-            ['Annual Income', formatCurrency(annualIncome)],
-            ['Annual Expenses', formatCurrency(annualExpenses)],
-            ['Financial Freedom Score', `${ffScore} years`],
-            ['Risk Profile', riskProfile],
-            ['Savings Rate', `${annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome * 100).toFixed(1) : 0}%`]
+        // Create professional summary cards
+        const summaryCards = [
+            { label: 'Net Worth', value: formatCurrency(netWorth), icon: '💰', color: [34, 197, 94] },
+            { label: 'Annual Income', value: formatCurrency(annualIncome), icon: '📈', color: [59, 130, 246] },
+            { label: 'Annual Expenses', value: formatCurrency(annualExpenses), icon: '💸', color: [239, 68, 68] },
+            { label: 'Savings Rate', value: `${savingsRate}%`, icon: '🎯', color: [168, 85, 247] },
+            { label: 'FF Score', value: `${ffScore} years`, icon: '🏆', color: [245, 158, 11] },
+            { label: 'Risk Profile', value: riskProfile, icon: '⚖️', color: [107, 114, 128] }
         ];
         
-        summaryData.forEach(([label, value]) => {
+        let cardX = margin;
+        let cardY = yPosition;
+        const cardWidth = (contentWidth - 10) / 2;
+        const cardHeight = 20;
+        
+        summaryCards.forEach((card, index) => {
+            if (index % 2 === 0 && index > 0) {
+                cardY += cardHeight + 5;
+                cardX = margin;
+            } else if (index % 2 === 1) {
+                cardX = margin + cardWidth + 5;
+            }
+            
+            // Card background
+            pdf.setFillColor(card.color[0], card.color[1], card.color[2]);
+            pdf.rect(cardX, cardY, cardWidth, cardHeight, 'F');
+            
+            // Card content
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(10);
             pdf.setFont('helvetica', 'bold');
-            pdf.text(label + ':', margin, yPosition);
+            pdf.text(`${card.icon} ${card.label}`, cardX + 3, cardY + 8);
             pdf.setFont('helvetica', 'normal');
-            pdf.text(value, margin + 60, yPosition);
-            yPosition += 8;
+            pdf.text(card.value, cardX + 3, cardY + 15);
         });
         
-        yPosition += 10;
+        yPosition = cardY + cardHeight + 20;
         
         // Personal Information Section
         if (yPosition > 250) {
@@ -1551,13 +1611,167 @@ async function downloadReport() {
         }
         
         // Expenses Section
-        yPosition += 5;
+        yPosition += 10;
         if (yPosition > 250) {
             pdf.addPage();
             yPosition = margin;
         }
         
         pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(37, 99, 235);
+        pdf.text('4. Expense Analysis', margin, yPosition);
+        yPosition += 12;
+        
+        pdf.setTextColor(0, 0, 0);
+        
+        if (allData.expenses.categories) {
+            Object.keys(allData.expenses.categories).forEach(category => {
+                const expenses = allData.expenses.categories[category];
+                if (Array.isArray(expenses) && expenses.length > 0) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text(`${formatCategoryName(category)}:`, margin, yPosition);
+                    yPosition += 8;
+                    
+                    expenses.forEach(expense => {
+                        if (yPosition > 280) {
+                            pdf.addPage();
+                            yPosition = margin;
+                        }
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(`  • ${expense.description || 'Expense'}: ${formatCurrency(expense.monthlyAmount || 0)}/month`, margin + 5, yPosition);
+                        yPosition += 5;
+                    });
+                    yPosition += 5;
+                }
+            });
+        }
+        
+        // Financial Health Analytics Section
+        yPosition += 10;
+        if (yPosition > 200) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFillColor(34, 197, 94);
+        pdf.rect(margin, yPosition, contentWidth, 8, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('💚 FINANCIAL HEALTH ANALYTICS', margin + 5, yPosition + 6);
+        
+        yPosition += 20;
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(10);
+        
+        // Calculate health metrics
+        const monthlyIncome = annualIncome / 12;
+        const monthlyExpenses = annualExpenses / 12;
+        const emergencyFund = calculateCategoryTotal('cash');
+        const emergencyFundMonths = monthlyExpenses > 0 ? emergencyFund / monthlyExpenses : 0;
+        const totalLiabilities = allData.netWorth.totals?.totalLiabilities || 0;
+        const debtToIncomeRatio = annualIncome > 0 ? (totalLiabilities / annualIncome) * 100 : 0;
+        const investmentRate = calculateTotalRecurringInvestments();
+        const investmentRatePercent = monthlyIncome > 0 ? (investmentRate / monthlyIncome) * 100 : 0;
+        
+        const healthMetrics = [
+            { label: 'Savings Rate', value: `${savingsRate}%`, status: savingsRate >= 20 ? 'Excellent' : savingsRate >= 15 ? 'Good' : 'Needs Improvement' },
+            { label: 'Emergency Fund', value: `${emergencyFundMonths.toFixed(1)} months`, status: emergencyFundMonths >= 6 ? 'Excellent' : emergencyFundMonths >= 3 ? 'Good' : 'Needs Improvement' },
+            { label: 'Debt-to-Income Ratio', value: `${debtToIncomeRatio.toFixed(1)}%`, status: debtToIncomeRatio <= 20 ? 'Excellent' : debtToIncomeRatio <= 40 ? 'Good' : 'Needs Improvement' },
+            { label: 'Investment Rate', value: `${investmentRatePercent.toFixed(1)}%`, status: investmentRatePercent >= 25 ? 'Excellent' : investmentRatePercent >= 15 ? 'Good' : 'Needs Improvement' }
+        ];
+        
+        healthMetrics.forEach(metric => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`${metric.label}:`, margin, yPosition);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(metric.value, margin + 60, yPosition);
+            
+            // Status color coding
+            const statusColor = metric.status === 'Excellent' ? [34, 197, 94] : 
+                               metric.status === 'Good' ? [245, 158, 11] : [239, 68, 68];
+            pdf.setTextColor(statusColor[0], statusColor[1], statusColor[2]);
+            pdf.text(`(${metric.status})`, margin + 100, yPosition);
+            pdf.setTextColor(0, 0, 0);
+            
+            yPosition += 8;
+        });
+        
+        // Insurance Analysis
+        yPosition += 15;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFillColor(168, 85, 247);
+        pdf.rect(margin, yPosition, contentWidth, 8, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('🛡️ INSURANCE ANALYSIS', margin + 5, yPosition + 6);
+        
+        yPosition += 20;
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(10);
+        
+        const lifeInsurance = allData.insurance.totalLifeInsurance || 0;
+        const healthInsurance = allData.insurance.totalHealthInsurance || 0;
+        const lifeInsuranceRatio = annualIncome > 0 ? lifeInsurance / annualIncome : 0;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Life Insurance Coverage: ${formatCurrency(lifeInsurance)} (${lifeInsuranceRatio.toFixed(1)}x income)`, margin, yPosition);
+        yPosition += 6;
+        pdf.text(`Health Insurance Coverage: ${formatCurrency(healthInsurance)}`, margin, yPosition);
+        yPosition += 6;
+        
+        const insuranceStatus = lifeInsuranceRatio >= 10 ? 'Excellent' : lifeInsuranceRatio >= 5 ? 'Good' : 'Needs Improvement';
+        const insuranceColor = insuranceStatus === 'Excellent' ? [34, 197, 94] : 
+                              insuranceStatus === 'Good' ? [245, 158, 11] : [239, 68, 68];
+        pdf.setTextColor(insuranceColor[0], insuranceColor[1], insuranceColor[2]);
+        pdf.text(`Insurance Status: ${insuranceStatus}`, margin, yPosition);
+        pdf.setTextColor(0, 0, 0);
+        
+        // Footer
+        yPosition += 30;
+        if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+        
+        pdf.setFillColor(248, 250, 252);
+        pdf.rect(margin, yPosition, contentWidth, 25, 'F');
+        pdf.setDrawColor(226, 232, 240);
+        pdf.rect(margin, yPosition, contentWidth, 25, 'S');
+        
+        yPosition += 8;
+        pdf.setTextColor(37, 99, 235);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('📋 Report Summary', margin + 5, yPosition);
+        
+        yPosition += 8;
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`This comprehensive financial report was generated on ${currentDate} at ${currentTime}.`, margin + 5, yPosition);
+        yPosition += 4;
+        pdf.text(`All data is based on information provided by the user and current market assumptions.`, margin + 5, yPosition);
+        yPosition += 4;
+        pdf.text(`For personalized financial advice, please consult with a qualified financial advisor.`, margin + 5, yPosition);
+        
+        // Save the PDF
+        const fileName = `Nivezo_Financial_Report_${currentDate.replace(/\//g, '-')}.pdf`;
+        pdf.save(fileName);
+        
+        showStatus('Financial report downloaded successfully!', 'success');
+        
+         } catch (error) {
+         console.error('Error generating report:', error);
+         showStatus('Error generating report. Please try again.', 'error');
+     }
+ }
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(37, 99, 235);
         pdf.text('4. Expense Analysis', margin, yPosition);
