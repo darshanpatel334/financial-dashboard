@@ -269,6 +269,7 @@ function loadExpenseData() {
     }
     
     calculateTotals();
+    loadGoalsData();
 }
 
 // Get expense type name
@@ -382,4 +383,201 @@ function getExpenseRecommendations() {
 // Export expense data for other modules
 function getExpenseData() {
     return getExpenseAnalysis();
+}
+
+// ===== FINANCIAL GOALS FUNCTIONS =====
+
+// Add financial goal
+function addFinancialGoal() {
+    const container = document.getElementById('financialGoalsItems');
+    const goalId = 'goal_' + Date.now();
+    
+    const goalHtml = `
+        <div class="goal-item-card" id="${goalId}">
+            <div class="goal-form-grid">
+                <div class="form-group">
+                    <label>Goal Name</label>
+                    <input type="text" placeholder="e.g., House Purchase, Child Education" onchange="calculateGoalTotals()">
+                </div>
+                <div class="form-group">
+                    <label>Amount (₹)</label>
+                    <input type="number" placeholder="0" min="0" step="1000" onchange="calculateGoalTotals()">
+                </div>
+                <div class="form-group">
+                    <label>Timeline (Years)</label>
+                    <select onchange="calculateGoalTotals()">
+                        <option value="0">Current Year</option>
+                        <option value="1">1 Year</option>
+                        <option value="2">2 Years</option>
+                        <option value="3">3 Years</option>
+                        <option value="4">4 Years</option>
+                        <option value="5">5 Years</option>
+                        <option value="6">6 Years</option>
+                        <option value="7">7 Years</option>
+                        <option value="8">8 Years</option>
+                        <option value="9">9 Years</option>
+                        <option value="10">10 Years</option>
+                    </select>
+                </div>
+                <div class="goal-future-value" id="${goalId}_future">
+                    ₹0
+                </div>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeFinancialGoal('${goalId}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', goalHtml);
+    calculateGoalTotals();
+}
+
+// Remove financial goal
+function removeFinancialGoal(goalId) {
+    const goalElement = document.getElementById(goalId);
+    if (goalElement) {
+        goalElement.remove();
+        calculateGoalTotals();
+    }
+}
+
+// Calculate goal totals and future values
+function calculateGoalTotals() {
+    const inflationRate = parseFloat(document.getElementById('inflationRate').value) || 6;
+    const goals = [];
+    let totalCurrentValue = 0;
+    let totalFutureValue = 0;
+    
+    // Process each goal
+    const goalItems = document.querySelectorAll('.goal-item-card');
+    goalItems.forEach(item => {
+        const inputs = item.querySelectorAll('input');
+        const select = item.querySelector('select');
+        const futureValueElement = item.querySelector('.goal-future-value');
+        
+        if (inputs.length >= 2 && select) {
+            const goalName = inputs[0].value;
+            const currentAmount = parseFloat(inputs[1].value) || 0;
+            const years = parseInt(select.value) || 0;
+            
+            if (goalName && currentAmount > 0) {
+                // Calculate future value with inflation
+                const futureValue = currentAmount * Math.pow(1 + (inflationRate / 100), years);
+                
+                // Update the future value display
+                futureValueElement.textContent = formatCurrency(futureValue);
+                
+                // Add to totals
+                totalCurrentValue += currentAmount;
+                totalFutureValue += futureValue;
+                
+                // Store goal data
+                goals.push({
+                    name: goalName,
+                    currentAmount: currentAmount,
+                    futureAmount: futureValue,
+                    years: years,
+                    inflationRate: inflationRate
+                });
+            } else {
+                futureValueElement.textContent = '₹0';
+            }
+        }
+    });
+    
+    // Update total display
+    document.getElementById('totalGoalsValue').textContent = formatCurrency(totalFutureValue);
+    
+    // Update goals timeline
+    updateGoalsTimeline(goals);
+    
+    // Save goals data
+    saveGoalsData(goals);
+}
+
+// Update goals timeline display
+function updateGoalsTimeline(goals) {
+    const timelineContainer = document.getElementById('goalsTimeline');
+    const summaryContainer = document.getElementById('goalsSummary');
+    
+    if (goals.length === 0) {
+        summaryContainer.style.display = 'none';
+        return;
+    }
+    
+    // Sort goals by year
+    goals.sort((a, b) => a.years - b.years);
+    
+    // Group goals by year
+    const goalsByYear = {};
+    goals.forEach(goal => {
+        if (!goalsByYear[goal.years]) {
+            goalsByYear[goal.years] = [];
+        }
+        goalsByYear[goal.years].push(goal);
+    });
+    
+    // Generate timeline HTML
+    const timelineHtml = Object.keys(goalsByYear).map(year => {
+        const yearGoals = goalsByYear[year];
+        const yearTotal = yearGoals.reduce((sum, goal) => sum + goal.futureAmount, 0);
+        
+        return `
+            <div class="goal-timeline-item">
+                <div class="goal-year">Year ${year}</div>
+                <div class="goal-details">
+                    ${yearGoals.map(goal => `
+                        <div class="goal-name">${goal.name}</div>
+                        <div class="goal-amounts">
+                            <span class="goal-current">Current: ${formatCurrency(goal.currentAmount)}</span>
+                            <span class="goal-future">Future: ${formatCurrency(goal.futureAmount)}</span>
+                        </div>
+                    `).join('')}
+                    ${yearGoals.length > 1 ? `
+                        <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0;">
+                            <strong>Year Total: ${formatCurrency(yearTotal)}</strong>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    timelineContainer.innerHTML = timelineHtml;
+    summaryContainer.style.display = 'block';
+}
+
+// Save goals data
+function saveGoalsData(goals) {
+    const existingData = Storage.get('expenseData', {});
+    existingData.financialGoals = goals;
+    existingData.goalsTotals = {
+        totalCurrentValue: goals.reduce((sum, goal) => sum + goal.currentAmount, 0),
+        totalFutureValue: goals.reduce((sum, goal) => sum + goal.futureAmount, 0)
+    };
+    Storage.set('expenseData', existingData);
+}
+
+// Load goals data
+function loadGoalsData() {
+    const savedData = Storage.get('expenseData', {});
+    
+    if (savedData.financialGoals && savedData.financialGoals.length > 0) {
+        savedData.financialGoals.forEach(goal => {
+            addFinancialGoal();
+            
+            const lastGoal = document.querySelector('.goal-item-card:last-child');
+            if (lastGoal) {
+                const inputs = lastGoal.querySelectorAll('input');
+                const select = lastGoal.querySelector('select');
+                
+                inputs[0].value = goal.name;
+                inputs[1].value = goal.currentAmount;
+                select.value = goal.years;
+            }
+        });
+        
+        calculateGoalTotals();
+    }
 } 

@@ -60,12 +60,17 @@ function loadAllData() {
 
 // Initialize dashboard
 function initDashboard() {
+    console.log('Initializing dashboard...');
     loadAllData();
     updatePersonalInfoDisplay();
     updateSummaryCards();
+    createAssetAllocationCharts();
+    createIncomeExpenseCharts();
+    createIncomeVsExpenseAnalysis();
     updateHealthIndicators();
-    createCharts();
+    initHistorical();
     generateActionItems();
+    console.log('Dashboard initialization complete');
 }
 
 // Update personal information display
@@ -132,33 +137,51 @@ function calculateAge(dateOfBirth) {
 
 // Update summary cards
 function updateSummaryCards() {
-    // Net Worth
-    const netWorth = dashboardData.netWorth.totals?.netWorth || 0;
-    document.getElementById('dashboardNetWorth').textContent = formatCurrency(netWorth);
+    console.log('Updating summary cards...');
     
-    // Annual Income
-    const annualIncome = dashboardData.income.totals?.annualTotal || 0;
-    document.getElementById('dashboardIncome').textContent = formatCurrency(annualIncome);
-    
-    // Annual Expenses
-    const annualExpenses = dashboardData.expenses.totals?.annualTotal || 0;
-    document.getElementById('dashboardExpenses').textContent = formatCurrency(annualExpenses);
-    
-    // FF Score
-    const ffScore = dashboardData.ffScore.currentScore || dashboardData.ffScore.score || 0;
-    document.getElementById('dashboardFFScore').textContent = ffScore;
-    
-    // Update FF Score color
-    const ffScoreElement = document.getElementById('dashboardFFScore');
-    const ffScoreMeaning = getFFScoreMeaning(ffScore);
-    ffScoreElement.style.color = ffScoreMeaning.color;
-    document.getElementById('ffScoreStatus').textContent = ffScoreMeaning.level;
-    
-    // Update recurring investments section
-    updateRecurringInvestments();
-    
-    // Update savings analysis
-    updateSavingsAnalysis();
+    try {
+        // Net Worth
+        const netWorth = dashboardData.netWorth?.totals?.netWorth || 0;
+        const netWorthElement = document.getElementById('dashboardNetWorth');
+        if (netWorthElement) {
+            netWorthElement.textContent = formatCurrency(netWorth);
+        }
+        
+        // Annual Income
+        const annualIncome = dashboardData.income?.totals?.annualTotal || 0;
+        const incomeElement = document.getElementById('dashboardIncome');
+        if (incomeElement) {
+            incomeElement.textContent = formatCurrency(annualIncome);
+        }
+        
+        // Annual Expenses
+        const annualExpenses = dashboardData.expenses?.totals?.annualTotal || 0;
+        const expensesElement = document.getElementById('dashboardExpenses');
+        if (expensesElement) {
+            expensesElement.textContent = formatCurrency(annualExpenses);
+        }
+        
+        // FF Score
+        const ffScore = dashboardData.ffScore?.currentScore || dashboardData.ffScore?.score || 0;
+        const ffScoreElement = document.getElementById('dashboardFFScore');
+        if (ffScoreElement) {
+            ffScoreElement.textContent = ffScore;
+            
+            // Update FF Score color and status
+            const ffScoreMeaning = getFFScoreMeaning(ffScore);
+            ffScoreElement.style.color = ffScoreMeaning.color;
+            
+            const statusElement = document.getElementById('ffScoreStatus');
+            if (statusElement) {
+                statusElement.textContent = ffScoreMeaning.level;
+            }
+        }
+        
+        console.log('Summary cards updated successfully');
+        
+    } catch (error) {
+        console.error('Error updating summary cards:', error);
+    }
 }
 
 // Update recurring investments section
@@ -241,9 +264,55 @@ function updateRecurringInvestments() {
 
 // Update savings analysis
 function updateSavingsAnalysis() {
-    const monthlyIncome = (dashboardData.income.totals?.annualTotal || 0) / 12;
-    const monthlyExpenses = (dashboardData.expenses.totals?.annualTotal || 0) / 12;
-    const monthlySavings = monthlyIncome - monthlyExpenses;
+    console.log('Updating savings analysis...');
+    
+    try {
+        const annualIncome = dashboardData.income?.totals?.annualTotal || 0;
+        const annualExpenses = dashboardData.expenses?.totals?.annualTotal || 0;
+        const monthlyIncome = annualIncome / 12;
+        const monthlyExpenses = annualExpenses / 12;
+        const monthlySavings = monthlyIncome - monthlyExpenses;
+        
+        // Update monthly savings
+        const monthlySavingsElement = document.getElementById('monthlySavings');
+        if (monthlySavingsElement) {
+            monthlySavingsElement.textContent = formatCurrency(monthlySavings);
+            monthlySavingsElement.className = monthlySavings >= 0 ? 'score-number positive' : 'score-number negative';
+        }
+        
+        // Update savings rate
+        const savingsRate = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
+        const savingsRateElement = document.getElementById('savingsRate');
+        if (savingsRateElement) {
+            savingsRateElement.textContent = Math.round(savingsRate) + '%';
+            if (savingsRate >= 20) {
+                savingsRateElement.className = 'score-number positive';
+            } else if (savingsRate >= 10) {
+                savingsRateElement.className = 'score-number warning';
+            } else {
+                savingsRateElement.className = 'score-number negative';
+            }
+        }
+        
+        // Update expense ratio
+        const expenseRatio = annualIncome > 0 ? (annualExpenses / annualIncome) * 100 : 0;
+        const expenseRatioElement = document.getElementById('expenseRatio');
+        if (expenseRatioElement) {
+            expenseRatioElement.textContent = Math.round(expenseRatio) + '%';
+            if (expenseRatio <= 70) {
+                expenseRatioElement.className = 'score-number positive';
+            } else if (expenseRatio <= 85) {
+                expenseRatioElement.className = 'score-number warning';
+            } else {
+                expenseRatioElement.className = 'score-number negative';
+            }
+        }
+        
+        console.log('Savings analysis updated successfully');
+        
+    } catch (error) {
+        console.error('Error updating savings analysis:', error);
+    }
     const savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome) * 100 : 0;
     
     // Update savings display elements
@@ -430,14 +499,25 @@ function colorizeIndicatorReverse(elementId, value, lowThreshold, highThreshold)
 }
 
 // Create all charts
-function createCharts() {
+// Create asset allocation charts
+function createAssetAllocationCharts() {
+    console.log('Creating asset allocation charts...');
     createAssetChart();
     createLiabilityChart();
-    createIncomeExpenseChart();
+}
+
+// Create income and expense pie charts
+function createIncomeExpenseCharts() {
+    console.log('Creating income and expense charts...');
     createIncomeChart();
     createExpenseChart();
-    createAllocationCharts();
-    createTimelineChart();
+}
+
+// Create income vs expense analysis
+function createIncomeVsExpenseAnalysis() {
+    console.log('Creating income vs expense analysis...');
+    createIncomeExpenseChart();
+    updateSavingsAnalysis();
 }
 
 // Create asset allocation chart with enhanced legend

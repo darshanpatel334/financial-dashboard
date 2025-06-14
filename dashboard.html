@@ -6,9 +6,8 @@
     <title>Financial Dashboard - Nivezo</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -25,348 +24,280 @@
         </div>
     </nav>
 
-    <div class="container container-wide">
+    <div class="container">
         <!-- Page Header -->
         <div class="page-header">
-            <h1><i class="fas fa-chart-line"></i> Financial Dashboard</h1>
-            <p>Comprehensive overview of your financial health and investment portfolio</p>
-            <button class="btn btn-success" onclick="downloadReport()">
-                <i class="fas fa-download"></i> Download Report
-            </button>
+            <h1><i class="fas fa-tachometer-alt"></i> Financial Dashboard</h1>
+            <p>Your complete financial overview and analysis</p>
         </div>
 
-        <!-- Personal Information Summary -->
-        <div class="section-card" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); margin-bottom: 2rem;">
+        <!-- Personal Information Section -->
+        <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-user"></i> Personal Information
                 </h2>
             </div>
-            <div id="personalInfoSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; padding: 1rem;">
-                <!-- Personal info will be populated here -->
+            <div id="personalInfoSummary">
+                <!-- Personal info will be loaded here -->
             </div>
         </div>
 
-        <!-- Key Metrics Summary -->
+        <!-- Financial Summary Cards -->
         <div class="summary-grid">
-            <div class="summary-card networth">
-                <h3>Net Worth</h3>
-                <div class="summary-amount networth" id="dashboardNetWorth">₹0</div>
-                <small id="netWorthStatus">Total Assets - Liabilities</small>
-            </div>
             <div class="summary-card assets">
+                <h3>Net Worth</h3>
+                <div class="summary-amount positive" id="dashboardNetWorth">₹0</div>
+                <small>Total assets minus liabilities</small>
+            </div>
+            <div class="summary-card networth">
                 <h3>Annual Income</h3>
-                <div class="summary-amount positive" id="dashboardIncome">₹0</div>
-                <small id="incomeStatus">Total yearly income</small>
+                <div class="summary-amount networth" id="dashboardIncome">₹0</div>
+                <small>Total yearly income</small>
             </div>
             <div class="summary-card liabilities">
                 <h3>Annual Expenses</h3>
                 <div class="summary-amount negative" id="dashboardExpenses">₹0</div>
-                <small id="expensesStatus">Total yearly spending</small>
+                <small>Total yearly expenses</small>
             </div>
-            <div class="summary-card">
+            <div class="summary-card ff-score">
                 <h3>FF Score</h3>
-                <div class="summary-amount" id="dashboardFFScore">0</div>
-                <small id="ffScoreStatus">Years of financial freedom</small>
+                <div class="summary-amount ff-score" id="dashboardFFScore">0</div>
+                <small id="ffScoreStatus">Financial Freedom Years</small>
             </div>
         </div>
 
-        <!-- Recurring Investments Summary -->
-        <div class="section-card" id="recurringInvestmentsSection" style="display: none;">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-sync-alt"></i> Monthly Recurring Investments
-                </h2>
-                <p style="color: var(--text-secondary); margin-top: 0.5rem;">Your regular investment discipline</p>
-            </div>
-            
-            <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-                <div class="summary-card assets">
-                    <h3>SIP Investments</h3>
-                    <div class="summary-amount positive" id="dashboardSIP">₹0</div>
-                    <small>Monthly SIP amount</small>
-                </div>
-                <div class="summary-card networth">
-                    <h3>Recurring Deposits</h3>
-                    <div class="summary-amount networth" id="dashboardRD">₹0</div>
-                    <small>Monthly RD/FD amount</small>
-                </div>
-                <div class="summary-card liabilities">
-                    <h3>Other Savings</h3>
-                    <div class="summary-amount negative" id="dashboardOtherSavings">₹0</div>
-                    <small>PF, PPF, Insurance etc.</small>
-                </div>
-                <div class="summary-card">
-                    <h3>Total Monthly</h3>
-                    <div class="summary-amount" id="dashboardTotalRecurring">₹0</div>
-                    <small>Combined monthly savings</small>
-                </div>
-            </div>
-            
-            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div>
-                        <h4 style="margin: 0; color: var(--primary-color);">Investment Discipline Score</h4>
-                        <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">
-                            Regular investments help build wealth through compounding
-                        </p>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; color: var(--primary-color);" id="disciplineScore">0%</div>
-                        <small style="color: var(--text-secondary);">of income invested</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-        <!-- Primary Charts Section -->
-        <!-- Asset Allocation Chart -->
+        <!-- Asset Allocation Section -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-chart-pie"></i> Asset Allocation
                 </h2>
-                <div id="assetAllocationChange" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                    <!-- Asset allocation change will be shown here -->
-                </div>
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 2rem;">
-                <div class="chart-wrapper" style="flex: 1; max-width: 400px;">
-                    <canvas id="assetChart"></canvas>
-                </div>
-                <div id="assetLegend" style="flex: 1; min-width: 300px;">
-                    <!-- Asset legend with percentages will be populated here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Financial Health Indicators (Compact) -->
-        <div class="section-card" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);">
-            <div class="section-header">
-                <h2 class="section-title" style="font-size: 1.5rem;">
-                    <i class="fas fa-heartbeat"></i> Financial Health Analytics
-                </h2>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Savings Rate</h4>
-                    <div class="score-number" id="savingsRateIndicator" style="font-size: 1.5rem;">0%</div>
-                    <div class="progress-bar" style="height: 6px;">
-                        <div class="progress-fill" id="savingsRateProgress"></div>
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h4>Assets Distribution</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="assetChart"></canvas>
                     </div>
+                    <div id="assetLegend" class="chart-legend"></div>
                 </div>
-                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Emergency Fund</h4>
-                    <div class="score-number" id="emergencyFundIndicator" style="font-size: 1.5rem;">0 months</div>
-                    <small id="emergencyFundStatus" style="color: var(--text-secondary);">Monthly expenses covered</small>
-                </div>
-                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Life Insurance</h4>
-                    <div class="score-number" id="lifeInsuranceIndicator" style="font-size: 1.5rem;">0x</div>
-                    <small style="color: var(--text-secondary);">Income multiple</small>
-                </div>
-                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Risk Profile</h4>
-                    <div class="score-number" id="riskProfileIndicator" style="font-size: 1.5rem;">-</div>
-                    <small id="riskProfileSubtext" style="color: var(--text-secondary);">Investment approach</small>
-                </div>
-                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Debt-to-Income</h4>
-                    <div class="score-number" id="debtToIncomeIndicator" style="font-size: 1.5rem;">0%</div>
-                    <small style="color: var(--text-secondary);">Total debt ratio</small>
-                </div>
-                <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">Investment Rate</h4>
-                    <div class="score-number" id="investmentRateIndicator" style="font-size: 1.5rem;">0%</div>
-                    <small style="color: var(--text-secondary);">Income invested regularly</small>
+                <div class="chart-container">
+                    <h4>Liabilities Distribution</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="liabilityChart"></canvas>
+                    </div>
+                    <div id="liabilityLegend" class="chart-legend"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Liability Chart -->
-        <div class="section-card" id="liabilitySection" style="display: none;">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-credit-card"></i> Liabilities Breakdown
-                </h2>
-                <div id="liabilityChange" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                    <!-- Liability change will be shown here -->
-                </div>
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 2rem;">
-                <div class="chart-wrapper" style="flex: 1; max-width: 400px;">
-                    <canvas id="liabilityChart"></canvas>
-                </div>
-                <div id="liabilityLegend" style="flex: 1; min-width: 300px;">
-                    <!-- Liability legend with percentages will be populated here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Income vs Expenses with Savings -->
+        <!-- Income & Expense Analysis -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <i class="fas fa-chart-bar"></i> Income vs Expenses Analysis
+                    <i class="fas fa-chart-pie"></i> Income & Expense Breakdown
                 </h2>
-                <div id="incomeExpenseChange" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-                    <!-- Income/Expense change will be shown here -->
+            </div>
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h4>Income Sources</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="chart-wrapper">
-                <canvas id="incomeExpenseChart"></canvas>
-            </div>
-            
-            <!-- Savings Analysis -->
-            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
-                <div class="summary-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-                    <div style="text-align: center;">
-                        <h4 style="margin: 0; color: var(--success-color);">Monthly Savings</h4>
-                        <div style="font-size: 1.5rem; color: var(--success-color); margin: 0.5rem 0;" id="monthlySavings">₹0</div>
-                        <small style="color: var(--text-secondary);">Income - Expenses</small>
-                    </div>
-                    <div style="text-align: center;">
-                        <h4 style="margin: 0; color: var(--primary-color);">Savings Rate</h4>
-                        <div style="font-size: 1.5rem; color: var(--primary-color); margin: 0.5rem 0;" id="savingsRateDisplay">0%</div>
-                        <small style="color: var(--text-secondary);">Percentage saved</small>
-                    </div>
-                    <div style="text-align: center;">
-                        <h4 style="margin: 0; color: var(--warning-color);">Savings Change</h4>
-                        <div style="font-size: 1.5rem; color: var(--warning-color); margin: 0.5rem 0;" id="savingsChange">-</div>
-                        <small style="color: var(--text-secondary);">vs last snapshot</small>
+                <div class="chart-container">
+                    <h4>Expense Categories</h4>
+                    <div class="chart-wrapper">
+                        <canvas id="expenseChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Additional Charts Section -->
-        <div class="grid-2">
-            <!-- Income Composition -->
+        <!-- Income vs Expense Analysis -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-balance-scale"></i> Income vs Expense Analysis
+                </h2>
+            </div>
             <div class="chart-container">
-                <div class="chart-header">
-                    <h3><i class="fas fa-money-bill-wave"></i> Income Sources</h3>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="incomeChart"></canvas>
+                <div class="chart-wrapper" style="height: 300px;">
+                    <canvas id="incomeExpenseChart"></canvas>
                 </div>
             </div>
-
-            <!-- Expense Breakdown -->
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3><i class="fas fa-receipt"></i> Expense Categories</h3>
+            <div class="grid-3" style="margin-top: 2rem;">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Monthly Savings</h4>
+                        <div class="score-number positive" id="monthlySavings">₹0</div>
+                        <p class="text-secondary">Income - Expenses</p>
+                    </div>
                 </div>
-                <div class="chart-wrapper">
-                    <canvas id="expenseChart"></canvas>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Savings Rate</h4>
+                        <div class="score-number" id="savingsRate">0%</div>
+                        <p class="text-secondary">Percentage saved</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4>Expense Ratio</h4>
+                        <div class="score-number" id="expenseRatio">0%</div>
+                        <p class="text-secondary">Expenses vs Income</p>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Financial Health Analytics -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heartbeat"></i> Financial Health Analytics
+                </h2>
+            </div>
+            <div class="grid-3">
+                <div class="health-indicator">
+                    <div class="indicator-header">
+                        <i class="fas fa-piggy-bank"></i>
+                        <span>Savings Rate</span>
+                    </div>
+                    <div class="indicator-value" id="healthSavingsRate">0%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="healthSavingsRateBar"></div>
+                    </div>
+                </div>
+                <div class="health-indicator">
+                    <div class="indicator-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Emergency Fund</span>
+                    </div>
+                    <div class="indicator-value" id="healthEmergencyFund">0 months</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="healthEmergencyFundBar"></div>
+                    </div>
+                </div>
+                <div class="health-indicator">
+                    <div class="indicator-header">
+                        <i class="fas fa-umbrella"></i>
+                        <span>Life Insurance</span>
+                    </div>
+                    <div class="indicator-value" id="healthLifeInsurance">0x</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="healthLifeInsuranceBar"></div>
+                    </div>
+                </div>
+                <div class="health-indicator">
+                    <div class="indicator-header">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Investment Rate</span>
+                    </div>
+                    <div class="indicator-value" id="healthInvestmentRate">0%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="healthInvestmentRateBar"></div>
+                    </div>
+                </div>
+                <div class="health-indicator">
+                    <div class="indicator-header">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Debt-to-Income</span>
+                    </div>
+                    <div class="indicator-value" id="healthDebtToIncome">0%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="healthDebtToIncomeBar"></div>
+                    </div>
+                </div>
+                <div class="health-indicator">
+                    <div class="indicator-header">
+                        <i class="fas fa-balance-scale"></i>
+                        <span>Risk Profile</span>
+                    </div>
+                    <div class="indicator-value" id="healthRiskProfile">Not Set</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="healthRiskProfileBar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Historical Snapshots & Comparison -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i> Historical Snapshots & Comparison
+                </h2>
+                <button class="btn btn-primary" onclick="saveSnapshot()">
+                    <i class="fas fa-camera"></i> Save Current Snapshot
+                </button>
+            </div>
+            
+            <div id="historicalContent">
+                <div class="grid-2" style="margin-bottom: 2rem;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Total Snapshots</h4>
+                            <div class="score-number" id="totalSnapshots">0</div>
+                            <p class="text-secondary">Saved over time</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Latest Snapshot</h4>
+                            <div class="score-number" id="latestSnapshotDate">Never</div>
+                            <p class="text-secondary">Last saved</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="snapshotComparison">
+                    <!-- Comparison table will be loaded here -->
+                </div>
+                
+                <div id="quarterlyRecommendations" style="margin-top: 2rem;">
+                    <!-- Quarterly recommendations will be loaded here -->
+                </div>
+            </div>
+        </div>
 
-
-
-        <!-- Action Items & Recommendations -->
+        <!-- Priority Action Items -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-tasks"></i> Priority Action Items
                 </h2>
             </div>
-            
             <div id="actionItems">
-                <!-- Action items will be populated here -->
+                <!-- Action items will be loaded here -->
             </div>
         </div>
 
-        <!-- Financial Timeline -->
+        <!-- Download Report -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <i class="fas fa-calendar-alt"></i> Financial Timeline
+                    <i class="fas fa-download"></i> Download Report
                 </h2>
             </div>
-            
-            <div class="chart-container">
-                <div class="chart-wrapper">
-                    <canvas id="timelineChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Historical Comparison Section -->
-        <div class="section-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-history"></i> Historical Snapshots & Comparison
-                </h2>
-                <p style="color: var(--text-secondary); margin-top: 0.5rem;">Track your financial progress over time</p>
-            </div>
-            
-            <!-- Save Snapshot Button -->
-            <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 2px solid #cbd5e1; border-radius: 16px; padding: 2rem; margin-bottom: 2rem; text-align: center;">
-                <h3 style="color: var(--text-primary); margin-bottom: 1rem;">
-                    <i class="fas fa-camera"></i> Save Current Financial Snapshot
-                </h3>
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">
-                    Save your current financial data to compare progress over time. You can save multiple snapshots throughout the year. 
-                    <strong>Try to save snapshot once in quarter or year for better comparison.</strong>
+            <div class="text-center">
+                <p class="text-secondary" style="margin-bottom: 1.5rem;">
+                    Generate a comprehensive PDF report with all your financial data and analysis
                 </p>
-                <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <input type="date" id="snapshotDate" style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem;" />
-                    <input type="text" id="snapshotLabel" placeholder="Add label (e.g., Q4 2024)" style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; min-width: 200px;" />
-                </div>
-                <button class="btn btn-primary" onclick="saveSnapshot()" style="padding: 0.75rem 2rem; font-size: 1rem;">
-                    <i class="fas fa-save"></i> Save Financial Snapshot
+                <button class="btn btn-primary btn-lg" onclick="downloadReport()">
+                    <i class="fas fa-file-pdf"></i> Download Comprehensive Report
                 </button>
-                <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
-                    💡 Recommended: Save snapshots quarterly (Mar, Jun, Sep, Dec) or annually for meaningful comparisons
-                </div>
-            </div>
-
-            <!-- Historical Snapshots List -->
-            <div id="historicalSnapshots">
-                <!-- Historical snapshots will be populated here -->
-            </div>
-
-            <!-- Comparison Charts -->
-            <div id="comparisonCharts" style="display: none;">
-                <h3 style="margin-bottom: 1rem;">Historical Trends</h3>
-                <div class="grid-2">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h4>Net Worth Growth</h4>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="netWorthTrendChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h4>Income vs Expenses Trend</h4>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="incomeExpenseTrendChart"></canvas>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
         <!-- Navigation -->
         <div class="navigation">
             <button type="button" class="nav-btn btn-secondary" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Back: Risk Profile
+                <i class="fas fa-arrow-left"></i> Back: FF Score
             </button>
             <button type="button" class="nav-btn btn-primary" onclick="goNext()">
-                Next: Financial Advisor <i class="fas fa-arrow-right"></i>
+                Next: Find Advisor <i class="fas fa-arrow-right"></i>
             </button>
         </div>
     </div>
@@ -387,14 +318,21 @@
         // Initialize Firebase integration
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Load all data from Firestore for dashboard
+                // Load all data from Firestore
                 const allData = await fetchAllFormData();
-                window.firestoreData = allData;
-                
-                // Make Firestore functions available globally
-                window.saveFormData = saveFormData;
-                window.fetchFormData = fetchFormData;
-                window.fetchAllFormData = fetchAllFormData;
+                if (allData && Object.keys(allData).length > 0) {
+                    // Store data in localStorage for dashboard to use
+                    Object.keys(allData).forEach(key => {
+                        if (allData[key]) {
+                            localStorage.setItem(key, JSON.stringify(allData[key]));
+                        }
+                    });
+                    
+                    // Refresh dashboard
+                    if (typeof window.initDashboard === 'function') {
+                        setTimeout(() => window.initDashboard(), 500);
+                    }
+                }
             }
         });
     </script>
