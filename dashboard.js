@@ -431,6 +431,7 @@ function createLiabilitiesChart(liabilitiesData) {
 
 function displayIncomeExpenseBreakdown() {
     console.log('Displaying income expense breakdown...');
+    console.log('Dashboard data:', dashboardData);
     
     // Create income sources chart
     createIncomeSourcesChart();
@@ -444,8 +445,21 @@ function createIncomeSourcesChart() {
     if (!ctx) return;
     
     const incomeData = dashboardData.incomeData;
-    if (!incomeData || !incomeData.income) {
-        ctx.parentElement.innerHTML = '<div class="no-data-message">No income data available</div>';
+    console.log('Income data for chart:', incomeData);
+    
+    if (!incomeData) {
+        const chartContainer = ctx.closest('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="no-data-message">No income data available. Please complete the income section first.</div>';
+        }
+        return;
+    }
+    
+    if (!incomeData.income && !incomeData.autoCalculated) {
+        const chartContainer = ctx.closest('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="no-data-message">No income sources found. Please add income sources in the income section.</div>';
+        }
         return;
     }
     
@@ -455,37 +469,41 @@ function createIncomeSourcesChart() {
     
     // Calculate totals for each income category
     const categoryTotals = {};
-    Object.keys(incomeData.income).forEach(category => {
-        if (Array.isArray(incomeData.income[category])) {
-            let categoryTotal = 0;
-            incomeData.income[category].forEach(item => {
-                if (item && typeof item.amount === 'number') {
-                    let annualAmount = item.amount;
-                    // Convert to annual based on frequency
-                    switch (item.frequency) {
-                        case 'monthly':
-                            annualAmount = item.amount * 12;
-                            break;
-                        case 'quarterly':
-                            annualAmount = item.amount * 4;
-                            break;
-                        case 'half-yearly':
-                            annualAmount = item.amount * 2;
-                            break;
-                        case 'yearly':
-                            annualAmount = item.amount;
-                            break;
-                        default:
-                            annualAmount = item.amount * 12;
+    
+    // Process income categories if they exist
+    if (incomeData.income && typeof incomeData.income === 'object') {
+        Object.keys(incomeData.income).forEach(category => {
+            if (Array.isArray(incomeData.income[category])) {
+                let categoryTotal = 0;
+                incomeData.income[category].forEach(item => {
+                    if (item && typeof item.amount === 'number') {
+                        let annualAmount = item.amount;
+                        // Convert to annual based on frequency
+                        switch (item.frequency) {
+                            case 'monthly':
+                                annualAmount = item.amount * 12;
+                                break;
+                            case 'quarterly':
+                                annualAmount = item.amount * 4;
+                                break;
+                            case 'half-yearly':
+                                annualAmount = item.amount * 2;
+                                break;
+                            case 'yearly':
+                                annualAmount = item.amount;
+                                break;
+                            default:
+                                annualAmount = item.amount * 12;
+                        }
+                        categoryTotal += annualAmount;
                     }
-                    categoryTotal += annualAmount;
+                });
+                if (categoryTotal > 0) {
+                    categoryTotals[category] = categoryTotal;
                 }
-            });
-            if (categoryTotal > 0) {
-                categoryTotals[category] = categoryTotal;
             }
-        }
-    });
+        });
+    }
     
     // Add auto-calculated income
     if (incomeData.autoCalculated) {
@@ -508,7 +526,10 @@ function createIncomeSourcesChart() {
     });
     
     if (data.length === 0) {
-        ctx.parentElement.innerHTML = '<div class="no-data-message">No income data available</div>';
+        const chartContainer = ctx.closest('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="no-data-message">No income sources with valid amounts found. Please check your income data.</div>';
+        }
         return;
     }
     
@@ -550,7 +571,11 @@ function createIncomeSourcesChart() {
     });
     
     // Create custom legend with percentages
-    createChartLegendWithPercentages('incomeSourcesChart', labels, colors.slice(0, data.length), data, total);
+    try {
+        createChartLegendWithPercentages('incomeSourcesChart', labels, colors.slice(0, data.length), data, total);
+    } catch (error) {
+        console.error('Error creating income sources legend:', error);
+    }
 }
 
 function createExpenseCategoriesChart() {
@@ -558,8 +583,21 @@ function createExpenseCategoriesChart() {
     if (!ctx) return;
     
     const expenseData = dashboardData.expenseData;
-    if (!expenseData || !expenseData.expenses) {
-        ctx.parentElement.innerHTML = '<div class="no-data-message">No expense data available</div>';
+    console.log('Expense data for chart:', expenseData);
+    
+    if (!expenseData) {
+        const chartContainer = ctx.closest('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="no-data-message">No expense data available. Please complete the expenses section first.</div>';
+        }
+        return;
+    }
+    
+    if (!expenseData.expenses) {
+        const chartContainer = ctx.closest('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="no-data-message">No expense categories found. Please add expenses in the expenses section.</div>';
+        }
         return;
     }
     
@@ -598,7 +636,10 @@ function createExpenseCategoriesChart() {
     });
     
     if (data.length === 0) {
-        ctx.parentElement.innerHTML = '<div class="no-data-message">No expense data available</div>';
+        const chartContainer = ctx.closest('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="no-data-message">No expense categories with valid amounts found. Please check your expense data.</div>';
+        }
         return;
     }
     
@@ -640,7 +681,11 @@ function createExpenseCategoriesChart() {
     });
     
     // Create custom legend with percentages
-    createChartLegendWithPercentages('expenseCategoriesChart', labels, colors.slice(0, data.length), data, total);
+    try {
+        createChartLegendWithPercentages('expenseCategoriesChart', labels, colors.slice(0, data.length), data, total);
+    } catch (error) {
+        console.error('Error creating expense categories legend:', error);
+    }
 }
 
 function displayIncomeVsExpenseAnalysis() {
@@ -1129,7 +1174,13 @@ function createChartLegend(containerId, labels, colors, data) {
 }
 
 function createChartLegendWithPercentages(chartId, labels, colors, data, total) {
-    const chartContainer = document.getElementById(chartId).parentElement;
+    const chartElement = document.getElementById(chartId);
+    if (!chartElement) return;
+    
+    // Find the chart-container (parent of chart-wrapper)
+    const chartContainer = chartElement.closest('.chart-container');
+    if (!chartContainer) return;
+    
     const existingLegend = chartContainer.querySelector('.chart-legend-with-percentages');
     if (existingLegend) {
         existingLegend.remove();
