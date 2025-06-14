@@ -308,12 +308,12 @@ function updateSavingsAnalysis() {
             }
         }
         
-        console.log('Savings analysis updated successfully');
-        
-    } catch (error) {
-        console.error('Error updating savings analysis:', error);
-    }
-    const savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome) * 100 : 0;
+                 console.log('Savings analysis updated successfully');
+         
+     } catch (error) {
+         console.error('Error updating savings analysis:', error);
+     }
+ }
     
     // Update savings display elements
     const monthlySavingsElement = document.getElementById('monthlySavings');
@@ -407,63 +407,93 @@ function showIncomeExpenseChange(incomeExpenseChangeElement, savingsChangeElemen
 
 // Update health indicators
 function updateHealthIndicators() {
-    // Savings Rate
-    const annualIncome = dashboardData.income.totals?.annualTotal || 0;
-    const annualExpenses = dashboardData.expenses.totals?.annualTotal || 0;
-    const monthlyIncome = annualIncome / 12;
-    const monthlyExpenses = annualExpenses / 12;
-    const savingsRate = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
+    console.log('Updating health indicators...');
     
-    document.getElementById('savingsRateIndicator').textContent = Math.round(savingsRate) + '%';
-    updateProgressBar('savingsRateProgress', savingsRate, 100);
-    colorizeIndicator('savingsRateIndicator', savingsRate, 10, 25);
+    try {
+        const annualIncome = dashboardData.income?.totals?.annualTotal || 0;
+        const annualExpenses = dashboardData.expenses?.totals?.annualTotal || 0;
+        const monthlyIncome = annualIncome / 12;
+        const monthlyExpenses = annualExpenses / 12;
+        const netWorth = dashboardData.netWorth || {};
+        
+        // Savings Rate
+        const savingsRate = annualIncome > 0 ? ((annualIncome - annualExpenses) / annualIncome) * 100 : 0;
+        updateHealthIndicator('healthSavingsRate', 'healthSavingsRateBar', Math.round(savingsRate) + '%', savingsRate, 30);
+        
+        // Emergency Fund calculation (liquid assets / monthly expenses)
+        const cashAssets = (netWorth.assets?.cash || []).reduce((total, asset) => total + (asset.value || 0), 0);
+        const emergencyFundMonths = monthlyExpenses > 0 ? cashAssets / monthlyExpenses : 0;
+        updateHealthIndicator('healthEmergencyFund', 'healthEmergencyFundBar', Math.round(emergencyFundMonths) + ' months', emergencyFundMonths, 6);
+        
+        // Life Insurance Ratio
+        const lifeInsuranceRatio = dashboardData.insurance?.analysis?.lifeInsuranceRatio || 0;
+        updateHealthIndicator('healthLifeInsurance', 'healthLifeInsuranceBar', lifeInsuranceRatio.toFixed(1) + 'x', lifeInsuranceRatio, 10);
+        
+        // Investment Rate (recurring investments / income)
+        const recurringInvestments = netWorth.recurringInvestments || {};
+        const totalRecurringMonthly = (recurringInvestments.sip || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0) +
+                                     (recurringInvestments.rd || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0) +
+                                     (recurringInvestments.otherSavings || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0);
+        const investmentRate = monthlyIncome > 0 ? (totalRecurringMonthly / monthlyIncome) * 100 : 0;
+        updateHealthIndicator('healthInvestmentRate', 'healthInvestmentRateBar', Math.round(investmentRate) + '%', investmentRate, 20);
+        
+        // Debt-to-Income ratio
+        const totalLiabilities = netWorth.totals?.totalLiabilities || 0;
+        const debtToIncomeRatio = annualIncome > 0 ? (totalLiabilities / annualIncome) * 100 : 0;
+        updateHealthIndicator('healthDebtToIncome', 'healthDebtToIncomeBar', Math.round(debtToIncomeRatio) + '%', debtToIncomeRatio, 30, true);
+        
+        // Risk Profile
+        const riskProfile = dashboardData.riskProfile?.riskProfile || dashboardData.riskProfile?.category || 'Not Set';
+        const riskProfileElement = document.getElementById('healthRiskProfile');
+        if (riskProfileElement) {
+            riskProfileElement.textContent = riskProfile;
+        }
+        
+        console.log('Health indicators updated successfully');
+        
+    } catch (error) {
+        console.error('Error updating health indicators:', error);
+    }
+}
+
+// Helper function to update health indicators
+function updateHealthIndicator(valueId, barId, displayValue, actualValue, maxValue, reverse = false) {
+    const valueElement = document.getElementById(valueId);
+    const barElement = document.getElementById(barId);
     
-    // Emergency Fund calculation (liquid assets / monthly expenses)
-    const netWorth = dashboardData.netWorth || {};
-    const cashAssets = (netWorth.assets?.cash || []).reduce((total, asset) => total + (asset.value || 0), 0);
-    const emergencyFundMonths = monthlyExpenses > 0 ? cashAssets / monthlyExpenses : 0;
-    
-    document.getElementById('emergencyFundIndicator').textContent = Math.round(emergencyFundMonths) + ' months';
-    
-    // Life Insurance Ratio
-    const lifeInsuranceRatio = dashboardData.insurance?.analysis?.lifeInsuranceRatio || 0;
-    document.getElementById('lifeInsuranceIndicator').textContent = lifeInsuranceRatio.toFixed(1) + 'x';
-    colorizeIndicator('lifeInsuranceIndicator', lifeInsuranceRatio, 5, 10);
-    
-    // Risk Profile
-    const riskProfile = dashboardData.riskProfile?.riskProfile || dashboardData.riskProfile?.category || 'Not Assessed';
-    document.getElementById('riskProfileIndicator').textContent = riskProfile;
-    
-    // Debt-to-Income ratio
-    const totalLiabilities = netWorth.totals?.totalLiabilities || 0;
-    const debtToIncomeRatio = annualIncome > 0 ? (totalLiabilities / annualIncome) * 100 : 0;
-    document.getElementById('debtToIncomeIndicator').textContent = Math.round(debtToIncomeRatio) + '%';
-    
-    // Investment Rate (recurring investments / income)
-    const recurringInvestments = netWorth.recurringInvestments || {};
-    const totalRecurringMonthly = (recurringInvestments.sip || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0) +
-                                 (recurringInvestments.rd || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0) +
-                                 (recurringInvestments.otherSavings || []).reduce((total, inv) => total + convertToMonthly(inv.amount || 0, inv.frequency || 'monthly'), 0);
-    const investmentRate = monthlyIncome > 0 ? (totalRecurringMonthly / monthlyIncome) * 100 : 0;
-    document.getElementById('investmentRateIndicator').textContent = Math.round(investmentRate) + '%';
-    
-    // Color coding for indicators
-    colorizeIndicator('emergencyFundIndicator', emergencyFundMonths, 3, 6);
-    colorizeIndicatorReverse('debtToIncomeIndicator', debtToIncomeRatio, 20, 40); // Reverse - lower is better
-    colorizeIndicator('investmentRateIndicator', investmentRate, 15, 25);
-    
-    // Update emergency fund status
-    const emergencyStatus = document.getElementById('emergencyFundStatus');
-    if (emergencyStatus) {
-        if (emergencyFundMonths >= 6) {
-            emergencyStatus.textContent = 'Excellent coverage';
-            emergencyStatus.style.color = 'var(--success-color)';
-        } else if (emergencyFundMonths >= 3) {
-            emergencyStatus.textContent = 'Good coverage';
-            emergencyStatus.style.color = 'var(--warning-color)';
+    if (valueElement) {
+        valueElement.textContent = displayValue;
+        
+        // Color coding
+        let colorClass = '';
+        if (reverse) {
+            // For indicators where lower is better (like debt-to-income)
+            if (actualValue <= maxValue * 0.3) colorClass = 'positive';
+            else if (actualValue <= maxValue * 0.6) colorClass = 'warning';
+            else colorClass = 'negative';
         } else {
-            emergencyStatus.textContent = 'Needs improvement';
-            emergencyStatus.style.color = 'var(--error-color)';
+            // For indicators where higher is better
+            if (actualValue >= maxValue * 0.8) colorClass = 'positive';
+            else if (actualValue >= maxValue * 0.5) colorClass = 'warning';
+            else colorClass = 'negative';
+        }
+        
+        valueElement.className = `indicator-value ${colorClass}`;
+    }
+    
+    if (barElement) {
+        const percentage = Math.min((actualValue / maxValue) * 100, 100);
+        barElement.style.width = percentage + '%';
+        
+        // Color the progress bar
+        if (reverse) {
+            if (actualValue <= maxValue * 0.3) barElement.style.backgroundColor = 'var(--success-color)';
+            else if (actualValue <= maxValue * 0.6) barElement.style.backgroundColor = 'var(--warning-color)';
+            else barElement.style.backgroundColor = 'var(--danger-color)';
+        } else {
+            if (actualValue >= maxValue * 0.8) barElement.style.backgroundColor = 'var(--success-color)';
+            else if (actualValue >= maxValue * 0.5) barElement.style.backgroundColor = 'var(--warning-color)';
+            else barElement.style.backgroundColor = 'var(--danger-color)';
         }
     }
 }
