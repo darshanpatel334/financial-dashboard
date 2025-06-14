@@ -406,6 +406,54 @@
             font-size: 0.75rem;
             color: #94a3b8;
         }
+
+        /* Financial Metrics Grid */
+        .financial-metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            border: 1px solid #bae6fd;
+        }
+
+        .metric-summary-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .metric-summary-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value.positive {
+            color: #059669;
+        }
+
+        .metric-description {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
         
         .snapshot-single {
             text-align: center;
@@ -483,6 +531,10 @@
                 grid-template-columns: 1fr;
             }
             
+            .financial-metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .health-indicator-compact {
                 padding: 0.75rem;
             }
@@ -500,6 +552,11 @@
             }
             
             .snapshot-summary-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .financial-metrics-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
@@ -633,27 +690,21 @@
                     <i class="fas fa-chart-bar"></i> Financial Metrics Summary
                 </h2>
             </div>
-            <div class="grid-3 compact-cards">
-                <div class="card compact-card">
-                    <div class="card-body text-center">
-                        <h5>Monthly Savings</h5>
-                        <div class="score-number positive compact-score" id="monthlySavingsValue">₹0</div>
-                        <small class="text-secondary">Income - Expenses</small>
-                    </div>
+            <div class="financial-metrics-grid">
+                <div class="metric-summary-item">
+                    <div class="metric-label">Monthly Savings</div>
+                    <div class="metric-value positive" id="monthlySavingsValue">₹0</div>
+                    <div class="metric-description">Income - Expenses</div>
                 </div>
-                <div class="card compact-card">
-                    <div class="card-body text-center">
-                        <h5>Savings Rate</h5>
-                        <div class="score-number compact-score" id="savingsRateValue">0%</div>
-                        <small class="text-secondary">Percentage saved</small>
-                    </div>
+                <div class="metric-summary-item">
+                    <div class="metric-label">Savings Rate</div>
+                    <div class="metric-value" id="savingsRateValue">0%</div>
+                    <div class="metric-description">Percentage saved</div>
                 </div>
-                <div class="card compact-card">
-                    <div class="card-body text-center">
-                        <h5>Expense Ratio</h5>
-                        <div class="score-number compact-score" id="expenseRatioValue">0%</div>
-                        <small class="text-secondary">Expenses vs Income</small>
-                    </div>
+                <div class="metric-summary-item">
+                    <div class="metric-label">Expense Ratio</div>
+                    <div class="metric-value" id="expenseRatioValue">0%</div>
+                    <div class="metric-description">Expenses vs Income</div>
                 </div>
             </div>
         </div>

@@ -59,14 +59,35 @@ async function loadAllData() {
         if (firestoreData && Object.keys(firestoreData).length > 0) {
             console.log('Syncing with Firestore data:', firestoreData);
             
+            // Map Firestore keys back to localStorage keys
+            const firestoreToLocalMap = {
+                'personal_info': 'personalInfo',
+                'networth': 'netWorthData',
+                'income': 'incomeData',
+                'expenses': 'expenseData',
+                'insurance': 'insuranceData',
+                'risk-profile': 'riskProfileData',
+                'ff-score': 'ffScoreData',
+                'dashboard': 'financialSnapshots'
+            };
+            
             // Update localStorage with Firestore data if it's newer or missing locally
-            Object.keys(firestoreData).forEach(key => {
-                if (firestoreData[key]) {
-                    // Update dashboardData
-                    dashboardData[key] = firestoreData[key];
-                    
-                    // Update localStorage to keep them in sync
-                    localStorage.setItem(key, JSON.stringify(firestoreData[key]));
+            Object.keys(firestoreData).forEach(firestoreKey => {
+                const localKey = firestoreToLocalMap[firestoreKey] || firestoreKey;
+                const data = firestoreData[firestoreKey];
+                
+                if (data) {
+                    // For dashboard data, extract financialSnapshots
+                    if (firestoreKey === 'dashboard' && data.financialSnapshots) {
+                        dashboardData.financialSnapshots = data.financialSnapshots;
+                        localStorage.setItem('financialSnapshots', JSON.stringify(data.financialSnapshots));
+                    } else {
+                        // Update dashboardData
+                        dashboardData[localKey] = data;
+                        
+                        // Update localStorage to keep them in sync
+                        localStorage.setItem(localKey, JSON.stringify(data));
+                    }
                 }
             });
             
@@ -1212,7 +1233,15 @@ function generateActionItems() {
 // Utility functions
 function formatCurrency(amount) {
     if (typeof amount !== 'number') return '₹0';
-    return '₹' + amount.toLocaleString('en-IN');
+    
+    // Ensure we're working with a proper number
+    const numAmount = Number(amount);
+    if (isNaN(numAmount)) return '₹0';
+    
+    // Round to avoid floating point precision issues
+    const roundedAmount = Math.round(numAmount);
+    
+    return '₹' + roundedAmount.toLocaleString('en-IN');
 }
 
 function createChartLegend(containerId, labels, colors, data) {
@@ -1559,7 +1588,7 @@ async function syncDataToFirestore(key, data) {
         
         // Map localStorage keys to Firestore page names
         const keyToPageMap = {
-            'personalInfo': 'personal-info',
+            'personalInfo': 'personal_info',
             'netWorthData': 'networth',
             'incomeData': 'income',
             'expenseData': 'expenses',
