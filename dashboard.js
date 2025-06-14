@@ -104,13 +104,28 @@ function displayPersonalInfo() {
         return;
     }
     
+    // Format dependents info
+    let dependentsInfo = 'None';
+    if (personalInfo.dependents && personalInfo.dependents.length > 0) {
+        dependentsInfo = personalInfo.dependents.map(dep => 
+            `${dep.name} (${dep.relation}, ${dep.age})`
+        ).join(', ');
+    }
+
     container.innerHTML = `
         <div class="personal-info-grid compact-info-grid">
             <div class="info-item compact-info-item">
                 <i class="fas fa-user"></i>
                 <div>
-                    <strong>Name:</strong>
-                    <span>${personalInfo.name || personalInfo.fullName || 'Not provided'}</span>
+                    <strong>Full Name:</strong>
+                    <span>${personalInfo.fullName || personalInfo.firstName + ' ' + personalInfo.lastName || 'Not provided'}</span>
+                </div>
+            </div>
+            <div class="info-item compact-info-item">
+                <i class="fas fa-calendar"></i>
+                <div>
+                    <strong>Age:</strong>
+                    <span>${personalInfo.age || 'Not provided'}</span>
                 </div>
             </div>
             <div class="info-item compact-info-item">
@@ -121,10 +136,10 @@ function displayPersonalInfo() {
                 </div>
             </div>
             <div class="info-item compact-info-item">
-                <i class="fas fa-phone"></i>
+                <i class="fas fa-users"></i>
                 <div>
-                    <strong>Phone:</strong>
-                    <span>${personalInfo.phone || personalInfo.phoneNumber || 'Not provided'}</span>
+                    <strong>Dependents:</strong>
+                    <span>${dependentsInfo}</span>
                 </div>
             </div>
             <div class="info-item compact-info-item">
@@ -132,6 +147,13 @@ function displayPersonalInfo() {
                 <div>
                     <strong>Occupation:</strong>
                     <span>${personalInfo.occupation || 'Not provided'}</span>
+                </div>
+            </div>
+            <div class="info-item compact-info-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <strong>City:</strong>
+                    <span>${personalInfo.city || 'Not provided'}</span>
                 </div>
             </div>
         </div>

@@ -297,7 +297,7 @@
 
         .compact-info-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 0.75rem;
         }
 
@@ -431,6 +431,14 @@
                 grid-template-columns: 1fr;
             }
             
+            .compact-info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
             .health-indicator-compact {
                 padding: 0.75rem;
             }
@@ -439,6 +447,12 @@
                 width: 35px;
                 height: 35px;
                 margin-right: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .compact-info-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -561,7 +575,16 @@
                     <canvas id="incomeVsExpenseChart"></canvas>
                 </div>
             </div>
-            <div class="grid-3 compact-cards" style="margin-top: 1rem;">
+        </div>
+
+        <!-- Financial Metrics Summary -->
+        <div class="section-card compact-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i> Financial Metrics Summary
+                </h2>
+            </div>
+            <div class="grid-3 compact-cards">
                 <div class="card compact-card">
                     <div class="card-body text-center">
                         <h5>Monthly Savings</h5>
@@ -657,34 +680,43 @@
             </div>
         </div>
 
+        <!-- Snapshot Summary -->
+        <div class="section-card compact-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-camera"></i> Snapshot Summary
+                </h2>
+                <button class="btn btn-primary" onclick="saveCurrentSnapshot()">
+                    <i class="fas fa-camera"></i> Save Current Snapshot
+                </button>
+            </div>
+            <div class="grid-2 compact-cards">
+                <div class="card compact-card">
+                    <div class="card-body">
+                        <h5>Total Snapshots</h5>
+                        <div class="score-number compact-score" id="totalSnapshotsCount">0</div>
+                        <small class="text-secondary">Saved over time</small>
+                    </div>
+                </div>
+                <div class="card compact-card">
+                    <div class="card-body">
+                        <h5>Latest Snapshot</h5>
+                        <div class="score-number compact-score" id="latestSnapshotDate">Never</div>
+                        <small class="text-secondary">Last saved</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Historical Snapshots & Comparison -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-history"></i> Historical Snapshots & Comparison
                 </h2>
-                <button class="btn btn-primary" onclick="saveCurrentSnapshot()">
-                    <i class="fas fa-camera"></i> Save Current Snapshot
-                </button>
             </div>
             
             <div id="historicalContent">
-                <div class="grid-2 compact-cards" style="margin-bottom: 1.5rem;">
-                    <div class="card compact-card">
-                        <div class="card-body">
-                            <h5>Total Snapshots</h5>
-                            <div class="score-number compact-score" id="totalSnapshotsCount">0</div>
-                            <small class="text-secondary">Saved over time</small>
-                        </div>
-                    </div>
-                    <div class="card compact-card">
-                        <div class="card-body">
-                            <h5>Latest Snapshot</h5>
-                            <div class="score-number compact-score" id="latestSnapshotDate">Never</div>
-                            <small class="text-secondary">Last saved</small>
-                        </div>
-                    </div>
-                </div>
                 
                 <div id="snapshotComparisonTable">
                     <!-- Comparison table will be loaded here -->

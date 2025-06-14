@@ -434,6 +434,14 @@
                             <option value="widowed">Widowed</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="occupation">Occupation *</label>
+                        <input type="text" id="occupation" placeholder="e.g., Software Engineer, Doctor, Teacher" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" placeholder="e.g., Mumbai, Delhi, Bangalore" required>
+                    </div>
                 </div>
 
                 <!-- Dependents Section -->
@@ -565,6 +573,8 @@
                 lastName: document.getElementById('lastName').value,
                 dateOfBirth: document.getElementById('dateOfBirth').value,
                 maritalStatus: document.getElementById('maritalStatus').value,
+                occupation: document.getElementById('occupation').value,
+                city: document.getElementById('city').value,
                 dependents: []
             };
 
@@ -624,6 +634,8 @@
                     document.getElementById('lastName').value = data.lastName || '';
                     document.getElementById('dateOfBirth').value = data.dateOfBirth || '';
                     document.getElementById('maritalStatus').value = data.maritalStatus || '';
+                    document.getElementById('occupation').value = data.occupation || '';
+                    document.getElementById('city').value = data.city || '';
 
                     // Load dependents
                     if (data.dependents && data.dependents.length > 0) {
@@ -644,6 +656,8 @@
                         document.getElementById('lastName').value = localData.lastName || '';
                         document.getElementById('dateOfBirth').value = localData.dateOfBirth || '';
                         document.getElementById('maritalStatus').value = localData.maritalStatus || '';
+                        document.getElementById('occupation').value = localData.occupation || '';
+                        document.getElementById('city').value = localData.city || '';
 
                         // Load dependents
                         if (localData.dependents && localData.dependents.length > 0) {
@@ -667,6 +681,8 @@
                     document.getElementById('lastName').value = localData.lastName || '';
                     document.getElementById('dateOfBirth').value = localData.dateOfBirth || '';
                     document.getElementById('maritalStatus').value = localData.maritalStatus || '';
+                    document.getElementById('occupation').value = localData.occupation || '';
+                    document.getElementById('city').value = localData.city || '';
                 }
             }
         }
