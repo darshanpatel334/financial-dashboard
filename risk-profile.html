@@ -283,6 +283,44 @@
     <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
     <script src="auth.js"></script>
     <script src="common.js"></script>
+    <script type="module">
+        import { saveFormData, fetchFormData } from './firestoreService.js';
+        import { auth } from './firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+        
+        // Initialize Firebase integration
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Load existing data from Firestore
+                const savedData = await fetchFormData('risk_profile');
+                if (savedData && Object.keys(savedData).length > 0) {
+                    // Restore form data
+                    window.loadRiskProfileFromFirestore = () => savedData;
+                    if (typeof window.loadRiskProfileData === 'function') {
+                        window.loadRiskProfileData(savedData);
+                    }
+                }
+            }
+        });
+        
+        // Override save function to use Firestore
+        const originalSaveData = window.saveRiskProfileData;
+        window.saveRiskProfileData = async function() {
+            if (typeof originalSaveData === 'function') {
+                const data = originalSaveData();
+                if (data) {
+                    try {
+                        await saveFormData('risk_profile', data);
+                        localStorage.setItem('riskProfileData', JSON.stringify(data));
+                    } catch (error) {
+                        console.error('Error saving to Firestore:', error);
+                        localStorage.setItem('riskProfileData', JSON.stringify(data));
+                    }
+                }
+                return data;
+            }
+        };
+    </script>
     <script src="risk-profile.js"></script>
     
     <!-- Include Chat Widget -->

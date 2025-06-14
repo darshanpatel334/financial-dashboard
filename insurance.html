@@ -227,6 +227,44 @@
     <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
     <script src="auth.js"></script>
     <script src="common.js"></script>
+    <script type="module">
+        import { saveFormData, fetchFormData } from './firestoreService.js';
+        import { auth } from './firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+        
+        // Initialize Firebase integration
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Load existing data from Firestore
+                const savedData = await fetchFormData('insurance');
+                if (savedData && Object.keys(savedData).length > 0) {
+                    // Restore form data
+                    window.loadInsuranceFromFirestore = () => savedData;
+                    if (typeof window.loadInsuranceData === 'function') {
+                        window.loadInsuranceData(savedData);
+                    }
+                }
+            }
+        });
+        
+        // Override save function to use Firestore
+        const originalSaveData = window.saveInsuranceData;
+        window.saveInsuranceData = async function() {
+            if (typeof originalSaveData === 'function') {
+                const data = originalSaveData();
+                if (data) {
+                    try {
+                        await saveFormData('insurance', data);
+                        localStorage.setItem('insuranceData', JSON.stringify(data));
+                    } catch (error) {
+                        console.error('Error saving to Firestore:', error);
+                        localStorage.setItem('insuranceData', JSON.stringify(data));
+                    }
+                }
+                return data;
+            }
+        };
+    </script>
     <script src="insurance.js"></script>
     
     <!-- Include Chat Widget -->

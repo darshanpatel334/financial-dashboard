@@ -1962,6 +1962,20 @@
     <!-- Your Scripts -->
     <script src="auth.js"></script>
     <script src="common.js"></script>
+    <script type="module">
+        import { hasUserData } from './firestoreService.js';
+        import { auth } from './firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+        
+        // Initialize Firebase integration for landing page
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Check if user has existing data to determine redirect behavior
+                const hasData = await hasUserData();
+                window.userHasData = hasData;
+            }
+        });
+    </script>
     <script>
         // Modal functionality - moved after auth.js is loaded
         document.addEventListener('DOMContentLoaded', () => {

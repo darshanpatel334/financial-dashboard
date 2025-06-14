@@ -401,6 +401,25 @@
     <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
     <script src="auth.js"></script>
     <script src="common.js"></script>
+    <script type="module">
+        import { saveFormData, fetchFormData, fetchAllFormData } from './firestoreService.js';
+        import { auth } from './firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+        
+        // Initialize Firebase integration
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Load all data from Firestore for dashboard
+                const allData = await fetchAllFormData();
+                window.firestoreData = allData;
+                
+                // Make Firestore functions available globally
+                window.saveFormData = saveFormData;
+                window.fetchFormData = fetchFormData;
+                window.fetchAllFormData = fetchAllFormData;
+            }
+        });
+    </script>
     <script src="dashboard.js"></script>
     
     <!-- Include Chat Widget -->

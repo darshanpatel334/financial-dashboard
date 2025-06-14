@@ -471,11 +471,15 @@
     <script src="auth.js"></script>
     <script src="common.js"></script>
 
-    <script>
+    <script type="module">
+        import { saveFormData, fetchFormData } from './firestoreService.js';
+        import { auth } from './firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+
         let dependentCount = 0;
 
         // Check authentication and display user name
-        firebase.auth().onAuthStateChanged((user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userEmailElement = document.getElementById('userEmail');
                 if (userEmailElement) {
@@ -489,7 +493,7 @@
                         userEmailElement.textContent = namePart.charAt(0).toUpperCase() + namePart.slice(1);
                     }
                 }
-                loadPersonalInfo();
+                await loadPersonalInfo();
                 
                 // Initialize progress tracking
                 if (typeof initProgressTracking === 'function') {
@@ -555,7 +559,7 @@
             button.closest('.dependent-item').remove();
         }
 
-        function savePersonalInfo() {
+        async function savePersonalInfo() {
             const formData = {
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
@@ -568,7 +572,7 @@
             formData.fullName = `${formData.firstName} ${formData.lastName}`.trim();
             
             // Add email from Firebase auth
-            const user = firebase.auth().currentUser;
+            const user = auth.currentUser;
             if (user) {
                 formData.email = user.email;
             }
@@ -589,7 +593,7 @@
             if (formData.dateOfBirth) {
                 const today = new Date();
                 const birthDate = new Date(formData.dateOfBirth);
-                const age = today.getFullYear() - birthDate.getFullYear();
+                let age = today.getFullYear() - birthDate.getFullYear();
                 const monthDiff = today.getMonth() - birthDate.getMonth();
                 
                 if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
@@ -599,29 +603,70 @@
                 formData.age = age;
             }
 
-            // Save to localStorage
-            localStorage.setItem('personalInfo', JSON.stringify(formData));
+            // Save to Firestore (with localStorage fallback for compatibility)
+            try {
+                await saveFormData('personal_info', formData);
+                localStorage.setItem('personalInfo', JSON.stringify(formData));
+            } catch (error) {
+                console.error('Error saving to Firestore:', error);
+                localStorage.setItem('personalInfo', JSON.stringify(formData));
+            }
             return formData;
         }
 
-        function loadPersonalInfo() {
-            const savedData = localStorage.getItem('personalInfo');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                document.getElementById('firstName').value = data.firstName || '';
-                document.getElementById('lastName').value = data.lastName || '';
-                document.getElementById('dateOfBirth').value = data.dateOfBirth || '';
-                document.getElementById('maritalStatus').value = data.maritalStatus || '';
+        async function loadPersonalInfo() {
+            try {
+                // Load from Firestore first
+                const data = await fetchFormData('personal_info');
+                
+                if (data && Object.keys(data).length > 0) {
+                    document.getElementById('firstName').value = data.firstName || '';
+                    document.getElementById('lastName').value = data.lastName || '';
+                    document.getElementById('dateOfBirth').value = data.dateOfBirth || '';
+                    document.getElementById('maritalStatus').value = data.maritalStatus || '';
 
-                // Load dependents
-                if (data.dependents && data.dependents.length > 0) {
-                    data.dependents.forEach(dependent => {
-                        addDependent();
-                        const lastDependent = document.querySelector('.dependent-item:last-child');
-                        lastDependent.querySelector('input[name^="dependentName"]').value = dependent.name;
-                        lastDependent.querySelector('input[name^="dependentAge"]').value = dependent.age;
-                        lastDependent.querySelector('select[name^="dependentRelation"]').value = dependent.relation;
-                    });
+                    // Load dependents
+                    if (data.dependents && data.dependents.length > 0) {
+                        data.dependents.forEach(dependent => {
+                            addDependent();
+                            const lastDependent = document.querySelector('.dependent-item:last-child');
+                            lastDependent.querySelector('input[name^="dependentName"]').value = dependent.name;
+                            lastDependent.querySelector('input[name^="dependentAge"]').value = dependent.age;
+                            lastDependent.querySelector('select[name^="dependentRelation"]').value = dependent.relation;
+                        });
+                    }
+                } else {
+                    // Fallback to localStorage if no Firestore data
+                    const savedData = localStorage.getItem('personalInfo');
+                    if (savedData) {
+                        const localData = JSON.parse(savedData);
+                        document.getElementById('firstName').value = localData.firstName || '';
+                        document.getElementById('lastName').value = localData.lastName || '';
+                        document.getElementById('dateOfBirth').value = localData.dateOfBirth || '';
+                        document.getElementById('maritalStatus').value = localData.maritalStatus || '';
+
+                        // Load dependents
+                        if (localData.dependents && localData.dependents.length > 0) {
+                            localData.dependents.forEach(dependent => {
+                                addDependent();
+                                const lastDependent = document.querySelector('.dependent-item:last-child');
+                                lastDependent.querySelector('input[name^="dependentName"]').value = dependent.name;
+                                lastDependent.querySelector('input[name^="dependentAge"]').value = dependent.age;
+                                lastDependent.querySelector('select[name^="dependentRelation"]').value = dependent.relation;
+                            });
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading personal info:', error);
+                // Fallback to localStorage on error
+                const savedData = localStorage.getItem('personalInfo');
+                if (savedData) {
+                    const localData = JSON.parse(savedData);
+                    document.getElementById('firstName').value = localData.firstName || '';
+                    document.getElementById('lastName').value = localData.lastName || '';
+                    document.getElementById('dateOfBirth').value = localData.dateOfBirth || '';
+                    document.getElementById('maritalStatus').value = localData.maritalStatus || '';
                 }
             }
         }
@@ -631,10 +676,10 @@
         }
 
         // Form submission
-        document.getElementById('personalInfoForm').addEventListener('submit', (e) => {
+        document.getElementById('personalInfoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = savePersonalInfo();
+            const formData = await savePersonalInfo();
             showStatus('Personal information saved successfully!');
             
             // Redirect to next page after a short delay
@@ -645,14 +690,22 @@
 
         // Auto-save on form changes
         document.getElementById('personalInfoForm').addEventListener('input', () => {
-            setTimeout(() => {
-                savePersonalInfo();
+            setTimeout(async () => {
+                await savePersonalInfo();
                 // Refresh navigation to show completion status
                 if (typeof refreshNavigationStatus === 'function') {
                     refreshNavigationStatus();
                 }
             }, 1000);
         });
+
+        // Make functions available globally for compatibility
+        window.addDependent = addDependent;
+        window.removeDependent = removeDependent;
+        window.savePersonalInfo = savePersonalInfo;
+        window.loadPersonalInfo = loadPersonalInfo;
+        window.showStatus = showStatus;
+        window.goBack = goBack;
     </script>
     
     <!-- Include Chat Widget -->

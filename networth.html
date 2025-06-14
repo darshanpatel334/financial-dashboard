@@ -622,14 +622,18 @@
     <script src="auth.js"></script>
     <script src="common.js"></script>
 
-    <script>
+    <script type="module">
+        import { saveFormData, fetchFormData } from './firestoreService.js';
+        import { auth } from './firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+
         let assetCount = 0;
         let liabilityCount = 0;
 
         // Initialize page when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            firebase.auth().onAuthStateChanged((user) => {
+            onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     const userEmailElement = document.getElementById('userEmail');
                     if (userEmailElement) {
@@ -645,8 +649,8 @@
                     }
                     
                     // Load data with a small delay to ensure DOM is ready
-                    setTimeout(() => {
-                        loadNetWorthData();
+                    setTimeout(async () => {
+                        await loadNetWorthData();
                         calculateTotals();
                         calculateRecurringTotals();
                     }, 100);
@@ -665,6 +669,11 @@
                 saveNetWorthData();
             });
         });
+
+        // Make functions available globally for compatibility
+        window.saveNetWorthData = saveNetWorthData;
+        window.loadNetWorthData = loadNetWorthData;
+        window.loadNetWorthFromData = loadNetWorthFromData;
 
         function showStatus(message, isError = false) {
             const statusElement = document.getElementById('status');
@@ -958,7 +967,7 @@
             }, 500); // Reduced delay for faster saving
         }
 
-        function saveNetWorthData() {
+        async function saveNetWorthData() {
             const data = {
                 assets: {},
                 liabilities: [],
@@ -1054,92 +1063,119 @@
             // Add liquid net worth to totals
             data.totals.liquidNetWorth = liquidAssets - data.totals.totalLiabilities;
 
-            // Save to localStorage with error handling
+            // Save to Firestore (with localStorage fallback for compatibility)
             try {
+                await saveFormData('networth', data);
                 localStorage.setItem('netWorthData', JSON.stringify(data));
                 console.log('Net worth data saved successfully');
             } catch (error) {
                 console.error('Error saving net worth data:', error);
-                showStatus('Error saving data. Please try again.', true);
+                localStorage.setItem('netWorthData', JSON.stringify(data));
+                showStatus('Error saving data to cloud, saved locally.', true);
             }
         }
 
-        function loadNetWorthData() {
-            const savedData = localStorage.getItem('netWorthData');
-            console.log('Loading net worth data:', savedData ? 'Data found' : 'No data found');
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    console.log('Parsed data:', data);
+        async function loadNetWorthData() {
+            try {
+                // Load from Firestore first
+                const data = await fetchFormData('networth');
+                console.log('Loading net worth data from Firestore:', data);
                 
-                // Load assets
-                Object.keys(data.assets || {}).forEach(category => {
-                    data.assets[category].forEach(asset => {
-                        addAssetItem(category, category === 'realEstate' ? 'Real Estate' : 
-                                   category === 'cash' ? 'Cash & Bank' :
-                                   category === 'equity' ? 'Equity' : 
-                                   category === 'fixedIncome' ? 'Fixed Income' : 'Other Asset');
+                if (data && Object.keys(data).length > 0) {
+                    console.log('Parsed data:', data);
+                    loadNetWorthFromData(data);
+                } else {
+                    // Fallback to localStorage if no Firestore data
+                    const savedData = localStorage.getItem('netWorthData');
+                    console.log('Loading net worth data from localStorage:', savedData ? 'Data found' : 'No data found');
+                    if (savedData) {
+                        const localData = JSON.parse(savedData);
+                        console.log('Parsed local data:', localData);
+                        
+                        // Load from localStorage with same logic
+                        loadNetWorthFromData(localData);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading net worth data:', error);
+                // Fallback to localStorage on error
+                const savedData = localStorage.getItem('netWorthData');
+                if (savedData) {
+                    try {
+                        const localData = JSON.parse(savedData);
+                        loadNetWorthFromData(localData);
+                    } catch (parseError) {
+                        console.error('Error parsing localStorage data:', parseError);
+                        showStatus('Error loading saved data.', true);
+                    }
+                }
+            }
+        }
+
+        function loadNetWorthFromData(data) {
+            // Load assets
+            Object.keys(data.assets || {}).forEach(category => {
+                data.assets[category].forEach(asset => {
+                    addAssetItem(category, category === 'realEstate' ? 'Real Estate' : 
+                               category === 'cash' ? 'Cash & Bank' :
+                               category === 'equity' ? 'Equity' : 
+                               category === 'fixedIncome' ? 'Fixed Income' : 'Other Asset');
+                    
+                    const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
+                    const inputs = lastItem.querySelectorAll('input');
+                    const select = lastItem.querySelector('select');
+                    
+                    if (category === 'realEstate') {
+                        inputs[0].value = asset.name || '';
+                        inputs[1].value = asset.pricePerSqFt || 0;
+                        inputs[2].value = asset.totalArea || 0;
+                        inputs[3].value = asset.value || 0;
+                        inputs[4].value = asset.rentalAmount || 0;
+                        if (select) select.value = asset.rentalFrequency || 'monthly';
+                        inputs[6].value = asset.yield || 0;
+                        updateWords(inputs[3]);
+                    } else {
+                        inputs[0].value = asset.name || '';
+                        inputs[1].value = asset.value || 0;
+                        inputs[2].value = asset.yield || 0;
+                        updateWords(inputs[1]);
+                    }
+                });
+            });
+
+            // Load liabilities
+            (data.liabilities || []).forEach(liability => {
+                addLiabilityItem();
+                const lastItem = document.querySelector('#liabilityItems .asset-item:last-child');
+                const select = lastItem.querySelector('select');
+                const inputs = lastItem.querySelectorAll('input');
+                select.value = liability.type;
+                inputs[0].value = liability.amount;
+                inputs[1].value = liability.tenure;
+                updateWords(inputs[0]);
+            });
+
+            // Load recurring investments
+            const recurringData = data.recurringInvestments || {};
+            Object.keys(recurringData).forEach(category => {
+                if (recurringData[category]) {
+                    recurringData[category].forEach(item => {
+                        const categoryName = category === 'sip' ? 'Mutual Fund SIP' : 
+                                            category === 'rd' ? 'Recurring Deposit' : 'Savings Scheme';
+                        addRecurringItem(category, categoryName);
                         
                         const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
                         const inputs = lastItem.querySelectorAll('input');
                         const select = lastItem.querySelector('select');
-                        
-                        if (category === 'realEstate') {
-                            inputs[0].value = asset.name || '';
-                            inputs[1].value = asset.pricePerSqFt || 0;
-                            inputs[2].value = asset.totalArea || 0;
-                            inputs[3].value = asset.value || 0;
-                            inputs[4].value = asset.rentalAmount || 0;
-                            if (select) select.value = asset.rentalFrequency || 'monthly';
-                            inputs[6].value = asset.yield || 0;
-                            updateWords(inputs[3]);
-                        } else {
-                            inputs[0].value = asset.name || '';
-                            inputs[1].value = asset.value || 0;
-                            inputs[2].value = asset.yield || 0;
-                            updateWords(inputs[1]);
-                        }
+                        inputs[0].value = item.name || '';
+                        inputs[1].value = item.amount || 0;
+                        select.value = item.frequency || 'monthly';
                     });
-                });
-
-                // Load liabilities
-                (data.liabilities || []).forEach(liability => {
-                    addLiabilityItem();
-                    const lastItem = document.querySelector('#liabilityItems .asset-item:last-child');
-                    const select = lastItem.querySelector('select');
-                    const inputs = lastItem.querySelectorAll('input');
-                    select.value = liability.type;
-                    inputs[0].value = liability.amount;
-                    inputs[1].value = liability.tenure;
-                    updateWords(inputs[0]);
-                });
-
-                // Load recurring investments
-                const recurringData = data.recurringInvestments || {};
-                Object.keys(recurringData).forEach(category => {
-                    if (recurringData[category]) {
-                        recurringData[category].forEach(item => {
-                            const categoryName = category === 'sip' ? 'Mutual Fund SIP' : 
-                                                category === 'rd' ? 'Recurring Deposit' : 'Savings Scheme';
-                            addRecurringItem(category, categoryName);
-                            
-                            const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
-                            const inputs = lastItem.querySelectorAll('input');
-                            const select = lastItem.querySelector('select');
-                            inputs[0].value = item.name || '';
-                            inputs[1].value = item.amount || 0;
-                            select.value = item.frequency || 'monthly';
-                        });
-                    }
-                });
-
-                calculateTotals();
-                calculateRecurringTotals();
-                } catch (error) {
-                    console.error('Error loading net worth data:', error);
-                    showStatus('Error loading saved data.', true);
                 }
-            }
+            });
+
+            calculateTotals();
+            calculateRecurringTotals();
         }
 
         function goBack() {

@@ -616,6 +616,20 @@
     <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
     <script src="auth.js"></script>
     <script src="common.js"></script>
+    <script type="module">
+        import { fetchAllFormData } from './firestoreService.js';
+        import { auth } from './firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+        
+        // Initialize Firebase integration
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Load all user data for advisor consultation
+                const allData = await fetchAllFormData();
+                window.firestoreData = allData;
+            }
+        });
+    </script>
     <script src="analytics.js"></script>
     <script>
         // Initialize page
