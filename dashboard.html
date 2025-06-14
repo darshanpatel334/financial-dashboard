@@ -362,6 +362,50 @@
             gap: 0.5rem;
             align-items: center;
         }
+
+        /* Snapshot Summary Grid */
+        .snapshot-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .snapshot-summary-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .snapshot-summary-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-description {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
         
         .snapshot-single {
             text-align: center;
@@ -453,6 +497,11 @@
         @media (max-width: 480px) {
             .compact-info-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .snapshot-summary-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
         }
     </style>
@@ -690,20 +739,16 @@
                     <i class="fas fa-camera"></i> Save Current Snapshot
                 </button>
             </div>
-            <div class="grid-2 compact-cards">
-                <div class="card compact-card">
-                    <div class="card-body">
-                        <h5>Total Snapshots</h5>
-                        <div class="score-number compact-score" id="totalSnapshotsCount">0</div>
-                        <small class="text-secondary">Saved over time</small>
-                    </div>
+            <div class="snapshot-summary-grid">
+                <div class="snapshot-summary-item">
+                    <div class="summary-label">Total Snapshots</div>
+                    <div class="summary-value" id="totalSnapshotsCount">0</div>
+                    <div class="summary-description">Saved over time</div>
                 </div>
-                <div class="card compact-card">
-                    <div class="card-body">
-                        <h5>Latest Snapshot</h5>
-                        <div class="score-number compact-score" id="latestSnapshotDate">Never</div>
-                        <small class="text-secondary">Last saved</small>
-                    </div>
+                <div class="snapshot-summary-item">
+                    <div class="summary-label">Latest Snapshot</div>
+                    <div class="summary-value" id="latestSnapshotDate">Never</div>
+                    <div class="summary-description">Last saved</div>
                 </div>
             </div>
         </div>

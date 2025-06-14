@@ -368,13 +368,31 @@ function createAssetsChart(assetsData) {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = data.reduce((sum, value) => sum + value, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
     });
     
-    // Create legend
-    createChartLegend('assetsLegend', labels, colors.slice(0, data.length), data);
+    // Calculate total for percentages
+    const total = data.reduce((sum, value) => sum + value, 0);
+    
+    // Create legend with percentages
+    try {
+        createChartLegendWithPercentages('assetsChart', labels, colors.slice(0, data.length), data, total);
+    } catch (error) {
+        console.error('Error creating assets legend:', error);
+        // Fallback to simple legend
+        createChartLegend('assetsLegend', labels, colors.slice(0, data.length), data);
+    }
 }
 
 function createLiabilitiesChart(liabilitiesData) {
@@ -402,8 +420,10 @@ function createLiabilitiesChart(liabilitiesData) {
     });
     
     if (data.length === 0) {
-        document.getElementById('liabilitiesChart').parentElement.innerHTML = 
-            '<div class="no-data-message">No liabilities data available</div>';
+        const chartContainer = ctx.closest('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="no-data-message">No liabilities data available</div>';
+        }
         return;
     }
     
@@ -428,13 +448,31 @@ function createLiabilitiesChart(liabilitiesData) {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = data.reduce((sum, value) => sum + value, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
     });
     
-    // Create legend
-    createChartLegend('liabilitiesLegend', labels, colors.slice(0, data.length), data);
+    // Calculate total for percentages
+    const total = data.reduce((sum, value) => sum + value, 0);
+    
+    // Create legend with percentages
+    try {
+        createChartLegendWithPercentages('liabilitiesChart', labels, colors.slice(0, data.length), data, total);
+    } catch (error) {
+        console.error('Error creating liabilities legend:', error);
+        // Fallback to simple legend
+        createChartLegend('liabilitiesLegend', labels, colors.slice(0, data.length), data);
+    }
 }
 
 function displayIncomeExpenseBreakdown() {
