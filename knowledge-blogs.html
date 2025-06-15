@@ -295,7 +295,11 @@
         <!-- Error State -->
         <div id="errorContainer" class="error-message" style="display: none;">
             <i class="fas fa-exclamation-triangle"></i>
-            <p>Failed to load blog posts. Please try again later.</p>
+            <p id="errorMessage">Failed to load blog posts. Please try again later.</p>
+            <details style="margin-top: 1rem;">
+                <summary style="cursor: pointer; color: #dc2626;">Show technical details</summary>
+                <pre id="errorDetails" style="margin-top: 0.5rem; font-size: 0.8rem; background: #fef2f2; padding: 1rem; border-radius: 0.25rem; overflow: auto;"></pre>
+            </details>
         </div>
 
         <!-- Blogs Grid -->
@@ -325,7 +329,8 @@
                 const response = await fetch('/.netlify/functions/getBlogs');
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    throw new Error(`HTTP ${response.status}: ${errorData.message || errorData.error || 'Unknown error'}`);
                 }
                 
                 const data = await response.json();
@@ -346,6 +351,14 @@
             } catch (error) {
                 console.error('Error fetching blog posts:', error);
                 loadingContainer.style.display = 'none';
+                
+                // Show detailed error information
+                const errorMessage = document.getElementById('errorMessage');
+                const errorDetails = document.getElementById('errorDetails');
+                
+                errorMessage.textContent = 'Failed to load blog posts. Please try again later.';
+                errorDetails.textContent = `Error: ${error.message}\n\nThis might be due to:\n1. Network connectivity issues\n2. Server configuration problems\n3. Notion API access issues\n\nPlease check the browser's Network tab for more details.`;
+                
                 errorContainer.style.display = 'block';
             }
         }
