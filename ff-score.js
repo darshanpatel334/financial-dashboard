@@ -48,18 +48,33 @@ function loadDataFromPreviousPages() {
         document.getElementById('inflationRate').value = ffData.inflationRate;
     }
     
+    // Load weighted average expected returns
+    const weightedAverageData = Storage.get('weightedAverageReturns', {});
+    if (weightedAverageData.weightedAverageReturn && weightedAverageData.weightedAverageReturn > 0) {
+        ffData.assetGrowthRate = weightedAverageData.weightedAverageReturn;
+        document.getElementById('assetGrowthRate').value = ffData.assetGrowthRate.toFixed(2);
+    }
+    
     // Update display
-    document.getElementById('currentGrowthRate').textContent = ffData.assetGrowthRate + '%';
+    document.getElementById('currentGrowthRate').textContent = ffData.assetGrowthRate.toFixed(1) + '%';
 }
 
 // Calculate FF Score
 function calculateFFScore() {
-    // Get current values
-    ffData.assetGrowthRate = parseFloat(document.getElementById('assetGrowthRate').value) || 8;
+    // Load weighted average if available (for real-time updates)
+    const weightedAverageData = Storage.get('weightedAverageReturns', {});
+    if (weightedAverageData.weightedAverageReturn && weightedAverageData.weightedAverageReturn > 0) {
+        ffData.assetGrowthRate = weightedAverageData.weightedAverageReturn;
+        document.getElementById('assetGrowthRate').value = ffData.assetGrowthRate.toFixed(2);
+    } else {
+        // Get current values as fallback
+        ffData.assetGrowthRate = parseFloat(document.getElementById('assetGrowthRate').value) || 8;
+    }
+    
     ffData.inflationRate = parseFloat(document.getElementById('inflationRate').value) || 6;
     
     // Update display
-    document.getElementById('currentGrowthRate').textContent = ffData.assetGrowthRate + '%';
+    document.getElementById('currentGrowthRate').textContent = ffData.assetGrowthRate.toFixed(1) + '%';
     
     // Calculate the score
     ffData.currentScore = calculateFFScoreValue(ffData.netWorth, ffData.annualExpenses, ffData.assetGrowthRate, ffData.inflationRate);

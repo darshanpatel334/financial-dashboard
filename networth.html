@@ -762,8 +762,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Annual Yield %</label>
-                        <input type="number" step="0.1" placeholder="0" readonly style="background: #f8fafc;">
+                        <label>Expected Annual Returns %</label>
+                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals(); calculateWeightedAverageReturns()">
                     </div>
                 `;
             } else if (category === 'equity') {
@@ -780,6 +780,10 @@
                     <div class="form-group">
                         <label>% Dividend Yield</label>
                         <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
+                    </div>
+                    <div class="form-group">
+                        <label>Expected Annual Returns %</label>
+                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals(); calculateWeightedAverageReturns()">
                     </div>
                 `;
             } else if (category === 'fixedIncome') {
@@ -826,8 +830,8 @@
                         <div class="amount-display"></div>
                     </div>
                     <div class="form-group">
-                        <label>% Annual Return</label>
-                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals()">
+                        <label>% Annual Expected Return</label>
+                        <input type="number" step="0.1" placeholder="0" onchange="calculateTotals(); calculateWeightedAverageReturns()">
                     </div>
                 `;
             }
@@ -960,10 +964,11 @@
                 liquidNetWorthElement.textContent = `₹${liquidNetWorth.toLocaleString('en-IN')}`;
             }
 
-            // Auto-save and recalculate asset income
+            // Auto-save and recalculate asset income and weighted average
             setTimeout(() => {
                 saveNetWorthData();
                 calculateAssetIncome();
+                calculateWeightedAverageReturns();
             }, 500); // Reduced delay for faster saving
         }
 
@@ -1455,6 +1460,91 @@
         window.numberToWords = numberToWords;
         window.convertToMonthly = convertToMonthly;
         window.calculateAssetIncome = calculateAssetIncome;
+        window.calculateWeightedAverageReturns = calculateWeightedAverageReturns;
+        
+        // Calculate weighted average expected returns
+        function calculateWeightedAverageReturns() {
+            let totalAssets = 0;
+            let weightedSum = 0;
+            
+            // Calculate category totals first - include ALL asset categories
+            const categories = ['realEstate', 'equity', 'fixedIncome', 'cash', 'otherAssets'];
+            categories.forEach(category => {
+                let categoryTotal = 0;
+                let categoryExpectedReturn = 0;
+                let hasExpectedReturn = false;
+                
+                const items = document.querySelectorAll(`#${category}Items .asset-item`);
+                items.forEach(item => {
+                    let value = 0;
+                    let expectedReturn = 0;
+                    
+                    if (category === 'realEstate') {
+                        // For real estate, value is in the 4th input (Current Value)
+                        // Expected return is in the 7th input (Expected Annual Returns %)
+                        const inputs = item.querySelectorAll('input');
+                        value = parseFloat(inputs[3]?.value) || 0;
+                        expectedReturn = parseFloat(inputs[6]?.value) || 0;
+                    } else if (category === 'equity') {
+                        // For equity, value is in the 2nd input (Current Value)
+                        // Expected return is in the 4th input (Expected Annual Returns %)
+                        const inputs = item.querySelectorAll('input');
+                        value = parseFloat(inputs[1]?.value) || 0;
+                        expectedReturn = parseFloat(inputs[3]?.value) || 0;
+                    } else if (category === 'fixedIncome') {
+                        // For fixed income, value is in the 2nd input (Current Value)
+                        // Expected return is in the 3rd input (% Annual Interest)
+                        const inputs = item.querySelectorAll('input');
+                        value = parseFloat(inputs[1]?.value) || 0;
+                        expectedReturn = parseFloat(inputs[2]?.value) || 0;
+                    } else if (category === 'cash') {
+                        // For cash & bank, value is in the 2nd input (Current Value)
+                        // Expected return is in the 3rd input (% Annual Interest)
+                        const inputs = item.querySelectorAll('input');
+                        value = parseFloat(inputs[1]?.value) || 0;
+                        expectedReturn = parseFloat(inputs[2]?.value) || 0;
+                    } else if (category === 'otherAssets') {
+                        // For other assets, value is in the 2nd input (Current Value)
+                        // Expected return is in the 3rd input (% Annual Expected Return)
+                        const inputs = item.querySelectorAll('input');
+                        value = parseFloat(inputs[1]?.value) || 0;
+                        expectedReturn = parseFloat(inputs[2]?.value) || 0;
+                    }
+                    
+                    categoryTotal += value;
+                    if (expectedReturn > 0) {
+                        categoryExpectedReturn += value * expectedReturn;
+                        hasExpectedReturn = true;
+                    }
+                });
+                
+                // Add to total assets and weighted sum
+                totalAssets += categoryTotal;
+                if (hasExpectedReturn && categoryTotal > 0) {
+                    weightedSum += categoryExpectedReturn;
+                }
+            });
+            
+            // Calculate weighted average
+            const weightedAverageReturn = totalAssets > 0 ? (weightedSum / totalAssets) : 0;
+            
+            // Save weighted average for use in FF Score
+            const weightedAverageData = {
+                weightedAverageReturn: weightedAverageReturn,
+                totalAssetsWithReturns: totalAssets,
+                lastUpdated: Date.now()
+            };
+            
+            localStorage.setItem('weightedAverageReturns', JSON.stringify(weightedAverageData));
+            
+            // Update display if element exists
+            const displayElement = document.getElementById('weightedAverageDisplay');
+            if (displayElement) {
+                displayElement.textContent = `${weightedAverageReturn.toFixed(2)}%`;
+            }
+            
+            return weightedAverageReturn;
+        }
     </script>
     
     <!-- Include Chat Widget -->
