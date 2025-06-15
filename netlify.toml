@@ -119,6 +119,16 @@
   status = 301
 
 [[redirects]]
+  from = "/blog-post"
+  to = "/blog-post.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog-post.html"
+  to = "/blog-post"
+  status = 301
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post - Financial Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background-color: #f9fafb;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Loading State */
+        .loading-container {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            color: #dc2626;
+            background: #fef2f2;
+            border-radius: 0.5rem;
+            border: 1px solid #fecaca;
+        }
+
+        /* Blog Post Content */
+        .blog-post {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .blog-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .blog-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .blog-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .blog-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .blog-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #374151;
+        }
+
+        .blog-content h1, .blog-content h2, .blog-content h3 {
+            color: #1f2937;
+            margin: 2rem 0 1rem 0;
+            font-weight: 600;
+        }
+
+        .blog-content h1 { font-size: 2rem; }
+        .blog-content h2 { font-size: 1.5rem; }
+        .blog-content h3 { font-size: 1.25rem; }
+
+        .blog-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .blog-content ul, .blog-content ol {
+            margin: 1rem 0 1.5rem 2rem;
+        }
+
+        .blog-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .blog-content code {
+            background: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .blog-content pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .blog-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background-color: #f3f4f6;
+            color: #4f46e5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .blog-post {
+                padding: 1.5rem;
+            }
+
+            .blog-title {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">Financial Dashboard</a>
+            <a href="/knowledge-blogs" class="nav-link">← Back to Blogs</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Back Button -->
+        <a href="/knowledge-blogs" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Back to All Blogs
+        </a>
+
+        <!-- Loading State -->
+        <div id="loadingContainer" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Loading blog post...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorContainer" class="error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="errorMessage">Failed to load blog post. Please try again later.</p>
+        </div>
+
+        <!-- Blog Post Content -->
+        <article id="blogPostContainer" class="blog-post" style="display: none;">
+            <header class="blog-header">
+                <h1 id="blogTitle" class="blog-title"></h1>
+                <div class="blog-meta">
+                    <div id="blogDate" class="blog-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span></span>
+                    </div>
+                    <div id="blogTags" class="blog-tags"></div>
+                </div>
+            </header>
+            <div id="blogContent" class="blog-content"></div>
+        </article>
+    </main>
+
+    <script>
+        // Get blog ID from URL parameters
+        function getBlogIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+            const id = urlParams.get('id');
+            return { slug, id };
+        }
+
+        // Create slug from title
+        function createSlug(title) {
+            return title
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim('-');
+        }
+
+        // Extract title from Notion data
+        function extractTitle(post) {
+            if (post.properties?.Title?.title?.[0]?.plain_text) {
+                return post.properties.Title.title[0].plain_text;
+            }
+            if (post.properties?.Name?.title?.[0]?.plain_text) {
+                return post.properties.Name.title[0].plain_text;
+            }
+            return 'Untitled Post';
+        }
+
+        // Extract date from Notion data
+        function extractDate(post) {
+            if (post.properties?.Date?.date?.start) {
+                return new Date(post.properties.Date.date.start).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            if (post.created_time) {
+                return new Date(post.created_time).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            return '';
+        }
+
+        // Extract tags from Notion data
+        function extractTags(post) {
+            const tags = [];
+            
+            if (post.properties?.Tags?.multi_select) {
+                tags.push(...post.properties.Tags.multi_select.map(tag => tag.name));
+            }
+            if (post.properties?.Category?.select?.name) {
+                tags.push(post.properties.Category.select.name);
+            }
+            
+            return tags;
+        }
+
+        // Extract content from Notion data
+        function extractContent(post) {
+            // For now, we'll show the preview content
+            // In a full implementation, you'd fetch the full page content
+            let content = '';
+            
+            if (post.properties?.Content?.rich_text?.[0]?.plain_text) {
+                content = post.properties.Content.rich_text[0].plain_text;
+            } else if (post.properties?.Preview?.rich_text?.[0]?.plain_text) {
+                content = post.properties.Preview.rich_text[0].plain_text;
+            } else if (post.properties?.Description?.rich_text?.[0]?.plain_text) {
+                content = post.properties.Description.rich_text[0].plain_text;
+            }
+            
+            // Convert plain text to basic HTML formatting
+            return content
+                .split('\n\n')
+                .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+                .join('');
+        }
+
+        // Load and display blog post
+        async function loadBlogPost() {
+            const { slug, id } = getBlogIdFromUrl();
+            
+            if (!slug && !id) {
+                showError('No blog post specified. Please select a blog from the blogs page.');
+                return;
+            }
+
+            try {
+                // Fetch all blog posts to find the matching one
+                const response = await fetch('/.netlify/functions/getBlogs');
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    throw new Error(`HTTP ${response.status}: ${errorData.message || errorData.error || 'Unknown error'}`);
+                }
+                
+                const posts = await response.json();
+                
+                if (!posts || posts.length === 0) {
+                    showError('No blog posts found.');
+                    return;
+                }
+
+                // Find the post by slug or ID
+                let targetPost = null;
+                
+                if (slug) {
+                    targetPost = posts.find(post => {
+                        const postSlug = createSlug(extractTitle(post));
+                        return postSlug === slug;
+                    });
+                }
+                
+                if (!targetPost && id) {
+                    targetPost = posts.find(post => post.id === id);
+                }
+                
+                if (!targetPost) {
+                    showError('Blog post not found.');
+                    return;
+                }
+
+                displayBlogPost(targetPost);
+                
+            } catch (error) {
+                console.error('Error loading blog post:', error);
+                showError(`Failed to load blog post: ${error.message}`);
+            }
+        }
+
+        // Display the blog post
+        function displayBlogPost(post) {
+            const title = extractTitle(post);
+            const date = extractDate(post);
+            const tags = extractTags(post);
+            const content = extractContent(post);
+
+            // Update page title
+            document.title = `${title} - Financial Dashboard`;
+
+            // Display content
+            document.getElementById('blogTitle').textContent = title;
+            
+            const dateElement = document.querySelector('#blogDate span');
+            if (date) {
+                dateElement.textContent = date;
+                document.getElementById('blogDate').style.display = 'flex';
+            } else {
+                document.getElementById('blogDate').style.display = 'none';
+            }
+
+            const tagsContainer = document.getElementById('blogTags');
+            if (tags.length > 0) {
+                tagsContainer.innerHTML = tags.map(tag => 
+                    `<span class="tag">${tag}</span>`
+                ).join('');
+            } else {
+                tagsContainer.style.display = 'none';
+            }
+
+            document.getElementById('blogContent').innerHTML = content || '<p>Content not available.</p>';
+
+            // Show blog post and hide loading
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('blogPostContainer').style.display = 'block';
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('loadingContainer').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorContainer').style.display = 'block';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadBlogPost);
+    </script>
+</body>
+</html> 

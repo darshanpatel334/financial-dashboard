@@ -381,6 +381,7 @@
             const title = extractTitle(post);
             const tags = extractTags(post);
             const preview = extractPreview(post);
+            const blogUrl = createBlogUrl(post);
             
             card.innerHTML = `
                 <div class="blog-card-header">
@@ -393,9 +394,9 @@
                     <p class="blog-preview">${escapeHtml(preview)}</p>
                 </div>
                 <div class="blog-card-footer">
-                    <button class="read-more-btn" onclick="handleReadMore('${escapeHtml(title)}')">
+                    <a href="${blogUrl}" class="read-more-btn" style="display: inline-block; text-decoration: none; text-align: center;">
                         <i class="fas fa-arrow-right"></i> Read More
-                    </button>
+                    </a>
                 </div>
             `;
 
@@ -472,9 +473,21 @@
             return div.innerHTML;
         }
 
-        function handleReadMore(title) {
-            // Placeholder for read more functionality
-            alert(`Read More functionality for "${title}" will be implemented soon!`);
+        // Create slug from title
+        function createSlug(title) {
+            return title
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim('-');
+        }
+
+        // Create blog post URL
+        function createBlogUrl(post) {
+            const title = extractTitle(post);
+            const slug = createSlug(title);
+            return `/blog-post?slug=${encodeURIComponent(slug)}&id=${encodeURIComponent(post.id)}`;
         }
 
         // Initialize the page
