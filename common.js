@@ -1162,7 +1162,7 @@ const NAVIGATION_STEPS = [
     { id: 6, name: 'Insurance', page: 'insurance.html' },
     { id: 7, name: 'Risk Profile', page: 'risk-profile.html' },
     { id: 8, name: 'Dashboard', page: 'dashboard.html' },
-    { id: 9, name: 'Analytics', page: 'advisor.html' },
+    { id: 9, name: 'Analytics', page: 'analytics.html' },
     { id: 10, name: 'Find Advisor', page: 'find-advisor.html' }
 ];
 
