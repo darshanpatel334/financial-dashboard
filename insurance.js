@@ -365,11 +365,11 @@ function getInsuranceTypeName(category) {
 
 // Navigation functions
 function goBack() {
-    navigateToPage('ff-score.html', saveInsuranceData);
+    navigateToPage('ff-score', saveInsuranceData);
 }
 
 function goNext() {
-    navigateToPage('risk-profile.html', saveInsuranceData);
+    navigateToPage('risk-profile', saveInsuranceData);
 }
 
 // ===== EXPORT FUNCTIONS =====

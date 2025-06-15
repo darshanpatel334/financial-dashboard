@@ -1388,11 +1388,11 @@ async function saveCurrentSnapshot() {
 
 // Navigation functions
 function goBack() {
-    window.location.href = 'ff-score.html';
+    window.location.href = 'ff-score';
 }
 
 function goNext() {
-    window.location.href = 'find-advisor.html';
+    window.location.href = 'find-analytics';
 }
 
 // PDF Report Generation

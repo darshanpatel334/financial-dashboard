@@ -284,7 +284,7 @@ function getIncomeTypeName(category) {
 
 // Navigation functions
 function goBack() {
-    navigateToPage('networth.html', saveIncomeData);
+    navigateToPage('networth', saveIncomeData);
 }
 
 function goNext() {
@@ -292,7 +292,7 @@ function goNext() {
         showStatus('Please fill in at least one income source', 'error');
         return;
     }
-    navigateToPage('expenses.html', saveIncomeData);
+    navigateToPage('expenses', saveIncomeData);
 }
 
 // Validate income data

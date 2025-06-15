@@ -79,7 +79,7 @@ function handleSignUp(event) {
             
             // Use smart redirect to determine where to go
             setTimeout(() => {
-                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info.html';
+                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info';
                 window.location.href = nextPage;
             }, 1500);
         })
@@ -110,7 +110,7 @@ function handleLogin(event) {
             
             // Use smart redirect to determine where to go
             setTimeout(() => {
-                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info.html';
+                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info';
                 window.location.href = nextPage;
             }, 1500);
         })
@@ -126,7 +126,7 @@ function handleLogout() {
         .then(() => {
             showStatus('Logged out successfully!');
             // Redirect to landing page
-            window.location.href = 'index.html';
+            window.location.href = '/';
         })
         .catch((error) => {
             showStatus(error.message, true);
@@ -171,7 +171,7 @@ function handleGoogleSignIn() {
             
             // Use smart redirect to determine where to go
             setTimeout(() => {
-                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info.html';
+                const nextPage = window.smartRedirect ? window.smartRedirect() : 'personal-info';
                 window.location.href = nextPage;
             }, 1500);
         })

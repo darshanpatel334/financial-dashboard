@@ -286,11 +286,11 @@ function saveFFData() {
 
 // Navigation functions
 function goBack() {
-    navigateToPage('expenses.html', saveFFData);
+    navigateToPage('expenses', saveFFData);
 }
 
 function goNext() {
-    navigateToPage('insurance.html', saveFFData);
+    navigateToPage('insurance', saveFFData);
 }
 
 // ===== EXPORT FUNCTIONS =====

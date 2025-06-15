@@ -140,13 +140,13 @@ const Storage = {
                 
                 // Map localStorage keys to Firestore page names
                 const keyToPageMap = {
-                    'personalInfo': 'personal-info',
+                    'personalInfo': 'personal_info',
                     'netWorthData': 'networth',
                     'incomeData': 'income',
                     'expenseData': 'expenses',
                     'insuranceData': 'insurance',
-                    'riskProfileData': 'risk-profile',
-                    'ffScoreData': 'ff-score',
+                    'riskProfileData': 'risk_profile',
+                    'ffScoreData': 'ff_score',
                     'analyticsVisited': 'analytics'
                 };
                 
@@ -202,7 +202,7 @@ function checkAuth() {
             if (user) {
                 resolve(user);
             } else {
-                window.location.href = 'index.html';
+                window.location.href = '/';
             }
         });
     });
@@ -954,14 +954,14 @@ window.validateAllCalculations = validateAllCalculations;
 
 // Define the journey steps in order
 const JOURNEY_STEPS = [
-    { key: 'personalInfo', page: 'personal-info.html', name: 'Personal Information' },
-    { key: 'netWorthData', page: 'networth.html', name: 'Net Worth' },
-    { key: 'incomeData', page: 'income.html', name: 'Income Analysis' },
-    { key: 'expenseData', page: 'expenses.html', name: 'Expense Analysis' },
-    { key: 'ffScoreData', page: 'ff-score.html', name: 'FF Score' },
-    { key: 'insuranceData', page: 'insurance.html', name: 'Insurance' },
-    { key: 'riskProfileData', page: 'risk-profile.html', name: 'Risk Profile' },
-    { key: 'completed', page: 'dashboard.html', name: 'Dashboard' }
+            { key: 'personalInfo', page: 'personal-info', name: 'Personal Information' },
+        { key: 'netWorthData', page: 'networth', name: 'Net Worth' },
+        { key: 'incomeData', page: 'income', name: 'Income Analysis' },
+        { key: 'expenseData', page: 'expenses', name: 'Expense Analysis' },
+        { key: 'ffScoreData', page: 'ff-score', name: 'FF Score' },
+        { key: 'insuranceData', page: 'insurance', name: 'Insurance' },
+        { key: 'riskProfileData', page: 'risk-profile', name: 'Risk Profile' },
+        { key: 'completed', page: 'dashboard', name: 'Dashboard' }
 ];
 
 // Check user progress and determine where they should be redirected
@@ -973,16 +973,16 @@ function checkUserProgress() {
 // Get user progress with step validation
 function getUserProgress() {
     const steps = [
-        { key: 'personalInfo', page: 'personal-info.html', name: 'Personal Info' },
-        { key: 'netWorthData', page: 'networth.html', name: 'Net Worth' },
-        { key: 'incomeData', page: 'income.html', name: 'Income' },
-        { key: 'expenseData', page: 'expenses.html', name: 'Expenses' },
-        { key: 'ffScoreData', page: 'ff-score.html', name: 'FF Score' },
-        { key: 'insuranceData', page: 'insurance.html', name: 'Insurance' },
-        { key: 'riskProfileData', page: 'risk-profile.html', name: 'Risk Profile' },
-        { key: 'dashboard', page: 'dashboard.html', name: 'Dashboard' },
-        { key: 'analytics', page: 'advisor.html', name: 'Analytics' },
-        { key: 'findAdvisor', page: 'find-advisor.html', name: 'Find Advisor' }
+        { key: 'personalInfo', page: 'personal-info', name: 'Personal Info' },
+        { key: 'netWorthData', page: 'networth', name: 'Net Worth' },
+        { key: 'incomeData', page: 'income', name: 'Income' },
+        { key: 'expenseData', page: 'expenses', name: 'Expenses' },
+        { key: 'ffScoreData', page: 'ff-score', name: 'FF Score' },
+        { key: 'insuranceData', page: 'insurance', name: 'Insurance' },
+        { key: 'riskProfileData', page: 'risk-profile', name: 'Risk Profile' },
+        { key: 'dashboard', page: 'dashboard', name: 'Dashboard' },
+        { key: 'analytics', page: 'analytics', name: 'Analytics' },
+        { key: 'findAdvisor', page: 'find-advisor', name: 'Find Advisor' }
     ];
     
     let currentStep = 1;
@@ -1071,13 +1071,13 @@ function smartRedirect() {
     
     if (progress.isComplete) {
         // All steps completed, go to dashboard
-        return 'dashboard.html';
+        return 'dashboard';
     } else if (progress.current) {
         // Go to current incomplete step
         return progress.current.page;
     } else {
         // Start from beginning
-        return 'personal-info.html';
+        return 'personal-info';
     }
 }
 
@@ -1087,7 +1087,7 @@ function initProgressTracking() {
     const progress = checkUserProgress();
     
     // Only redirect if we're on landing page
-    if (currentPage === 'index.html') {
+            if (currentPage === 'index.html' || currentPage === '') {
         // If user has completed everything, show option to go to dashboard
         if (progress.isComplete) {
             showDashboardOption();
@@ -1154,16 +1154,16 @@ window.initProgressTracking = initProgressTracking;
 // Create and setup progress navigation for any page
 // Define navigation steps configuration
 const NAVIGATION_STEPS = [
-    { id: 1, name: 'Personal Info', page: 'personal-info.html' },
-    { id: 2, name: 'Net Worth', page: 'networth.html' },
-    { id: 3, name: 'Income', page: 'income.html' },
-    { id: 4, name: 'Expenses', page: 'expenses.html' },
-    { id: 5, name: 'FF Score', page: 'ff-score.html' },
-    { id: 6, name: 'Insurance', page: 'insurance.html' },
-    { id: 7, name: 'Risk Profile', page: 'risk-profile.html' },
-    { id: 8, name: 'Dashboard', page: 'dashboard.html' },
-    { id: 9, name: 'Analytics', page: 'analytics.html' },
-    { id: 10, name: 'Find Advisor', page: 'find-advisor.html' }
+            { id: 1, name: 'Personal Info', page: 'personal-info' },
+        { id: 2, name: 'Net Worth', page: 'networth' },
+        { id: 3, name: 'Income', page: 'income' },
+        { id: 4, name: 'Expenses', page: 'expenses' },
+        { id: 5, name: 'FF Score', page: 'ff-score' },
+        { id: 6, name: 'Insurance', page: 'insurance' },
+        { id: 7, name: 'Risk Profile', page: 'risk-profile' },
+        { id: 8, name: 'Dashboard', page: 'dashboard' },
+        { id: 9, name: 'Analytics', page: 'analytics' },
+        { id: 10, name: 'Find Advisor', page: 'find-advisor' }
 ];
 
 function setupPageNavigation(currentPageIndex = 1) {

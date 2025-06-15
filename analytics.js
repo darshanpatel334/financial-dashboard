@@ -561,20 +561,20 @@ function createCashFlowChart(monthlyIncome, monthlyExpenses) {
 
 // Navigation functions
 function goBack() {
-    window.location.href = 'dashboard.html';
+    window.location.href = 'dashboard';
 }
 
 function goToFindAdvisor() {
     showStatus('Navigating to Find Advisor page...', 'success');
     setTimeout(() => {
-        window.location.href = 'find-advisor.html';
+        window.location.href = 'find-analytics';
     }, 1000);
 }
 
 function completeJourney() {
     showStatus('Financial analytics review completed! You can always return to analyze your data.', 'success');
     setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = 'dashboard';
     }, 2000);
 }
 

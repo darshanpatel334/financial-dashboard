@@ -326,7 +326,7 @@ function saveRiskData() {
 
 // Navigation functions
 function goBack() {
-    navigateToPage('insurance.html', saveRiskData);
+    navigateToPage('insurance', saveRiskData);
 }
 
 function goNext() {
@@ -334,7 +334,7 @@ function goNext() {
         showStatus('Please complete the risk assessment before proceeding', 'error');
         return;
     }
-    navigateToPage('advisor.html', saveRiskData);
+    navigateToPage('analytics', saveRiskData);
 }
 
 // ===== EXPORT FUNCTIONS =====

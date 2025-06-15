@@ -284,7 +284,7 @@ function getExpenseTypeName(category) {
 
 // Navigation functions
 function goBack() {
-    navigateToPage('income.html', saveExpenseData);
+    navigateToPage('income', saveExpenseData);
 }
 
 function goNext() {
@@ -292,7 +292,7 @@ function goNext() {
         showStatus('Please add at least one expense category', 'error');
         return;
     }
-    navigateToPage('ff-score.html', saveExpenseData);
+    navigateToPage('ff-score', saveExpenseData);
 }
 
 // Validate expense data
