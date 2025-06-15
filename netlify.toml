@@ -57,6 +57,11 @@
   to = "/find-advisor.html"
   status = 200
 
+[[redirects]]
+  from = "/knowledge-blogs"
+  to = "/knowledge-blogs.html"
+  status = 200
+
 # Redirect .html URLs to clean URLs
 [[redirects]]
   from = "/personal-info.html"
@@ -106,6 +111,11 @@
 [[redirects]]
   from = "/find-advisor.html"
   to = "/find-advisor"
+  status = 301
+
+[[redirects]]
+  from = "/knowledge-blogs.html"
+  to = "/knowledge-blogs"
   status = 301
 
 [[redirects]]
