@@ -1,0 +1,21 @@
+{
+  "name": "financial-dashboard",
+  "version": "1.0.0",
+  "description": "Personal Finance Dashboard with Netlify Functions",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build process required for static site'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "finance",
+    "dashboard",
+    "netlify",
+    "notion"
+  ],
+  "author": "",
+  "license": "MIT"
+} 

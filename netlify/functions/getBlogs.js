@@ -1,3 +1,5 @@
+const fetch = require("node-fetch");
+
 exports.handler = async function (event, context) {
   const NOTION_TOKEN = process.env.NOTION_SECRET;
   const DATABASE_ID = "213907ff129980c6ac0fdcec0496a810";
