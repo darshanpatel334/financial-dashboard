@@ -6,6 +6,108 @@
   to = "/networth.html"
   status = 301
 
+# Clean URL redirects - remove .html extension
+[[redirects]]
+  from = "/personal-info"
+  to = "/personal-info.html"
+  status = 200
+
+[[redirects]]
+  from = "/networth"
+  to = "/networth.html"
+  status = 200
+
+[[redirects]]
+  from = "/income"
+  to = "/income.html"
+  status = 200
+
+[[redirects]]
+  from = "/expenses"
+  to = "/expenses.html"
+  status = 200
+
+[[redirects]]
+  from = "/ff-score"
+  to = "/ff-score.html"
+  status = 200
+
+[[redirects]]
+  from = "/insurance"
+  to = "/insurance.html"
+  status = 200
+
+[[redirects]]
+  from = "/risk-profile"
+  to = "/risk-profile.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/analytics"
+  to = "/analytics.html"
+  status = 200
+
+[[redirects]]
+  from = "/find-advisor"
+  to = "/find-advisor.html"
+  status = 200
+
+# Redirect .html URLs to clean URLs
+[[redirects]]
+  from = "/personal-info.html"
+  to = "/personal-info"
+  status = 301
+
+[[redirects]]
+  from = "/networth.html"
+  to = "/networth"
+  status = 301
+
+[[redirects]]
+  from = "/income.html"
+  to = "/income"
+  status = 301
+
+[[redirects]]
+  from = "/expenses.html"
+  to = "/expenses"
+  status = 301
+
+[[redirects]]
+  from = "/ff-score.html"
+  to = "/ff-score"
+  status = 301
+
+[[redirects]]
+  from = "/insurance.html"
+  to = "/insurance"
+  status = 301
+
+[[redirects]]
+  from = "/risk-profile.html"
+  to = "/risk-profile"
+  status = 301
+
+[[redirects]]
+  from = "/dashboard.html"
+  to = "/dashboard"
+  status = 301
+
+[[redirects]]
+  from = "/analytics.html"
+  to = "/analytics"
+  status = 301
+
+[[redirects]]
+  from = "/find-advisor.html"
+  to = "/find-advisor"
+  status = 301
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
