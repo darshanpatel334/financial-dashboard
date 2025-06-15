@@ -1011,7 +1011,20 @@
                             value: assetValue,
                             rentalAmount: parseFloat(inputs[4].value) || 0,
                             rentalFrequency: select?.value || 'monthly',
-                            yield: parseFloat(inputs[6].value) || 0
+                            expectedReturn: parseFloat(inputs[6].value) || 0
+                        });
+                        
+                        // Add to liquid assets if it's a liquid category
+                        if (liquidCategories.includes(category)) {
+                            liquidAssets += assetValue;
+                        }
+                    } else if (category === 'equity' && inputs.length >= 4) {
+                        const assetValue = parseFloat(inputs[1].value) || 0;
+                        data.assets[category].push({
+                            name: inputs[0].value,
+                            value: assetValue,
+                            dividendYield: parseFloat(inputs[2].value) || 0,
+                            expectedReturn: parseFloat(inputs[3].value) || 0
                         });
                         
                         // Add to liquid assets if it's a liquid category
@@ -1118,69 +1131,155 @@
         }
 
         function loadNetWorthFromData(data) {
-            // Load assets
-            Object.keys(data.assets || {}).forEach(category => {
-                data.assets[category].forEach(asset => {
-                    addAssetItem(category, category === 'realEstate' ? 'Real Estate' : 
-                               category === 'cash' ? 'Cash & Bank' :
-                               category === 'equity' ? 'Equity' : 
-                               category === 'fixedIncome' ? 'Fixed Income' : 'Other Asset');
-                    
-                    const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
-                    const inputs = lastItem.querySelectorAll('input');
-                    const select = lastItem.querySelector('select');
-                    
-                    if (category === 'realEstate') {
-                        inputs[0].value = asset.name || '';
-                        inputs[1].value = asset.pricePerSqFt || 0;
-                        inputs[2].value = asset.totalArea || 0;
-                        inputs[3].value = asset.value || 0;
-                        inputs[4].value = asset.rentalAmount || 0;
-                        if (select) select.value = asset.rentalFrequency || 'monthly';
-                        inputs[6].value = asset.yield || 0;
-                        updateWords(inputs[3]);
-                    } else {
-                        inputs[0].value = asset.name || '';
-                        inputs[1].value = asset.value || 0;
-                        inputs[2].value = asset.yield || 0;
-                        updateWords(inputs[1]);
+            try {
+                // Clear existing items first to prevent duplication
+                const categories = ['realEstate', 'cash', 'equity', 'fixedIncome', 'otherAssets'];
+                categories.forEach(category => {
+                    const container = document.getElementById(category + 'Items');
+                    if (container) {
+                        container.innerHTML = '';
                     }
                 });
-            });
+                
+                // Load assets
+                Object.keys(data.assets || {}).forEach(category => {
+                    if (data.assets[category] && Array.isArray(data.assets[category])) {
+                        data.assets[category].forEach(asset => {
+                            try {
+                                addAssetItem(category, category === 'realEstate' ? 'Real Estate' : 
+                                           category === 'cash' ? 'Cash & Bank' :
+                                           category === 'equity' ? 'Equity' : 
+                                           category === 'fixedIncome' ? 'Fixed Income' : 'Other Asset');
+                                
+                                const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
+                                if (!lastItem) {
+                                    console.error('Failed to create asset item for category:', category);
+                                    return;
+                                }
+                                
+                                const inputs = lastItem.querySelectorAll('input');
+                                const select = lastItem.querySelector('select');
+                                
+                                if (category === 'realEstate') {
+                                    if (inputs.length >= 7) {
+                                        inputs[0].value = asset.name || '';
+                                        inputs[1].value = asset.pricePerSqFt || 0;
+                                        inputs[2].value = asset.totalArea || 0;
+                                        inputs[3].value = asset.value || 0;
+                                        inputs[4].value = asset.rentalAmount || 0;
+                                        if (select) select.value = asset.rentalFrequency || 'monthly';
+                                        inputs[6].value = asset.expectedReturn || asset.yield || 0; // Handle both old and new data
+                                        updateWords(inputs[3]);
+                                    } else {
+                                        console.error('Insufficient inputs for real estate item:', inputs.length);
+                                    }
+                                } else if (category === 'equity') {
+                                    if (inputs.length >= 4) {
+                                        inputs[0].value = asset.name || '';
+                                        inputs[1].value = asset.value || 0;
+                                        inputs[2].value = asset.dividendYield || asset.yield || 0; // Handle dividend yield
+                                        inputs[3].value = asset.expectedReturn || 0; // Handle expected return
+                                        updateWords(inputs[1]);
+                                    } else if (inputs.length >= 3) {
+                                        // Handle old equity data format
+                                        inputs[0].value = asset.name || '';
+                                        inputs[1].value = asset.value || 0;
+                                        inputs[2].value = asset.yield || 0;
+                                        updateWords(inputs[1]);
+                                    }
+                                } else {
+                                    if (inputs.length >= 3) {
+                                        inputs[0].value = asset.name || '';
+                                        inputs[1].value = asset.value || 0;
+                                        inputs[2].value = asset.yield || 0;
+                                        updateWords(inputs[1]);
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('Error loading asset item:', error, asset);
+                            }
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Error in loadNetWorthFromData:', error);
+                showStatus('Error loading some saved data. Some items may not display correctly.', 'warning');
+            }
 
-            // Load liabilities
-            (data.liabilities || []).forEach(liability => {
-                addLiabilityItem();
-                const lastItem = document.querySelector('#liabilityItems .asset-item:last-child');
-                const select = lastItem.querySelector('select');
-                const inputs = lastItem.querySelectorAll('input');
-                select.value = liability.type;
-                inputs[0].value = liability.amount;
-                inputs[1].value = liability.tenure;
-                updateWords(inputs[0]);
-            });
-
-            // Load recurring investments
-            const recurringData = data.recurringInvestments || {};
-            Object.keys(recurringData).forEach(category => {
-                if (recurringData[category]) {
-                    recurringData[category].forEach(item => {
-                        const categoryName = category === 'sip' ? 'Mutual Fund SIP' : 
-                                            category === 'rd' ? 'Recurring Deposit' : 'Savings Scheme';
-                        addRecurringItem(category, categoryName);
-                        
-                        const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
-                        const inputs = lastItem.querySelectorAll('input');
-                        const select = lastItem.querySelector('select');
-                        inputs[0].value = item.name || '';
-                        inputs[1].value = item.amount || 0;
-                        select.value = item.frequency || 'monthly';
-                    });
+            try {
+                // Load liabilities
+                const liabilityContainer = document.getElementById('liabilityItems');
+                if (liabilityContainer) {
+                    liabilityContainer.innerHTML = '';
                 }
-            });
+                
+                (data.liabilities || []).forEach(liability => {
+                    try {
+                        addLiabilityItem();
+                        const lastItem = document.querySelector('#liabilityItems .asset-item:last-child');
+                        if (lastItem) {
+                            const select = lastItem.querySelector('select');
+                            const inputs = lastItem.querySelectorAll('input');
+                            if (select && inputs.length >= 2) {
+                                select.value = liability.type || '';
+                                inputs[0].value = liability.amount || 0;
+                                inputs[1].value = liability.tenure || 0;
+                                updateWords(inputs[0]);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error loading liability item:', error, liability);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading liabilities:', error);
+            }
 
-            calculateTotals();
-            calculateRecurringTotals();
+            try {
+                // Load recurring investments
+                const recurringCategories = ['sip', 'rd', 'otherSavings'];
+                recurringCategories.forEach(category => {
+                    const container = document.getElementById(category + 'Items');
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+                });
+                
+                const recurringData = data.recurringInvestments || {};
+                Object.keys(recurringData).forEach(category => {
+                    if (recurringData[category] && Array.isArray(recurringData[category])) {
+                        recurringData[category].forEach(item => {
+                            try {
+                                const categoryName = category === 'sip' ? 'Mutual Fund SIP' : 
+                                                    category === 'rd' ? 'Recurring Deposit' : 'Savings Scheme';
+                                addRecurringItem(category, categoryName);
+                                
+                                const lastItem = document.querySelector(`#${category}Items .asset-item:last-child`);
+                                if (lastItem) {
+                                    const inputs = lastItem.querySelectorAll('input');
+                                    const select = lastItem.querySelector('select');
+                                    if (inputs.length >= 2 && select) {
+                                        inputs[0].value = item.name || '';
+                                        inputs[1].value = item.amount || 0;
+                                        select.value = item.frequency || 'monthly';
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('Error loading recurring item:', error, item);
+                            }
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading recurring investments:', error);
+            }
+
+            try {
+                calculateTotals();
+                calculateRecurringTotals();
+            } catch (error) {
+                console.error('Error calculating totals:', error);
+            }
         }
 
         function goBack() {

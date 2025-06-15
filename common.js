@@ -1326,10 +1326,10 @@ function setupPageNavigation(currentPageIndex = 1) {
     `;
     
     // Check if navigation already exists to avoid duplicates
-    if (document.getElementById('progressNavigation')) {
-        console.log('Navigation already exists, refreshing...');
-        setupNavigationInteractions();
-        return;
+    const existingNav = document.getElementById('progressNavigation');
+    if (existingNav) {
+        console.log('Navigation already exists, removing and recreating...');
+        existingNav.remove();
     }
     
     // Find insertion point - look for navigation section, then container, then body
